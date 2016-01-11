@@ -1,0 +1,23 @@
+//by jcy
+//time:2011-12-12
+//name:msgdatadef_sip.proto
+
+package DICE;
+message TSipVia
+{
+	required TSipUri uri = 1;
+	required string  branch = 2;
+	optional string  rport = 3;
+	optional string  received = 4;
+}
+
+message TSipUri
+{
+	required string     host = 1;
+	optional string     port = 2;
+}
+
+message TSipVias
+{
+	repeated TSipVia vias  = 1;
+}

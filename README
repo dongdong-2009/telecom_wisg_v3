@@ -1,0 +1,51 @@
+#######################################################
+# File:       README
+# Author:     zhangyadong
+# Created on: 2014-11-28
+########################################################
+#README:
+#	
+########################################################
+use utf-8 encoding to see the content
+
+v2.3 将与XMS重协商的UPDATE改为re-invite,可能会出现503 reinvite-inside-reinvite错误，（因为没有给XMS回复ACK）
+#2015-12-01 by zhangyadong in GuangZhou
+将信令网关直接和媒体服务器XMS对接，去掉媒体网关
+添加信令网关的彩铃支持，对180、183、update的sdp提供支持
+对于XMS部署到公网后，XMS对UPDATE返回200 OK的SDP携带的确实内网的地址，本版本的网关将对其进行修改
+
+
+#Added on: 2014-11-18 by zhangyadong
+1.add sip-psa module into projects
+
+#Added on: 2014-12-22 by zhangyadong
+1.modified domain setting, webrtc client should dail ims number or conference number without domain
+2.add UPDATE message body
+
+#Added on: 2014-12-29 by zhangyadong
+1.add sdp to OK and ACK message body
+2.add handle state for INFO and UPDATE to state machine 
+
+工程目录结构
+辅助文件目录:
+doc 存放有关文档,可使用make doc命令生成.
+tools 为工程使用的工具
+test-tools 为测试工具
+源码目录:
+utils 为各子模块的公用函数
+
+    
+使用方法:
+在根目录下使用make命令编译整个工程
+一般使用make all&&make deploy
+
+运行signal gateway方法:
+在目录unidir下运行mcf
+
+
+++++注意事项:++++
+运行之前可能需要将生成的目标文件拷贝到unidir相应位置去.
+如.so文件需要放入unidir/app
+
+如果程序编译或者运行不成功，请先确保mcf和psasip安装成功。
+如果运行时，数据库无法连接，请在/unidir/etc/目录下修改配置文件，重新指定数据库

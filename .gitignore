@@ -1,0 +1,4 @@
+*.[oa]
+*.so
+
+!unidir/lib/libutils.a

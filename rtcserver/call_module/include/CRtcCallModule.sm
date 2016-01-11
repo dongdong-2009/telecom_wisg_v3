@@ -1,0 +1,173 @@
+%{
+/*********************************************************************
+ * Copyright (c)2010-2012, by BUPT
+ * All rights reserved.
+
+ * FileName:       CRtcCallModule.sm
+ * System:         webrtc
+ * SubSystem:      gateway
+ * Author:         Liu Mingshuan
+ * Date:           2012.11.26
+ * Version:        1.0
+ * Description:
+     RtcCallModule state machine。
+
+ *
+ * Last Modified:
+     2013-4-17 add Default state
+            By Liu Mingshuan.
+*******************************************************************************/
+%}
+/* all possible sate
+ * IDLE			initial. be careful , new added
+ * CLOSED		recv ok and last state is SHUTDOWN, or Error happpend, or timeout
+ * OFFER		recv offer
+ * ANSWER		recv answer
+ * ACTIVE 		recv ok and last state is ANSWER
+ * SHUTDOWN		recv shutdown
+*/
+//指明.sm服务的实际Task类
+%class CRtcCallModule
+//指明需要SMC生成的代码包含哪个文件。只能一个。如多于一个将被忽略。
+%header CRtcCallModule.h 
+//初始状态
+%start CRtcCallModState::IDLE 
+//生成的状态集合名称
+%map CRtcCallModState 
+%%
+
+IDLE
+{
+    onMessage(msg:TUniNetMsg*)
+    [(RTC_OFFER == msg->msgName)] // transition guard语句
+    OFFER 
+    {
+        setTimer(RTC_CONNECTION_TIMEOUT);
+        sendToDispatcher(msg);
+    }
+}
+
+OFFER
+{
+    onMessage(msg:TUniNetMsg*)
+    [(RTC_ANSWER == msg->msgName)] // transition guard语句
+    ANSWER 
+    {
+    	sendToDispatcher(msg);
+    }
+    
+    onMessage(msg:TUniNetMsg*)
+    [(RTC_ERROR == msg->msgName)] // transition guard语句
+    CLOSED 
+    {
+    	sendToDispatcher(msg);
+    }
+    
+    onMessage(msg:TUniNetMsg*)
+    [(RTC_SHUTDOWN == msg->msgName)] // new add 3.28
+    CLOSED 
+    {
+    	sendToDispatcher(msg);
+    }
+    
+    onTimeOut(timerMark:TTimeMarkExt)
+    CLOSED
+    {
+  //  	stopTimer();
+    }
+}
+
+ANSWER
+{
+    onMessage(msg:TUniNetMsg*)
+    [(RTC_OK == msg->msgName)] // transition guard语句
+    ACTIVE 
+    {
+    	stopTimer();
+    	sendToDispatcher(msg);
+    }
+    
+    onMessage(msg:TUniNetMsg*)
+    [(RTC_ERROR == msg->msgName)] // transition guard语句
+    CLOSED 
+    {
+    	sendToDispatcher(msg);
+    }
+    
+    onTimeOut(timerMark:TTimeMarkExt)
+    CLOSED
+    {
+    	stopTimer();
+    }
+}
+
+ACTIVE
+{
+    onMessage(msg:TUniNetMsg*)
+    [(RTC_SHUTDOWN == msg->msgName) && true == ctxt.isByeFromSip(msg)] // transition guard语句
+    SHUTDOWN 
+    {
+    	sendToDispatcher(msg);
+    	setTimer(RTC_SHUTDOWN_TIMEOUT);
+    }
+    
+    onMessage(msg:TUniNetMsg*)
+    [(RTC_SHUTDOWN == msg->msgName) && true == ctxt.isByeFromRtc(msg)] // transition guard语句
+    SHUTDOWN 
+    {
+    	sendToDispatcher(msg);
+    	sendBackOK(msg);
+    	setTimer(RTC_SHUTDOWN_TIMEOUT);		// 等待超时
+    }
+    
+}
+
+SHUTDOWN
+{
+	onMessage(msg:TUniNetMsg*)
+    [(RTC_OK == msg->msgName)] // transition guard语句
+    CLOSED 
+    {
+   // 	sendToDispatcher(msg);
+    }
+    
+    onMessage(msg:TUniNetMsg*)
+    [(RTC_ERROR == msg->msgName)] // transition guard语句
+    CLOSED 
+    {
+   // 	sendToDispatcher(msg);
+    }
+    
+    onTimeOut(timerMark:TTimeMarkExt)
+    CLOSED
+    {
+    	stopTimer();	// stop RTC_SHUTDOWN_TIMEOUT
+    }
+}
+
+CLOSED
+Entry
+{
+	endTask();
+}
+{
+//	nil
+//	{
+//		endTask();
+//	}
+}
+
+Default
+{
+	onMessage(msg:TUniNetMsg*)
+	nil
+	{
+		endTask();
+	}
+	onTimeOut(timerMark:TTimeMarkExt)
+	nil
+	{
+		endTask();
+	}
+}
+%%

@@ -1,0 +1,603 @@
+/************************************************************************
+
+ * Copyright (c)2010-2012, by BUPT
+ * All rights reserved.
+
+ * FileName：       exosiptranslator.C
+ * System：         MCF
+ * SubSystem：      PSA
+ * Author：         Huang Haiping
+ * Date：           2010.04.07
+ * Version：        1.0
+ * Description：
+        eXosip 中间消息转换器
+
+ *
+ * Last Modified:
+	  2010.04.07, 完成初始版本定义
+		 By Huang Haiping
+
+
+*************************************************************************/
+#include "exosiptranslator.h"
+#include <stdlib.h>
+#include <string.h>
+#include "comfunction.h"
+#include "msghelper_sip.h"
+
+namespace ExosipTranslator
+{
+PTSipCtrlMsg convertCtrlMsg2MCF(osip_message_t *sip, PTSipCtrlMsg pCtrlMsg)
+{
+	osip_via_t *via = NULL;
+
+	// from
+	convertOsipFrom2MCF(sip->from, pCtrlMsg->from);
+
+	// to
+	convertOsipTo2MCF(sip->to, pCtrlMsg->to);
+
+	// via
+	osip_message_get_via(sip, 0, &via);
+
+	if (NULL != via)
+	{
+		convertOsipVia2MCF(via, pCtrlMsg->via);
+	}
+
+	// TODO: route?
+
+	// call id
+	convertOsipCallId2MCF(osip_message_get_call_id(sip), pCtrlMsg->sip_callId);
+
+	// cseq number
+	// cseq method
+	osip_cseq_t *cseq = NULL;
+	cseq = osip_message_get_cseq(sip);
+	pCtrlMsg->cseq_method = cseq->method;
+	pCtrlMsg->cseq_number = cseq->number;
+
+	return pCtrlMsg;
+}
+
+osip_message_t* convertMCF2CtrlMsg(PCTSipCtrlMsg pCtrlMsg, osip_message_t *sip)
+{
+	CHAR *tmp = NULL;
+
+	osip_from_t *from = NULL;
+	osip_to_t *to = NULL;
+
+	osip_from_init(&from);
+	osip_from_init(&to);
+
+	// from, to
+	convertMCF2OsipFrom(pCtrlMsg->from, from);
+	convertMCF2OsipTo(pCtrlMsg->to, to);
+	if (pCtrlMsg->from.tag.length() == 0)
+	{
+		osip_generic_param_t *tag = NULL;
+		if (OSIP_SUCCESS == osip_from_get_tag(from, &tag))
+		{
+			osip_from_set_tag(from, osip_strdup(tag->gvalue));
+		}
+	}
+	if (pCtrlMsg->to.tag.length() > 0)
+	{
+		osip_generic_param_t *tag = NULL;
+		if (OSIP_SUCCESS == osip_to_get_tag(to, &tag))
+		{
+			osip_to_set_tag(to, osip_strdup(tag->gvalue));
+		}
+	}
+
+	if (sip->from) osip_from_free(sip->from);
+	if (sip->to) osip_to_free(sip->to);
+
+	sip->from = from;
+	sip->to = to;
+
+
+	// TODO: via
+
+
+	// Route
+	// Route is set outside
+//	osip_route_t* route = NULL;
+//	char* routeStr = NULL;
+//	if (pCtrlMsg->route.url.host.length() > 0)
+//	{
+//		osip_route_init(&route);
+//		ExosipTranslator::convertMCF2OsipRoute(pCtrlMsg->route, route);
+//		osip_route_to_str(route, &routeStr);
+//
+//		osip_message_set_route(sip, routeStr);
+//	}
+
+
+	// call id
+	osip_call_id_t* callId = NULL;
+	if (pCtrlMsg->sip_callId.number.length() > 0)
+	{
+		osip_call_id_init(&callId);
+		convertMCF2OsipCallId(pCtrlMsg->sip_callId, callId);
+		osip_call_id_free(sip->call_id);
+		sip->call_id = callId;
+	}
+
+	// cseq number
+	// cseq method
+//	osip_cseq_t *cseq = NULL;
+//
+//	if (pCtrlMsg->cseq_method.length() > 0
+//			|| pCtrlMsg->cseq_number.length() > 0)
+//	{
+//		osip_cseq_init(&cseq);
+//		if (pCtrlMsg->cseq_method.length() > 0)
+//		{
+//			osip_cseq_set_number(cseq,
+//					osip_strdup(pCtrlMsg->cseq_number.c_str()));
+//		}
+//		if (pCtrlMsg->cseq_number.length() > 0)
+//		{
+//			osip_cseq_set_number(cseq,
+//					osip_strdup(pCtrlMsg->cseq_number.c_str()));
+//		}
+
+		//osip_cseq_free(osip_message_get_cseq(sip));
+		//char *tmp = NULL;
+		//osip_cseq_to_str(cseq, &tmp);
+		//osip_message_set_cseq(sip, tmp);
+		//osip_free(tmp);
+		//sip->cseq = cseq;
+		//osip_cseq_free(cseq);
+	//}
+}
+
+/* Convert SIP request */
+RTSipReq convertOsipReq2MCF(osip_message_t *req, RTSipReq mcfReq)
+{
+	convertOsipUri2MCF(req->req_uri, mcfReq.req_uri);
+
+	return mcfReq;
+}
+
+osip_message_t* convertMCF2OsipReq(RCTSipReq mcfReq, osip_message_t *req)
+{
+	convertMCF2OsipUri(mcfReq.req_uri, req->req_uri);
+
+	return req;
+}
+
+RTSipResp convertOsipResp2MCF(osip_message_t *response, RTSipResp mcfResp)
+{
+	mcfResp.statusCode = response->status_code;
+	mcfResp.reason_phase = response->reason_phrase;
+
+	if (200 == mcfResp.statusCode)
+	{
+		osip_body_t *body = NULL;
+
+		osip_message_get_body(response, 0, &body);
+		if (NULL != body)
+		{
+			convertOsipBody2MCF(body, mcfResp.body);
+		}
+
+		osip_content_type_t* contentType = NULL;
+		contentType = osip_message_get_content_type(response);
+		if (contentType != NULL)
+		{
+			convertOsipContentType2MCF(contentType, mcfResp.content_type);
+		}
+	}
+
+	return mcfResp;
+}
+
+osip_message_t* convertMCF2OsipResp(RCTSipResp mcfResp, osip_message_t *response)
+{
+	osip_message_set_status_code(response, mcfResp.statusCode);
+
+	if (mcfResp.reason_phase.length() > 0)
+	{
+		osip_free(response->reason_phrase);
+		response->reason_phrase = osip_strdup(mcfResp.reason_phase.c_str());
+	}
+
+	// 200 ok body
+	if (mcfResp.statusCode == 200)
+	{
+		// body and content type
+		if (mcfResp.body.content_length > 0)
+		{
+			osip_message_set_body(response, mcfResp.body.content.c_str(),
+					mcfResp.body.content.length());
+
+			osip_message_set_content_type(response, CSipMsgHelper::toString(mcfResp.content_type).c_str());
+		}
+	}
+
+	return response;
+}
+
+RTSipCallId convertOsipCallId2MCF(osip_call_id_t *callId, RTSipCallId mcfCallId)
+{
+	mcfCallId.number = osip_call_id_get_number(callId);
+	mcfCallId.host = osip_call_id_get_host(callId);
+
+	return mcfCallId;
+}
+
+osip_call_id_t* convertMCF2OsipCallId(RCTSipCallId mcfCallId, osip_call_id_t *callId)
+{
+	if (mcfCallId.number.length() > 0)
+	{
+		osip_call_id_set_number(callId, osip_strdup(mcfCallId.number.c_str()));
+	}
+
+	if (mcfCallId.host.length() > 0)
+	{
+		osip_call_id_set_host(callId, osip_strdup(mcfCallId.host.c_str()));
+	}
+
+	return callId;
+}
+
+RTSipAddress convertOsipFrom2MCF(osip_from_t * osipFrom, RTSipAddress mcfFrom)
+{
+	osip_uri_t *fromurl = osip_from_get_url(osipFrom);
+
+	// Process URI
+	convertOsipUri2MCF(fromurl, mcfFrom.url);
+
+	// Process displayname
+	mcfFrom.displayname = osip_from_get_displayname(osipFrom);
+
+	// Process tag
+	osip_generic_param_t *tag = NULL;
+
+	if (OSIP_SUCCESS == osip_from_get_tag(osipFrom, &tag))
+	{
+		mcfFrom.tag = tag->gvalue;
+	}
+
+	return mcfFrom;
+}
+
+osip_from_t* convertMCF2OsipFrom(RCTSipAddress mcfFrom, osip_from_t *osipFrom)
+{
+	osip_uri_t *url = NULL;
+
+	osip_uri_free(osip_from_get_url(osipFrom));
+	osip_from_set_url(osipFrom, NULL);
+
+	// Process URI
+	osip_uri_init(&url);
+	convertMCF2OsipUri(mcfFrom.url, url);
+	osip_from_set_url(osipFrom, url);
+
+	// Process displayname
+	osip_free(osipFrom->displayname);
+	osip_from_set_displayname(osipFrom, NULL);
+
+	if (mcfFrom.displayname.length() > 0)
+	{
+		osip_from_set_displayname(osipFrom, osip_strdup(mcfFrom.displayname.c_str()));
+	}
+
+	// Process tag
+	if (mcfFrom.tag.length() > 0)
+		{ osip_from_set_tag(osipFrom, osip_strdup(mcfFrom.tag.c_str())); }
+
+	return osipFrom;
+}
+
+RTSipURI convertOsipUri2MCF(osip_uri_t *osipUri, RTSipURI mcfSipUri)
+{
+	mcfSipUri.scheme = osip_uri_get_scheme(osipUri);
+	mcfSipUri.username = osip_uri_get_username(osipUri);
+//	mcfSipUri.password = osip_uri_get_password(osipUri);
+	mcfSipUri.host = osip_uri_get_host(osipUri);
+	mcfSipUri.port = osip_uri_get_port(osipUri);
+
+	return mcfSipUri;
+}
+
+osip_uri_t* convertMCF2OsipUri(RCTSipURI mcfSipUri, osip_uri_t *osipUri)
+{
+	osip_free(osipUri->scheme);
+	osip_uri_set_scheme(osipUri, NULL);
+	if (mcfSipUri.scheme.length() > 0)
+		{ osip_uri_set_scheme(osipUri, osip_strdup(mcfSipUri.scheme.c_str())); }
+
+	osip_free(osipUri->username);
+	osip_uri_set_username(osipUri, NULL);
+	if (mcfSipUri.username.length() > 0)
+		{ osip_uri_set_username(osipUri, osip_strdup(mcfSipUri.username.c_str())); }
+
+//	osip_free(osipUri->password);
+//	osip_uri_set_password(osipUri, NULL);
+//	if (mcfSipUri.password.length() > 0)
+//		{ osip_uri_set_password(osipUri, osip_strdup(mcfSipUri.password.c_str())); }
+
+	osip_free(osipUri->host);
+	osip_uri_set_host(osipUri, NULL);
+	if (mcfSipUri.host.length() > 0)
+		{ osip_uri_set_host(osipUri, osip_strdup(mcfSipUri.host.c_str())); }
+
+	osip_free(osipUri->port);
+	osip_uri_set_port(osipUri, NULL);
+	if (mcfSipUri.port.length() > 0)
+		{ osip_uri_set_port(osipUri, osip_strdup(mcfSipUri.port.c_str())); }
+
+	return osipUri;
+}
+
+/* Convert osip via */
+RTSipVia convertOsipVia2MCF(osip_via_t *osipVia, RTSipVia mcfVia)
+{
+	osip_generic_param_t *branch = NULL;
+
+	if (OSIP_SUCCESS == osip_via_param_get_byname(osipVia, "branch", &branch))
+	{
+		mcfVia.branch = branch->gvalue;
+	}
+	mcfVia.url.host = osip_via_get_host(osipVia);
+	mcfVia.url.port = osip_via_get_port(osipVia);
+	return mcfVia;
+}
+
+osip_via_t* convertMCF2OsipVia(RCTSipVia mcfVia, osip_via_t* osipVia)
+{
+// TODO: 提供对MCF向osip_via的解析
+	return NULL;
+}
+
+/* Convert osip route */
+RTSipAddress convertOsipRoute2MCF(osip_route_t* osipRoute, RTSipAddress mcfRoute)
+{
+// TODO: 提供osip_route向MCF的解析
+	return mcfRoute;
+}
+
+osip_route_t* convertMCF2OsipRoute(RCTSipAddress mcfRoute, osip_route_t* osipRoute)
+{
+	convertMCF2OsipFrom(mcfRoute, (osip_from_t*) osipRoute);
+	osip_uri_uparam_add(osipRoute->url, osip_strdup("lr"), NULL);
+	return osipRoute;
+}
+
+RTSipRegister convertOsipRegister2MCF(osip_message_t *registerMsg, RTSipRegister mcfReg)
+{
+	// req_uri
+	convertOsipUri2MCF(registerMsg->req_uri, mcfReg.req_uri);
+
+	// contact
+	osip_contact_t *contact = NULL;
+	if (OSIP_SUCCESS == osip_message_get_contact(registerMsg, 0, &contact))
+		{ convertOsipContact2MCF(contact, mcfReg.contact); }
+
+	// expires
+	osip_header_t* expiresHeader = NULL;
+	osip_message_header_get_byname(registerMsg, "Expires", 0, &expiresHeader);
+	if (NULL != expiresHeader)
+	{
+		mcfReg.expires = osip_atoi(expiresHeader->hvalue);
+	}
+	else
+	{
+		mcfReg.expires = -1;
+	}
+
+	return mcfReg;
+}
+
+osip_message_t* convertMCF2OsipRegister(RCTSipRegister mcfReg, osip_message_t *registerMsg)
+{
+	// req_uri
+	convertMCF2OsipUri(mcfReg.req_uri, registerMsg->req_uri);
+
+	// contact
+	CVarChar contactStr = CSipMsgHelper::toString(mcfReg.contact);
+	if (contactStr.length() > 0)
+	{
+		osip_message_set_contact(registerMsg, contactStr.c_str());
+	}
+
+	// expires
+	if (mcfReg.expires != -1)
+	{ osip_message_set_expires(registerMsg, itostr(mcfReg.expires)); }
+
+	return registerMsg;
+}
+
+RTSipBody convertOsipBody2MCF(osip_body_t *sipBody, RTSipBody mcfBody)
+{
+	// content length
+	mcfBody.content_length = (UINT) sipBody->length;
+
+	// content
+	mcfBody.content = sipBody->body;
+
+	return mcfBody;
+}
+
+osip_body_t* convertMCF2OsipBody(RCTSipBody mcfBody, osip_body_t *sipBody)
+{
+	// content length
+	sipBody->length = (size_t) mcfBody.content_length;
+
+	// content
+	sipBody->body = osip_strdup(mcfBody.content.c_str());
+
+	return sipBody;
+}
+
+osip_message_t* fillOsipBody(RCTSipBody mcfBody, RCTSipContentType mcfContentType,
+		osip_message_t* sip)
+{
+	if (mcfBody.content.length() > 0)
+	{
+		osip_message_set_body(sip, mcfBody.content.c_str(),
+				mcfBody.content.length());
+
+		osip_message_set_content_type(sip, CSipMsgHelper::toString(mcfContentType).c_str());
+	}
+
+	return sip;
+}
+
+/* Convert Sip content type */
+RTSipContentType convertOsipContentType2MCF(osip_content_type_t *sipContentType,
+			RTSipContentType mcfContentType)
+{
+	// content type
+	if (NULL != sipContentType)
+	{
+		if (sipContentType->type != NULL)
+			mcfContentType.type = sipContentType->type;
+		if (sipContentType->subtype != NULL)
+			mcfContentType.subtype = sipContentType->subtype;
+	}
+
+	return mcfContentType;
+}
+
+osip_content_type* convertMCF2OsipContentType(RCTSipContentType mcfContentType,
+			osip_content_type_t *sipContentType)
+{
+	// content type
+	if (mcfContentType.type.length() > 0
+			&& mcfContentType.subtype.length() > 0) {
+		sipContentType->type = osip_strdup(mcfContentType.type.c_str());
+		sipContentType->subtype = osip_strdup(	mcfContentType.subtype.c_str());
+	}
+
+	return sipContentType;
+}
+
+/* Convert Invite */
+RTSipInvite convertOsipInvite2MCF(osip_message_t *invite, RTSipInvite mcfInvite)
+{
+	// req_uri
+	convertOsipUri2MCF(invite->req_uri, mcfInvite.req_uri);
+
+	// subject
+//	osip_header_t *subject = NULL;
+//	osip_message_get_subject(invite, 0, &subject);
+//	if (NULL != subject)
+//	{
+//		mcfInvite.subject = subject->hvalue;
+//	}
+
+	// invite content body
+	osip_body_t *body = NULL;
+
+	osip_message_get_body(invite, 0, &body);
+	if (NULL != body)
+	{
+		convertOsipBody2MCF(body, mcfInvite.body);
+	}
+
+	osip_content_type_t* contentType = NULL;
+	contentType = osip_message_get_content_type(invite);
+	if (contentType != NULL)
+	{
+		convertOsipContentType2MCF(contentType, mcfInvite.content_type);
+	}
+
+	return mcfInvite;
+}
+
+osip_message_t* convertMCF2OsipInvite(RCTSipInvite mcfInvite, osip_message_t *invite)
+{
+	// req_uri
+	convertMCF2OsipUri(mcfInvite.req_uri, invite->req_uri);
+
+	// subject
+//	if (mcfInvite.subject.length() > 0)
+//		{ osip_message_set_subject(invite, osip_strdup(mcfInvite.subject.c_str())); }
+
+	// body and content type
+	if (mcfInvite.body.content_length > 0)
+	{
+		osip_message_set_body(invite, mcfInvite.body.content.c_str(),
+				mcfInvite.body.content.length());
+
+		osip_message_set_content_type(invite, CSipMsgHelper::toString(mcfInvite.content_type).c_str());
+	}
+
+	return invite;
+}
+
+/* Convert Message */
+RTSipMessage convertOsipMessage2MCF(osip_message_t *message, RTSipMessage mcfMessage)
+{
+	// req_uri
+	convertOsipUri2MCF(message->req_uri, mcfMessage.req_uri);
+
+	// body
+	osip_body_t *body = NULL;
+	osip_message_get_body(message, 0, &body);
+	if (NULL != body)
+		{ convertOsipBody2MCF(body, mcfMessage.body); }
+
+	osip_content_type_t* contentType = NULL;
+	contentType = osip_message_get_content_type(message);
+	if (contentType != NULL)
+	{
+		convertOsipContentType2MCF(contentType, mcfMessage.content_type);
+	}
+
+	return mcfMessage;
+}
+
+osip_message_t* convertMCF2OsipMessage(RCTSipMessage mcfMessage, osip_message_t *message)
+{
+	// req_uri
+	//convertMCF2OsipUri(mcfMessage.req_uri, message->req_uri);
+
+	// body and content type
+	if (mcfMessage.body.content.length() > 0)
+	{
+		osip_message_set_body(message, mcfMessage.body.content.c_str(),
+				mcfMessage.body.content.length());
+
+		osip_message_set_content_type(message, CSipMsgHelper::toString(mcfMessage.content_type).c_str());
+	}
+
+	return message;
+}
+
+/* Convert BYE */
+RTSipBye convertOsipBye2MCF(osip_message_t *bye, RTSipBye mcfBye)
+{
+	convertOsipUri2MCF(bye->req_uri, mcfBye.req_uri);
+
+	return mcfBye;
+}
+
+osip_message_t* convertMCF2OsipBye(RCTSipBye mcfBye, osip_message_t* bye)
+{
+	convertMCF2OsipUri(mcfBye.req_uri, bye->req_uri);
+
+	return bye;
+}
+
+/* Convert CANCEL */
+RTSipCancel convertOsipCancel2MCF(osip_message_t* cancel, RTSipCancel mcfCancel)
+{
+	convertOsipUri2MCF(cancel->req_uri, mcfCancel.req_uri);
+
+	return mcfCancel;
+}
+
+osip_message_t* convertMCF2OsipCancel(RCTSipCancel mcfCancel, osip_message_t* cancel)
+{
+	convertMCF2OsipUri(mcfCancel.req_uri, cancel->req_uri);
+
+	return cancel;
+}
+
+} // namespace ExosipTranslator
+

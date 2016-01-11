@@ -1,0 +1,2 @@
+--proto_path=src --cpp_out=build/gen src/foo.proto src/bar/baz.proto
+

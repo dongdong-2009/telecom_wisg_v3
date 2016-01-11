@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh root@10.109.247.122
+expect {
+    "*password:" {exp_send "123456\r";exp_continue}
+    "口令：" {exp_send "123456\r";exp_continue}
+    "密码：" {exp_send "123456\r";exp_continue}
+    "*# " {exp_send "service tomcat6 restart"}
+}
+
+expect {
+    "*# " {send_user "success!"}
+}
+exit 0

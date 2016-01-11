@@ -1,0 +1,32 @@
+CC = g++
+DEPLOY_DIR = ./unidir
+LIB_DIR= $(DEPLOY_DIR)/lib 
+INC_DIR = -I./psa/include \
+		  -I./utils/include \
+		  -I./msgdef/include \
+		  -I./dbhandler/include \
+		  -I./server/include \
+		  -I/usr/local/include/mcf
+CFLAGS = -Wall -g $(INC_DIR) -D_DEBUG
+
+PSA_SRC_DIR = ./psa/source
+OBJS_RTC = $(PSA_SRC_DIR)/roapParser.o $(PSA_SRC_DIR)/rtcProtocolParser.o $(PSA_SRC_DIR)/test.o $(PSA_SRC_DIR)/PracticalSocket.o \
+		./dbhandler/source/dbHandler.o
+
+LIBS = -L$(LIB_DIR) -ljsoncpp -lmcf -lutils -lmysqlclient
+all:	clean test
+
+%.o: %.C
+	  $(CC) -c -o $@ $(CFLAGS) $<
+
+test: $(OBJS_RTC)
+	  $(CC) $(CFLAGS) -o $@ $(OBJS_RTC) $(LIBS)
+
+## make compilemsg
+MSGDEFS =msgdef_rtc.def 
+#msgdatadef_rtc.def 
+compilemsg:
+	mmc $(MSGDEFS) -m msgdef/include -i /usr/local/include/mcf:msgdef/include -h msgdef/include -c msgdef/source -x msgdef/include
+
+clean:
+		rm -f test *.o *~

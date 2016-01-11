@@ -1,0 +1,77 @@
+// msgdatadef_sip.def
+#ifndef _MSGDATADEF_SIP_H
+#define _MSGDATADEF_SIP_H
+
+class TSipContentType : public TMsgPara
+{
+public:
+	CVarChar16 type;
+	CVarChar16 subtype;
+};
+
+// SIP Body
+class TSipBody : public TMsgPara
+{
+public:
+	UINT content_length;
+	CVarChar content;
+};
+
+class TSipHeader : public TMsgPara
+{
+public:
+	CVarChar128 hname; // header name
+	CVarChar128 hvalue; // hvalue
+};
+
+//SIP parameters
+class TSipURIParam : public TMsgPara
+{
+public:
+	CVarChar128 gname;    // uri parameter name
+	CVarChar128 gvalue;   // uri parameter value
+};
+
+class TSipURI : public TMsgPara
+{
+public:
+	CVarChar16 scheme; //< Uri Scheme (sip or sips)
+	CVarChar128 username; // < Username
+	CVarChar128 host;  // Domain
+	CVarChar8 port; // Port number
+};
+
+//SIP From, To, Route
+class TSipAddress : public TMsgPara
+{
+public:
+	CVarChar256 displayname; // Display name
+	TSipURI url;
+	CVarChar32 tag; // uri-parameter tag
+};
+
+// SIP Call-id
+class TSipCallId : public TMsgPara
+{
+public:
+	CVarChar64 number; // call-id number
+	CVarChar64 host; // call-id host information
+};
+
+// SIP Via
+//class TSipVia : public TMsgPara
+//{
+//public:
+	//TSipURI url; // should use only host and port
+	//CVarChar64 branch; //transaction id
+//};
+
+class TSipSubscriptionState : public TMsgPara
+{
+public:
+    CVarChar64 state;
+    int expires;
+    CVarChar64 reason;
+};
+
+#endif

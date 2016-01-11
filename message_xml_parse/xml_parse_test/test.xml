@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no">
+<DICE_MESSAGE>
+  <DestionContactInfo>
+    <Status>true</Status>
+    <RealAddress>59.64.179.211</RealAddress>
+    <RealPort>5060</RealPort>
+  </DestionContactInfo>
+  <Message>
+    <SendTime>2011-10-20 15:48:31</SendTime>
+    <MessageContent>hello</MessageContent>
+  </Message>
+</DICE_MESSAGE>

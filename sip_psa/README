@@ -1,0 +1,34 @@
+PSA SIP for MCF System
+
+Author: Huang Haiping
+
+QUICK USAGE:
+$ make all
+# make install || $ sudo make install
+
+Include psa_sip_inf.h in your module
+Add -I/usr/local/include/mcf/sip and -lmcfsipmsg in your Makefile
+
+Copy the so of PSA SIP to your $(UNIDIR)/app folder
+
+Add configurations in mcf config files (lib.cfg, mod.cfg)
+
+Create sip.env in $(UNIDIR)/etc and contain the follwing 4 lines:
+
+# sip listening port
+sipPort             5060
+# the dispacher module logical address
+disLogAddr          211
+
+
+'sipPort' is the listening port for the SIP stack.
+
+'disLogAddr' is the logical address of MCF module for the upforwarding SIP messages.
+
+Use CSipMsgHelper class to
+Generate SIP Messages
+Convert messages to CVarChar
+Generate random number (used for callid, etc.)
+
+Requirements:
+  osip2 eXosip2

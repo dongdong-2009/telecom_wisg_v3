@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this xsd file is created automatically by msgcreator tool( msc ). -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:include schemaLocation="msgdatadef_sip.xsd"/>
+<xs:include schemaLocation="comtypedef_fchar.xsd"/>
+	<xs:element name="TSipCtrlMsg">
+	    <xs:annotation>
+	        <xs:documentation> TSipCtrlMsg ctrl msg definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="sip_callId"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipCallId"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="from"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipAddress"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="to"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipAddress"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="cseq_method" type="xs:string"   />
+	            <xs:element name="cseq_number" type="xs:string"   />
+	            <xs:element name="viaHds" type="xs:string"   />
+	            <xs:element name="route"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipAddress"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipResp">
+	    <xs:annotation>
+	        <xs:documentation> TSipResp msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="statusCode" type="xs:int"   />
+	            <xs:element name="reason_phase" type="xs:string"   />
+	            <xs:element name="expires" type="xs:int"   />
+	            <xs:element name="contact"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipAddress"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="sip_etag" type="xs:string"   />
+	            <xs:element name="content_type"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipContentType"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="authScheme" type="xs:string"   />
+	            <xs:element name="authRealm" type="xs:string"   />
+	            <xs:element name="authNonce" type="xs:string"   />
+	            <xs:element name="authStale" type="xs:string"   />
+	            <xs:element name="authAlgor" type="xs:string"   />
+	            <xs:element name="authQop" type="xs:string"   />
+	            <xs:element name="authOpaque" type="xs:string"   />
+	            <xs:element name="body"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipBody"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipReq">
+	    <xs:annotation>
+	        <xs:documentation> TSipReq msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="req_uri"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipURI"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipBye">
+	    <xs:annotation>
+	        <xs:documentation> TSipBye msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="req_uri"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipURI"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipCancel">
+	    <xs:annotation>
+	        <xs:documentation> TSipCancel msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="req_uri"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipURI"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipRegister">
+	    <xs:annotation>
+	        <xs:documentation> TSipRegister msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="req_uri"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipURI"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="contact"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipAddress"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="expires" type="xs:int"   />
+	            <xs:element name="authScheme" type="xs:string"   />
+	            <xs:element name="authUserName" type="xs:string"   />
+	            <xs:element name="authRealm" type="xs:string"   />
+	            <xs:element name="authNonce" type="xs:string"   />
+	            <xs:element name="authUri" type="xs:string"   />
+	            <xs:element name="authResponse" type="xs:string"   />
+	            <xs:element name="authAlgor" type="xs:string"   />
+	            <xs:element name="authCnonce" type="xs:string"   />
+	            <xs:element name="authOpaque" type="xs:string"   />
+	            <xs:element name="authQop" type="xs:string"   />
+	            <xs:element name="authNc" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipInvite">
+	    <xs:annotation>
+	        <xs:documentation> TSipInvite msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="req_uri"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipURI"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="content_type"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipContentType"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="body"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipBody"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipMessage">
+	    <xs:annotation>
+	        <xs:documentation> TSipMessage msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="req_uri"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipURI"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="content_type"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipContentType"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="body"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipBody"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipPublish">
+	    <xs:annotation>
+	        <xs:documentation> TSipPublish msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="req_uri"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipURI"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="expires" type="xs:int"   />
+	            <xs:element name="sip_if_match" type="xs:string"   />
+	            <xs:element name="event_type" type="xs:string"   />
+	            <xs:element name="content_type"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipContentType"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="body"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipBody"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipSubscribe">
+	    <xs:annotation>
+	        <xs:documentation> TSipSubscribe msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="req_uri"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipURI"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="expires" type="xs:int"   />
+	            <xs:element name="event_type" type="xs:string"   />
+	            <xs:element name="content_type"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipContentType"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="body"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipBody"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipNotify">
+	    <xs:annotation>
+	        <xs:documentation> TSipNotify msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="req_uri"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipURI"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="event_type" type="xs:string"   />
+	            <xs:element name="subscription_state"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipSubscriptionState"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="content_type"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipContentType"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="body"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipBody"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+</xs:schema>

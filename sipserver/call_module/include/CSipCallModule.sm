@@ -1,0 +1,211 @@
+%{
+/*********************************************************************
+ * Copyright (c)2010-2012, by BUPT
+ * All rights reserved.
+
+ * FileName:       CSipCallModule.sm
+ * System:         webrtc
+ * SubSystem:      gateway
+ * Author:         Liu Mingshuan
+ * Date:           2012.11.28
+ * Version:        1.0
+ * Description:
+     SipCallModule state machine。
+
+ *
+ * Last Modified:
+     2013-4-17 add Default state
+            By Liu Mingshuan.
+*******************************************************************************/
+%}
+/* all possible sate
+ * IDLE			initial.
+ * CALLPROC		收到invite，或者1XX
+ * SUCCESS		收到2XX
+ * ACTIVE 		收到ack
+ * release 		收到3XX-6XX、cancel，timeout，Bye
+*/
+// 注意，为了与roap匹配，目前只有创建和结束会话时需要等待ack，以后可能需要修改
+
+//指明.sm服务的实际Task类
+%class CSipCallModule
+//指明需要SMC生成的代码包含哪个文件。只能一个。如多于一个将被忽略。
+%header CSipCallModule.h 
+//初始状态
+%start CSipCallModState::IDLE 
+//生成的状态集合名称
+%map CSipCallModState 
+%%
+
+IDLE
+{
+	onInvite(msg:TUniNetMsg*)
+	CALLPROC
+	{
+		setTimer(SIPCALL_200OK_TIMEOUT);
+        sendToDispatcher(msg);
+	}
+}
+
+CALLPROC
+{
+	//收到响应 1XX
+	onResponse(msg:TUniNetMsg*) 
+	[true == ctxt.isResp1xx(msg)]   	
+	nil 
+	{
+	//	stopTimer();
+	//  sendToDispatcher(msg); // 不转发，即使是180
+	}
+	
+	onResponse(msg:TUniNetMsg*)
+	[true == ctxt.isResp3xx_6xx(msg)]   //如果收到的是3xx~6xx的错误响应，释放会话
+	RELEASE
+	{
+		stopTimer();
+		sendToDispatcher(msg);    	
+		setTimer(SIPCALL_ACK_TIMEOUT);
+	}
+	
+	onResponse(msg:TUniNetMsg*) 
+	[true == ctxt.isResp2xx(msg)]    	//收到200 OK会话建立成功
+	SUCCESS
+	{
+		stopTimer();
+		sendToDispatcher(msg);		
+		setTimer(SIPCALL_ACK_TIMEOUT);
+	}
+	
+	onCancel(msg:TUniNetMsg*)
+	RELEASE
+	{
+		stopTimer();	// add 515
+		sendToDispatcher(msg);
+		setTimer(SIPCALL_ACK_TIMEOUT);
+	}
+
+	onTimeOut(timerMark:TTimeMarkExt)  	//等待响应超时，会话释放
+	RELEASE
+	{	
+		handleTimeoutAtCallProcState();
+		setTimer(SIPCALL_ACK_TIMEOUT);
+//		sendToDispatcher(msg);
+	}
+}
+
+SUCCESS
+{
+	onInvite(msg:TUniNetMsg*)
+	nil
+	{
+		// just ignore re-invite
+		sendBack488NotAcceptableHere(msg);
+	}
+	
+	onAck(msg:TUniNetMsg*)
+	ACTIVE  
+	{
+		stopTimer();     //停止定时器SIPCALL_ACK_TIMEOUT
+		sendToDispatcher(msg);
+	}
+
+	onTimeOut(timerMark:TTimeMarkExt)
+	RELEASE
+	{
+		// send CANCEL to UAS ？
+		// send BYE to UAC
+	}
+}
+
+ACTIVE
+{
+	onInvite(msg:TUniNetMsg*)
+	nil
+	{
+		// just ignore re-invite
+		sendBack488NotAcceptableHere(msg);
+	}
+	
+	onBye(msg:TUniNetMsg*)
+	[true == ctxt.isByeFromRtc(msg)]
+	RELEASE
+	{
+		sendToDispatcher(msg);
+		setTimer(SIPCALL_200OK_TIMEOUT);     
+	}
+	
+	onBye(msg:TUniNetMsg*)
+	[true == ctxt.isByeFromSip(msg)]
+	RELEASE
+	{
+		sendToDispatcher(msg);
+		sendBack200OK(msg);
+		setTimer(SIPCALL_200OK_TIMEOUT);    // 只有等待超时 
+	}
+}
+
+// 不等待ACK或者超时
+RELEASE
+Entry
+{
+}
+{
+	onAck(msg:TUniNetMsg*)
+	nil
+	{
+		stopTimer();
+		endTask();
+	}
+	
+	onResponse(msg:TUniNetMsg*)
+	nil
+	{
+		stopTimer();
+		endTask();
+	}
+
+	//RELEASE状态只是个假状态
+	//关于会话释放的消息，底层PSA会自动处理200OK以及ACK消息
+	//因此高层只需直接释放会话即可
+	onTimeOut(timerMark:TTimeMarkExt)
+	nil
+	{
+		endTask();
+	}
+}
+
+Default
+{
+	onInvite(msg:TUniNetMsg*)
+	nil
+	{
+//		endTask();
+	}
+	onResponse(msg:TUniNetMsg*)
+	nil
+	{
+//		endTask();
+	}
+	onAck(msg:TUniNetMsg*)
+	nil
+	{
+//		endTask();
+	}
+	onCancel(msg:TUniNetMsg*)
+	nil
+	{
+//		endTask();
+	}
+	onBye(msg:TUniNetMsg*)
+	nil
+	{
+//		endTask();
+	}
+	onTimeOut(timerMark:TTimeMarkExt)
+	nil
+	{
+		endTask();
+	}
+}
+
+%%

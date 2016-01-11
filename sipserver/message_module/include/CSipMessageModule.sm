@@ -1,0 +1,80 @@
+%{
+/*********************************************************************
+ * Copyright (c)2010-2012, by BUPT
+ * All rights reserved.
+
+ * FileName:       CSipMessageModule.sm
+ * System:         webrtc
+ * SubSystem:      gateway
+ * Author:         Liu Mingshuan
+ * Date:           2012.12.19
+ * Version:        1.0
+ * Description:
+     SipMessageModule state machine。
+
+ *
+ * Last Modified:
+     2012-12-19 original version
+            By Liu Mingshuan.
+*******************************************************************************/
+%}
+/* all possible sate
+ * IDLE			initial.
+ * FORWARD		收到即时消息
+ * RELEASE		收到200ok或者超时
+*/
+
+//指明.sm服务的实际Task类
+%class CSipMessageModule
+//指明需要SMC生成的代码包含哪个文件。只能一个。如多于一个将被忽略。
+%header CSipMessageModule.h 
+//初始状态
+%start CSipMessageModState::IDLE 
+//生成的状态集合名称
+%map CSipMessageModState 
+
+%%
+IDLE
+{	
+	onMessage(msg:TUniNetMsg*)
+	[SIP_MESSAGE == msg->msgName && true == ctxt.isFromSip(msg)]
+	FORWARD
+	{
+		convertToPlain(msg);
+		sendToDispatcher(msg);
+		sendBack200OK(msg);
+		setTimer(SIPMESSAGE_200OK_TIMEOUT);	// 只有等待超时
+	}
+	
+	onMessage(msg:TUniNetMsg*)
+	[SIP_MESSAGE == msg->msgName && true == ctxt.isFromRtc(msg)]
+	FORWARD
+	{
+		sendToDispatcher(msg);
+		setTimer(SIPMESSAGE_200OK_TIMEOUT);	// 等待收到200 ok
+	}
+}
+
+FORWARD
+{
+	onMessage(msg:TUniNetMsg*)
+	[true == ctxt.isResponse200OK(msg)]
+	RELEASE
+	{
+		stopTimer();
+	}
+	
+	onTimeOut(timerMark:TTimeMarkExt)  	//等待响应超时，会话释放
+	RELEASE
+	{
+	}
+}
+
+RELEASE
+Entry
+{
+	endTask();
+}
+{
+}
+%%

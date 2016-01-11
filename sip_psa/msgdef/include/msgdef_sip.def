@@ -1,0 +1,134 @@
+// msgdef_sip.def
+#ifndef _MSGDEF_SIP_H
+#define _MSGDEF_SIP_H
+
+#include "msgdatadef_sip.h"
+
+class TSipCtrlMsg : public TCtrlMsg
+{
+public:
+	TSipCallId sip_callId; // unique id for SIP calls (but multiple dialogs!)
+	TSipAddress from;
+	TSipAddress to;
+	CVarChar16 cseq_method;
+	CVarChar64 cseq_number;
+	CVarChar    viaHds;
+	TSipAddress route;
+}; 
+
+// SIP Response
+class TSipResp : public TMsgBody
+{
+public:
+	INT statusCode;
+	CVarChar64 reason_phase;
+   INT expires;// notify subscribe publish
+   TSipAddress contact;// subscribe
+   CVarChar64 sip_etag;// publish
+	TSipContentType content_type;
+	//for 401 response
+	CVarChar16 authScheme;
+	CVarChar64     authRealm;
+	CVarChar   authNonce;
+	CVarChar16   authStale;
+	CVarChar16   authAlgor;
+	CVarChar   authQop;
+	CVarChar   authOpaque;	
+	
+	TSipBody body;
+};
+
+// comm sip request message. For ACK, etc..
+class TSipReq : public TMsgBody
+{
+public:
+	TSipURI req_uri;
+};
+
+// BYE
+class TSipBye : public TMsgBody
+{
+public:
+	TSipURI req_uri;
+};
+
+// CANCEL
+class TSipCancel : public TMsgBody
+{
+public:
+	TSipURI req_uri;
+};
+
+// Register request
+class TSipRegister : public TMsgBody
+{
+public:
+	TSipURI req_uri;
+	TSipAddress contact;
+	INT expires;
+	//for authorization
+	CVarChar16 authScheme;
+	CVarChar   authUserName;
+	CVarChar64    authRealm;
+	CVarChar   authNonce;
+	CVarChar    authUri;	
+	CVarChar   authResponse;
+	CVarChar16 authAlgor;
+	CVarChar64   authCnonce;
+	CVarChar   authOpaque;
+	CVarChar   authQop;
+	CVarChar   authNc;
+};
+
+// Invite request
+class TSipInvite : public TMsgBody
+{
+public:
+	TSipURI req_uri;
+	TSipContentType content_type;
+	TSipBody body;
+};
+
+// Message
+class TSipMessage : public TMsgBody
+{
+public:
+	TSipURI req_uri;
+	TSipContentType content_type;
+	TSipBody body;
+};
+
+//Publish
+class TSipPublish: public TMsgBody
+{
+public:
+    TSipURI req_uri;
+    INT expires;
+    CVarChar64 sip_if_match;
+    CVarChar64 event_type;
+    TSipContentType content_type;
+    TSipBody body;
+};
+//Subscribe
+class TSipSubscribe: public TMsgBody
+{
+public:
+    TSipURI req_uri;
+    INT expires;
+    CVarChar64 event_type;
+    TSipContentType content_type;
+    TSipBody body;
+};
+//Notify
+class TSipNotify: public TMsgBody
+{
+public:
+    TSipURI req_uri;
+    CVarChar64 event_type;
+    TSipSubscriptionState subscription_state;
+    TSipContentType content_type;
+    TSipBody body;
+};
+
+
+#endif

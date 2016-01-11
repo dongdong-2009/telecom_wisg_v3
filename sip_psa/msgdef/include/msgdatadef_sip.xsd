@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this xsd file is created automatically by msgcreator tool( msc ). -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="TSipContentType">
+	    <xs:annotation>
+	        <xs:documentation> TSipContentType msg para definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="type" type="xs:string"   />
+	            <xs:element name="subtype" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipBody">
+	    <xs:annotation>
+	        <xs:documentation> TSipBody msg para definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="content_length" type="xs:unsignedInt"   />
+	            <xs:element name="content" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipHeader">
+	    <xs:annotation>
+	        <xs:documentation> TSipHeader msg para definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="hname" type="xs:string"   />
+	            <xs:element name="hvalue" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipURIParam">
+	    <xs:annotation>
+	        <xs:documentation> TSipURIParam msg para definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="gname" type="xs:string"   />
+	            <xs:element name="gvalue" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipURI">
+	    <xs:annotation>
+	        <xs:documentation> TSipURI msg para definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="scheme" type="xs:string"   />
+	            <xs:element name="username" type="xs:string"   />
+	            <xs:element name="host" type="xs:string"   />
+	            <xs:element name="port" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipAddress">
+	    <xs:annotation>
+	        <xs:documentation> TSipAddress msg para definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="displayname" type="xs:string"   />
+	            <xs:element name="url"    >
+	                <xs:complexType>
+	                    <xs:sequence>
+	                        <xs:element ref="TSipURI"/>
+	                    </xs:sequence>
+	                </xs:complexType>
+	            </xs:element>
+	            <xs:element name="tag" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipCallId">
+	    <xs:annotation>
+	        <xs:documentation> TSipCallId msg para definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="number" type="xs:string"   />
+	            <xs:element name="host" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TSipSubscriptionState">
+	    <xs:annotation>
+	        <xs:documentation> TSipSubscriptionState msg para definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="state" type="xs:string"   />
+	            <xs:element name="expires" type="xs:int"   />
+	            <xs:element name="reason" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+</xs:schema>

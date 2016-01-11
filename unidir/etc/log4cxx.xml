@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+  <!-- Output the log message to system console.
+    -->
+  <appender name="SgConsoleAppender" class="org.apache.log4j.ConsoleAppender">    
+    <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%-5p] %d %l : %m%n"/>
+        </layout>
+        
+        <filter type="org.apache.log4j.varia.LevelMatchFilter">    
+           <param name="LevelToMatch" value="DEBUG" />      
+           <AcceptOnMatch value="false" />       
+        </filter>    
+         
+        <!--filter specific text-->
+  	<!-- <filter class="org.apache.log4j.varia.StringMatchFilter">
+  	        <param name="StringToMatch" value="Hello" />
+                 <param name="AcceptOnMatch" value="true" />
+         </filter>
+         
+         <filter class="org.apache.log4j.varia.DenyAllFilter" /> -->
+        
+  </appender>
+
+  <!-- Output the log message to log file   
+ 	-->
+  <appender name="SgFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="file" value="log/signalgateway" />
+    <param name="append" value="true" />
+	<param name="datePattern" value="'-'yyyy-MM-dd'.log'" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %-5p %C{2} (%F:%L) - %m%n" />
+    </layout>
+      
+    <filter type="org.apache.log4j.varia.LevelMatchFilter">    
+    	<param name="LevelToMatch" value="DEBUG" />      
+    	<AcceptOnMatch value="false" />       
+    </filter>    
+  	 
+	<!--filter specific text-->
+  	<!-- <filter class="org.apache.log4j.varia.StringMatchFilter">
+  	        <param name="StringToMatch" value="Hello" />
+                 <param name="AcceptOnMatch" value="true" />
+         </filter>
+         
+         <filter class="org.apache.log4j.varia.DenyAllFilter" /> -->
+    
+  </appender>
+ 
+
+  <root>
+        <priority value="debug" />
+        <appender-ref ref="SgConsoleAppender"/>
+        <appender-ref ref="SgFileAppender"/>
+  </root>
+
+  <!-- Specify the level for some specific categories -->
+  <category name="functionA" >
+        <priority value ="debug" />
+        <appender-ref ref="SgConsoleAppender"/>
+        <appender-ref ref="SgFileAppender"/>
+  </category>
+
+ </log4j:configuration>
