@@ -7,6 +7,8 @@
 #	
 ########################################################
 use utf-8 encoding to see the content
+v3
+重新设计状态机，将SIP和RTC CALL合并成一个状态及模块，媒体状态机模块BEAR新模块
 
 v2.3 将与XMS重协商的UPDATE改为re-invite,可能会出现503 reinvite-inside-reinvite错误，（因为没有给XMS回复ACK）
 #2015-12-01 by zhangyadong in GuangZhou
