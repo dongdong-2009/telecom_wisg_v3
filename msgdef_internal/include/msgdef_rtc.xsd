@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this xsd file is created automatically by msgcreator tool( msc ). -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="TRtcCtrlMsg">
+	    <xs:annotation>
+	        <xs:documentation> TRtcCtrlMsg ctrl msg definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="rtcType" type="xs:unsignedInt"   />
+	            <xs:element name="from" type="xs:string"   />
+	            <xs:element name="to" type="xs:string"   />
+	            <xs:element name="offerSessionId" type="xs:string"   />
+	            <xs:element name="answerSessionId" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TRtcOffer">
+	    <xs:annotation>
+	        <xs:documentation> TRtcOffer msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="seq" type="xs:unsignedInt"   />
+	            <xs:element name="sdp" type="xs:string"   />
+	            <xs:element name="tieBreaker" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TRtcAnswer">
+	    <xs:annotation>
+	        <xs:documentation> TRtcAnswer msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="seq" type="xs:unsignedInt"   />
+	            <xs:element name="sdp" type="xs:string"   />
+	            <xs:element name="moreComing" type="xs:boolean"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TRtcOK">
+	    <xs:annotation>
+	        <xs:documentation> TRtcOK msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="seq" type="xs:unsignedInt"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TRtcShutdown">
+	    <xs:annotation>
+	        <xs:documentation> TRtcShutdown msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="seq" type="xs:unsignedInt"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TRtcError">
+	    <xs:annotation>
+	        <xs:documentation> TRtcError msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="seq" type="xs:unsignedInt"   />
+	            <xs:element name="errorType" type="xs:unsignedInt"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TRtcCandidate">
+	    <xs:annotation>
+	        <xs:documentation> TRtcCandidate msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="seq" type="xs:unsignedInt"   />
+	            <xs:element name="label" type="xs:unsignedInt"   />
+	            <xs:element name="sdp" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	<xs:element name="TRtcMessage">
+	    <xs:annotation>
+	        <xs:documentation> TRtcMessage msg body definition</xs:documentation>
+	    </xs:annotation>
+	    <xs:complexType>
+	        <xs:sequence>
+	            <xs:element name="seq" type="xs:unsignedInt"   />
+	            <xs:element name="msgSize" type="xs:unsignedInt"   />
+	            <xs:element name="msgContent" type="xs:string"   />
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+</xs:schema>

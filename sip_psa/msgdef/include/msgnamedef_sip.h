@@ -38,9 +38,10 @@ const TUniNetMsgName SIP_INFO		  = SIP_NOTIFY + 1;	  //1010
 const TUniNetMsgName SIP_UPDATE		  = SIP_INFO + 1;	//1011
 const TUniNetMsgName SIP_PRACK		  = SIP_UPDATE + 1; //1012
 
-const TUniNetMsgName INTERNAL_INVITE  = 1020;
-const TUniNetMsgName INTERNAL_RESPONSE = INTERNAL_INVITE + 1; //1021
-const TUniNetMsgName INTERNAL_BYE = INTERNAL_RESPONSE + 1;
+const TUniNetMsgName INTERNAL_REQUEST  = 1020;	// 内部状态机交互消息
+const TUniNetMsgName INTERNAL_RESPONSE = INTERNAL_REQUEST + 1; //1021
+const TUniNetMsgName INTERNAL_ERROR = INTERNAL_RESPONSE + 1; //1022
+const TUniNetMsgName INTERNAL_CLOSE = INTERNAL_ERROR +1; //1023
 
 
 

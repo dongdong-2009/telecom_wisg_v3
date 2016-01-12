@@ -15,10 +15,12 @@ D_SRC_MD5DIGEST = $(D_MD5DIGEST)/source
 
 INC_DIR=  -I./rtcpsa/include \
 		  -I./utils/include \
-		  -I./msgdef/include \
+		  -I./msgdef_rtc/include \
+		  -I./msgdef_internal/include \
 		  -I./dbhandler/include \
 		  -I./msgmapper/include \
 		  -I./dispatcher/include \
+		  -I./bear/include \
 		  -I./rtcserver/call_module/include \
 		  -I./rtcserver/message_module/include \
 		  -I./sipserver/call_module/include \
@@ -32,7 +34,7 @@ INC_DIR=  -I./rtcpsa/include \
 CFLAGS = -Wall -g $(INC_DIR) -D_DEBUG  -Wno-deprecated -Wno-write-strings
 #CFLAGS = -Wall -g $(INC_DIR)  -Wno-deprecated -Wno-write-strings
 
-LIBS = -L. -L$(LIB_DIR) -lsipmsgdef -ljsoncpp -lmcf -lutils -lmysqlclient -lrtcmsg -lrtcdb \
+LIBS = -L. -L$(LIB_DIR) -lsipmsgdef -ljsoncpp -lmcf -lutils -lmysqlclient -lrtcmsg -lrtcdb  -lintmsg\
 		-losip2 -losipparser2 -leXosip2 -lpthread -llog4cxx
 
 %.o: %.C
@@ -56,10 +58,10 @@ usage:
 	@echo "    make compilemsg                      compile msg"
 	@echo "    make compilesm                       compile SM"
 
-all: sipmsgdef rtc_msgdef rtc_db rtc_psa msgmapper dispatcher \
-	rtc_call_module sip_call_module rtc_im_module sip_im_module psasip msglib 
-clean: clean.rtc_psa clean.rtc_msgdef clean.rtc_db clean.dispatcher clean.deploy clean.message_xml_parse \
-	clean.rtc_call_module clean.sip_call_module  clean.rtc_im_module clean.sip_im_module clean.msgmapper \
+all: sipmsgdef rtc_msgdef internal_msgdef rtc_db rtc_psa msgmapper dispatcher \
+	rtc_call_module sip_call_module rtc_im_module sip_im_module psasip msglib bear_module
+clean: clean.rtc_psa clean.rtc_msgdef clean.rtc_db clean.internal_msgdef clean.dispatcher clean.deploy clean.message_xml_parse \
+	clean.rtc_call_module clean.sip_call_module  clean.rtc_im_module clean.sip_im_module clean.msgmapper clean.bear_module\
 	clean.psasip clean.msglib clean.sipmsgdef
 compilesm: compilertcsm compilesipsm
 
@@ -135,14 +137,28 @@ clean.rtc_psa:
 MSGDEFS = msgdef_rtc.def 
 #msgdatadef_rtc.def 
 compilemsg:
-	mmc $(MSGDEFS) -m msgdef/include -i /usr/local/include/mcf:msgdef/include -h msgdef/include -c msgdef/source -x msgdef/include
+	mmc $(MSGDEFS) -m msgdef_rtc/include -i /usr/local/include/mcf:msgdef_rtc/include -h msgdef_rtc/include -c msgdef_rtc/source -x msgdef_rtc/include
 
-OBJS_RTC_MSGDEF = ./msgdef/source/msgdef_rtc.o
+OBJS_RTC_MSGDEF = ./msgdef_rtc/source/msgdef_rtc.o
 rtc_msgdef: $(OBJS_RTC_MSGDEF)
 	ar -crv $(OUTPUT_DIR)/librtcmsg.a $(OBJS_RTC_MSGDEF)
 	@echo "*************** Finish making librtcmsg.a ***************"
 clean.rtc_msgdef:
 	rm -f $(OBJS_RTC_MSGDEF) $(OUTPUT_DIR)/librtcmsg.a
+	
+#=========== internal_msgdef ===================
+## make compilemsg
+MSGDEFS_INT = msgdef_internal.def 
+#msgdatadef_rtc.def 
+compilemsg:
+	mmc $(MSGDEFS_INT) -m msgdef_internal/include -i /usr/local/include/mcf:msgdef_internal/include -h msgdef_internal/include -c msgdef_internal/source -x msgdef_internal/include
+
+OBJS_INT_MSGDEF = ./msgdef_internal/source/msgdef_int.o
+internal_msgdef: $(OBJS_INT_MSGDEF)
+	ar -crv $(OUTPUT_DIR)/libintmsg.a $(OBJS_INT_MSGDEF)
+	@echo "*************** Finish making libintmsg.a ***************"
+clean.internal_msgdef:
+	rm -f $(OBJS_INT_MSGDEF) $(OUTPUT_DIR)/libintmsg.a
 
 #=========== rtc_db ===================
 OBJS_RTC_DB = ./dbhandler/source/dbHandler.o
@@ -184,6 +200,20 @@ OBJ_XML_PARSE = \
 	
 clean.message_xml_parse:
 	rm -f $(OBJ_XML_PARSE)
+	
+	
+#=========== bearmodule ===================
+compilebearsm:
+	cd bear/nclude ; \
+	java -jar ../../../tools/Smc.jar -c++ -d ../source -headerd . BearModule.sm
+
+OBJS_BEAR = ./bear/source/CBearModule_sm.o \
+	./bear/source/CBearModule.o
+bear_module: $(OBJS_BEAR)
+	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/bear_module.so $(OBJS_BEAR) -L$(DEPLOY_DIR) $(LIBS) -lsipmsgdef 
+	@echo "**************Finsh making bear_module.so**********************"
+clean.bear_module:
+	rm -f $(OBJS_BEAR) $(OUTPUT_DIR)/bear_module.so
 	
 #=========== sip_server ===================
 compilesipsm:
@@ -244,7 +274,10 @@ deploy: all
 	mv ./rtc_im_module.so $(DEPLOY_DIR)/app/rtc_im_module.so
 	mv ./sip_im_module.so $(DEPLOY_DIR)/app/sip_im_module.so
 	mv ./librtcmsg.a $(DEPLOY_DIR)/lib/librtcmsg.a
+	mv ./libintmsg.a $(DEPLOY_DIR)/lib/libintmsg.a
+	
 	mv ./librtcdb.a $(DEPLOY_DIR)/lib/librtcdb.a
+	
 	#mv ./libmsgmapper.so /usr/lib/libmsgmapper.so
 	
 	#cp $(D_SIPMSGDEF)/include/*.h /usr/local/include/mcf/sip

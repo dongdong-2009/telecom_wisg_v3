@@ -1,0 +1,103 @@
+// msgdef_rtc.def
+#ifndef _MSGDEF_RTC_H
+#define _MSGDEF_RTC_H
+
+/* ip use for map socket
+ * only one type? or error? candidate?
+ */
+ 
+ /** MOD by lms 12.04
+  * 模仿SIP，把RTC消息分为一下几类，对应RTC 的 msgName
+  *	offer
+  *	answer
+  *	ok
+  *	shutdown
+  *	error
+  *	candidate
+  *	message
+  */
+ 
+
+//#include "msgdatadef_rtc.h"
+
+class TRtcCtrlMsg : public TCtrlMsg
+{
+public:
+	UINT rtcType; // whether need
+    CVarChar128 from;
+	CVarChar128 to;
+	CVarChar32 offerSessionId;
+	CVarChar32 answerSessionId;
+}; 
+
+// offer
+class TRtcOffer : public TMsgBody
+{
+public:
+	UINT seq;
+	CVarChar sdp;
+	CVarChar128 tieBreaker;
+};
+
+class TRtcAnswer: public TMsgBody
+{
+public:
+	UINT seq;
+	CVarChar sdp;
+	BOOL moreComing;
+};
+
+class TRtcOK: public TMsgBody
+{
+public:
+	UINT seq;
+};
+
+class TRtcShutdown: public TMsgBody
+{
+public:
+	UINT seq;
+};
+
+class TRtcError: public TMsgBody
+{
+public:
+	UINT seq;
+	UINT errorType;
+};
+
+class TRtcCandidate: public TMsgBody
+{
+public:
+	UINT seq;
+	UINT label;
+	CVarChar sdp;
+	
+};
+
+class TRtcMessage : public TMsgBody
+{
+public:
+	UINT seq;
+	UINT msgSize;
+	CVarChar msgContent;
+};
+
+/*
+class TRtcBody : public TMsgBody
+{
+public:
+	
+
+	UINT roapType;
+
+	UINT seq;
+	CVarChar128 label;
+	CVarChar sdp;
+	CVarChar16 errorType;
+	BOOL moreComing;
+	CVarChar128 tieBreaker;
+	
+};
+*/
+#endif
