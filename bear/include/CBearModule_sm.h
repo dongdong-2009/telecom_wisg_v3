@@ -38,13 +38,15 @@ public:
     virtual void Entry(CBearModuleContext&) {};
     virtual void Exit(CBearModuleContext&) {};
 
-    virtual void onAck(CBearModuleContext& context, TUniNetMsg* msg);
+    virtual void onBye(CBearModuleContext& context);
     virtual void onBye(CBearModuleContext& context, TUniNetMsg* msg);
-    virtual void onCancel(CBearModuleContext& context, TUniNetMsg* msg);
+    virtual void onClose(CBearModuleContext& context);
     virtual void onClose(CBearModuleContext& context, TUniNetMsg* msg);
-    virtual void onInvite(CBearModuleContext& context, TUniNetMsg* msg);
+    virtual void onJoin(CBearModuleContext& context);
     virtual void onJoin(CBearModuleContext& context, TUniNetMsg* msg);
+    virtual void onResponse(CBearModuleContext& context);
     virtual void onResponse(CBearModuleContext& context, TUniNetMsg* msg);
+    virtual void onSdpRequest(CBearModuleContext& context);
     virtual void onSdpRequest(CBearModuleContext& context, TUniNetMsg* msg);
     virtual void onTimeOut(CBearModuleContext& context, TTimeMarkExt timerMark);
 
@@ -74,11 +76,11 @@ public:
     : CBearModuleState(name, stateId)
     {};
 
-    virtual void onInvite(CBearModuleContext& context, TUniNetMsg* msg);
-    virtual void onResponse(CBearModuleContext& context, TUniNetMsg* msg);
-    virtual void onAck(CBearModuleContext& context, TUniNetMsg* msg);
-    virtual void onCancel(CBearModuleContext& context, TUniNetMsg* msg);
-    virtual void onBye(CBearModuleContext& context, TUniNetMsg* msg);
+    virtual void onBye(CBearModuleContext& context);
+    virtual void onClose(CBearModuleContext& context);
+    virtual void onJoin(CBearModuleContext& context);
+    virtual void onSdpRequest(CBearModuleContext& context);
+    virtual void onResponse(CBearModuleContext& context);
     virtual void onTimeOut(CBearModuleContext& context, TTimeMarkExt timerMark);
 };
 
@@ -196,9 +198,9 @@ public:
         return (dynamic_cast<CBearModuleState&>(*_state));
     };
 
-    void onAck(TUniNetMsg* msg)
+    void onBye()
     {
-        (getState()).onAck(*this, msg);
+        (getState()).onBye(*this);
     };
 
     void onBye(TUniNetMsg* msg)
@@ -206,9 +208,9 @@ public:
         (getState()).onBye(*this, msg);
     };
 
-    void onCancel(TUniNetMsg* msg)
+    void onClose()
     {
-        (getState()).onCancel(*this, msg);
+        (getState()).onClose(*this);
     };
 
     void onClose(TUniNetMsg* msg)
@@ -216,9 +218,9 @@ public:
         (getState()).onClose(*this, msg);
     };
 
-    void onInvite(TUniNetMsg* msg)
+    void onJoin()
     {
-        (getState()).onInvite(*this, msg);
+        (getState()).onJoin(*this);
     };
 
     void onJoin(TUniNetMsg* msg)
@@ -226,9 +228,19 @@ public:
         (getState()).onJoin(*this, msg);
     };
 
+    void onResponse()
+    {
+        (getState()).onResponse(*this);
+    };
+
     void onResponse(TUniNetMsg* msg)
     {
         (getState()).onResponse(*this, msg);
+    };
+
+    void onSdpRequest()
+    {
+        (getState()).onSdpRequest(*this);
     };
 
     void onSdpRequest(TUniNetMsg* msg)

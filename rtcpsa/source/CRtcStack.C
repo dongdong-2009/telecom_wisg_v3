@@ -182,6 +182,14 @@ BOOL CRtcStack::convertUniMsgToPlainMsg(PTUniNetMsg uniMsg, string& plainMsg){
 			break;
 		}
 
+		case RTC_NOTIFY:
+		{
+			PTRtcNotify pMsgNotify = (PTRtcNotify) uniMsg->msgBody;
+			roapParser = CRoapParser::createNotify(pCtrlMsg->offerSessionId.c_str(), pCtrlMsg->answerSessionId.c_str(),
+					pMsgNotify->seq, pMsgNotify->content_length, pMsgNotify->content.c_str());
+			break;
+		}
+
 		case RTC_SHUTDOWN:
 		{
 			PTRtcShutdown pMsgShutdown = (PTRtcShutdown)uniMsg->msgBody;

@@ -217,10 +217,10 @@ void CBearModule::sendSdpAnswerToCall(TUniNetMsg * msg) {
 			pResp);
 }
 
-void CBearModule::sendErrorToCall(const char * errorMsg) {
+void CBearModule::sendErrorToCall(const int errorType) {
 	PTIntCtrlMsg pCtrlMsg = (PTIntCtrlMsg) m_IntCtrlMsg->clone();
 	PTIntError pError = new TIntError();
-	pError->reason_phase = errorMsg;
+	pError->error = errorType;
 
 	sendMsgToDispatcher(INTERNAL_ERROR, INT_TYPE, DIALOG_CONTINUE, pCtrlMsg,
 			pError);

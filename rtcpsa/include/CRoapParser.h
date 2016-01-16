@@ -30,7 +30,8 @@ public:
 			int seq, int content_length, string content);
 	static CRoapParser* createUpdate(string offerSessionId, string answerSessionId,
 			int seq, int content_length, string content);
-
+	static CRoapParser* createNotify(string offerSessionId, string answerSessionId,
+				int seq, int content_length, string content);
 
 	static CRoapParser* createError(string offerSessionId, string answerSessionId,
 				int seq, int errorType);

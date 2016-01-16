@@ -27,7 +27,7 @@ public:
 	void sendCancelToMS();
 	void sendByeToMS();
 
-	void sendErrorToCall(const char * errrorMsg);
+	void sendErrorToCall(const int errorType);
 	void sendSdpAnswerToCall(TUniNetMsg * msg);
 	void sendCloseToCall();
 

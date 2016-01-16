@@ -10,6 +10,8 @@ const int ROAP_ERROR = 6;
 const int ROAP_MESSAGE = 7;
 const int ROAP_INFO	= 8;
 const int ROAP_UPDATE = 9;
+const int ROAP_NOTIFY = 10;
+
 
 
 // for error type

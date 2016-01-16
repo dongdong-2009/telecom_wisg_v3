@@ -260,20 +260,19 @@ void TIntResponse::print(ostrstream& st)
 PTMsgBody TIntError::clone()
 {
 	PTIntError amsg = new TIntError();
-	amsg->reason_phase						= reason_phase;
+	amsg->error						= error;
 	return amsg;
 }
 TIntError& TIntError::operator=(const TIntError &r)
 {
-	reason_phase						  = r.reason_phase;
+	error						  = r.error;
 	return *this;
 }
 
 BOOL TIntError::operator == (TMsgPara& msg)
 {
 	COMPARE_MSG_BEGIN(TIntError,msg)
-
-	COMPARE_FORCE_VCHAR(TIntError,reason_phase);
+	COMPARE_FORCE_INT(TIntError, error);
 
 	COMPARE_END
 }
@@ -282,21 +281,20 @@ INT TIntError::size()
 {
 	INT tmpSize = 0;
 
-	tmpSize += reason_phase.size();
+	tmpSize += sizeof(UINT);
 
 	return tmpSize;
 }
 
 INT TIntError::encode(CHAR* &buf)
 {
-	reason_phase.encode(buf);
-
+	ENCODE_INT( buf , error )
 	return size();
 }
 
 INT TIntError::decode(CHAR* &buf)
 {
-	reason_phase.decode(buf);
+	DECODE_INT(buf, error)
 
 	return size();
 }
@@ -305,7 +303,7 @@ BOOL TIntError::decodeFromXML(TiXmlHandle& xmlParser,PCGFSM fsm)
 {
 	FILL_FIELD_BEGIN
 
-	FILL_FORCE_VCHAR(TIntResponse,reason_phase)
+	FILL_FORCE_INT(TIntError, error)
 
 	FILL_FIELD_END
 }
@@ -313,7 +311,7 @@ BOOL TIntError::decodeFromXML(TiXmlHandle& xmlParser,PCGFSM fsm)
 void TIntError::print(ostrstream& st)
 {
 	st<<"==| TIntError =="<<endl;
-	st<<"$reason_phase						  = "<<reason_phase.GetVarCharContentPoint()<<endl;
+	st<<"$error						  = "<<error<<endl;
 
 }
 
@@ -342,7 +340,6 @@ INT TIntClose::size()
 {
 	INT tmpSize = 0;
 
-	tmpSize += sizeof(INT);
 
 	return tmpSize;
 }

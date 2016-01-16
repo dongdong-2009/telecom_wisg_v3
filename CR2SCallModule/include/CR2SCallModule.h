@@ -7,21 +7,17 @@
 
 #include "uacstask.h"
 #include "rtc_msg_def.h"
+#include "int_msg_def.h"
 #include "CPropertiesManager.h"
 #include "CRtcToSip.h"
-#include "CRtcCallModule_sm.h"
+#include "CR2SCallModule_sm.h"
 #include "CMsgDispatcher.h"
 
 #include "db.h"
-//
-//20	RTC_CONNECTION_TIMEOUT	30		0
-//21	RTC_SHUTDOWN_TIMEOUT	30		0
-//22 	RTC_WAITSIP_TIMEOUT		40		0
-//23 	RTC_WAITBEAR_TIMEOUT	30		0
 
 
-_CLASSDEF(CRtcCallModule)
-_DECLARE_CREATE_COMP(CRtcCallModule);
+_CLASSDEF(CR2SCallModule)
+_DECLARE_CREATE_COMP(CR2SCallModule);
 
 //注意下面仅仅是定时器ID，不是超时时间 在timer.cfg配置其具体信息:名字,时延,重发次数等
 const int RTC_CONNECTION_TIMEOUT = 20;
@@ -30,12 +26,16 @@ const int RTC_WAITSIP_TIMEOUT = 22;
 const int RTC_WAITBEAR_TIMEOUT = 23;
 
 
-class CRtcCallModule: public CUACSTask {
-public:
-	CRtcCallModule(PCGFSM afsm);
-	virtual ~CRtcCallModule();
 
-	void sendToDispatcher(TUniNetMsg *pMsg);
+class CR2SCallModule: public CUACSTask {
+public:
+	CR2SCallModule(PCGFSM afsm);
+	virtual ~CR2SCallModule();
+
+	void sendToDispatcher(TUniNetMsgName msgName,
+			TUniNetMsgType msgType, TDialogType dialog, PTCtrlMsg pCtrlMsg,
+			PTMsgBody pMsgBody);
+
 	/*
 	 * 结束状态机
 	 * 需要向Dispatcher模块发送信息,通知这个处理状态机实例的结束
@@ -55,23 +55,27 @@ protected:
 	virtual PTUACData createData();//需要子类实例化一个TUACData对象。
 	virtual void initState(); //需要子类实例化一个状态类对象。通常是转到初始状态。
 private:
-	CRtcCallModuleContext m_fsmContext;
+	CR2SCallModuleContext m_fsmContext;
 	INT LOGADDR_DISPATCHER;	// 231
 
 	TMsgAddress m_dispatcherAddr;
 	BOOL m_isDispatcherAddrSet;
 
-	TRtcCtrlMsg* m_RtcCtrlMsg;
-	CVarChar128 m_caller;
-	CVarChar128 m_callee;
-	CVarChar64 m_offerSessionId;
-	BOOL m_isCaller;
-	UINT m_seq;
-	bool selectSipUser(string rtcname);
+	string m_webSdp;
 
+	TRtcCtrlMsg* m_rtcCtrlMsg;
+
+	TIntCtrlMsg* m_intCtrlMsg;
+
+	CVarChar64 m_offerSessionId;
+
+
+	UINT m_seq;
 	int accessMode;
 
-	bool m_isReCall;
+	bool m_isSdpConfirmed;
+
+	bool selectSipUser(string rtcname);
 public:
 	// map rtc message to sip message
 	BOOL msgMap(TUniNetMsg *pSrcMsg, TUniNetMsg *pDestMsg);
@@ -90,6 +94,20 @@ public:
 
 	bool checkSipUserAvailable(TUniNetMsg *msg);
 
+	void notifySipTermCallSdp(TUniNetMsg *msg);
+	void notifySipTermClose();
 
+	void sendAnswerToWeb(TUniNetMsg *msg);
+	void sendErrorToWeb(const int errorType);
+	void forwardErrorToWeb(TUniNetMsg * msg);
+	void sendShutdownToWeb();
+	void sendNotifyToWeb(TUniNetMsg *msg);
+
+
+	bool isSdpConfirmed();
+
+
+	void sendReqToBear_Rtc();
+	void sendCloseToBear_Rtc();
 };
 #endif

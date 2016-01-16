@@ -101,7 +101,7 @@ _CLASSDEF(TIntError)
 class TIntError:public TMsgBody
 {
 	public:
-		CVarChar       reason_phase;
+		UINT       		error;
 
 		inline         TIntError();
 
@@ -156,6 +156,7 @@ inline TIntResponse::TIntResponse()
 
 inline TIntError::TIntError()
 {
+	error = 0;
 }
 
 inline TIntClose::TIntClose()

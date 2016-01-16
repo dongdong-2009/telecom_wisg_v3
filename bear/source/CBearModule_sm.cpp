@@ -35,7 +35,7 @@ CBearState_BEAR_JOIN CBearState::BEAR_JOIN("CBearState::BEAR_JOIN", 3);
 CBearState_BEAR_MODIFYING CBearState::BEAR_MODIFYING("CBearState::BEAR_MODIFYING", 4);
 CBearState_CLOSED CBearState::CLOSED("CBearState::CLOSED", 5);
 
-void CBearModuleState::onAck(CBearModuleContext& context, TUniNetMsg* msg)
+void CBearModuleState::onBye(CBearModuleContext& context)
 {
     Default(context);
     return;
@@ -47,7 +47,7 @@ void CBearModuleState::onBye(CBearModuleContext& context, TUniNetMsg* msg)
     return;
 }
 
-void CBearModuleState::onCancel(CBearModuleContext& context, TUniNetMsg* msg)
+void CBearModuleState::onClose(CBearModuleContext& context)
 {
     Default(context);
     return;
@@ -59,7 +59,7 @@ void CBearModuleState::onClose(CBearModuleContext& context, TUniNetMsg* msg)
     return;
 }
 
-void CBearModuleState::onInvite(CBearModuleContext& context, TUniNetMsg* msg)
+void CBearModuleState::onJoin(CBearModuleContext& context)
 {
     Default(context);
     return;
@@ -71,7 +71,19 @@ void CBearModuleState::onJoin(CBearModuleContext& context, TUniNetMsg* msg)
     return;
 }
 
+void CBearModuleState::onResponse(CBearModuleContext& context)
+{
+    Default(context);
+    return;
+}
+
 void CBearModuleState::onResponse(CBearModuleContext& context, TUniNetMsg* msg)
+{
+    Default(context);
+    return;
+}
+
+void CBearModuleState::onSdpRequest(CBearModuleContext& context)
 {
     Default(context);
     return;
@@ -99,35 +111,35 @@ void CBearModuleState::Default(CBearModuleContext& context)
     return;
 }
 
-void CBearState_Default::onInvite(CBearModuleContext& context, TUniNetMsg* msg)
+void CBearState_Default::onBye(CBearModuleContext& context)
 {
 
 
     return;
 }
 
-void CBearState_Default::onResponse(CBearModuleContext& context, TUniNetMsg* msg)
+void CBearState_Default::onClose(CBearModuleContext& context)
 {
 
 
     return;
 }
 
-void CBearState_Default::onAck(CBearModuleContext& context, TUniNetMsg* msg)
+void CBearState_Default::onJoin(CBearModuleContext& context)
 {
 
 
     return;
 }
 
-void CBearState_Default::onCancel(CBearModuleContext& context, TUniNetMsg* msg)
+void CBearState_Default::onSdpRequest(CBearModuleContext& context)
 {
 
 
     return;
 }
 
-void CBearState_Default::onBye(CBearModuleContext& context, TUniNetMsg* msg)
+void CBearState_Default::onResponse(CBearModuleContext& context)
 {
 
 
@@ -237,7 +249,7 @@ void CBearState_BEAR_INITIAL::onResponse(CBearModuleContext& context, TUniNetMsg
         try
         {
             ctxt.stopTimer();
-            ctxt.sendErrorToCall("MS return 3xx~6xx");
+            ctxt.sendErrorToCall(MS_ERROR_REFUSED);
             context.setState(CBearState::CLOSED);
         }
         catch (...)
@@ -275,7 +287,7 @@ void CBearState_BEAR_INITIAL::onResponse(CBearModuleContext& context, TUniNetMsg
         try
         {
             ctxt.stopTimer();
-            ctxt.sendErrorToCall("XMS return 200 OK with no SDP");
+            ctxt.sendErrorToCall(MS_ERROR_OTHER);
             ctxt.setTimer(BEAR_200OK_TIMEOUT);
             ctxt.sendAckToMS(msg);
             ctxt.sendByeToMS();
@@ -464,7 +476,7 @@ void CBearState_BEAR_JOIN::onResponse(CBearModuleContext& context, TUniNetMsg* m
         try
         {
             ctxt.stopTimer();
-            ctxt.sendErrorToCall("MS return 3xx~6xx");
+            ctxt.sendErrorToCall(MS_ERROR_REFUSED);
             context.setState(CBearState::CLOSED);
         }
         catch (...)
@@ -586,7 +598,7 @@ void CBearState_BEAR_MODIFYING::onResponse(CBearModuleContext& context, TUniNetM
         try
         {
             ctxt.stopTimer();
-            ctxt.sendErrorToCall("MS return 3xx~6xx");
+            ctxt.sendErrorToCall(MS_ERROR_REFUSED);
             context.setState(CBearState::CLOSED);
         }
         catch (...)
@@ -623,7 +635,7 @@ void CBearState_BEAR_MODIFYING::onResponse(CBearModuleContext& context, TUniNetM
         try
         {
             ctxt.stopTimer();
-            ctxt.sendErrorToCall("MS return 200 OK with no sdp");
+            ctxt.sendErrorToCall(MS_ERROR_OTHER);
             ctxt.setTimer(BEAR_200OK_TIMEOUT);
             ctxt.sendAckToMS(msg);
             ctxt.sendByeToMS();

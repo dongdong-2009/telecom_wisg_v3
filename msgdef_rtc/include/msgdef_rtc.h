@@ -234,6 +234,30 @@ public:
 	void           print(ostrstream& st);
 };
 
+_CLASSDEF(TRtcNotify)
+class TRtcNotify:public TMsgBody
+{
+public:
+	UINT seq;
+	UINT content_length;
+	CVarChar content;
+
+	inline         TRtcNotify();
+
+	CHAR*          getMsgName(){ return "TRtcNotify";};
+	TRtcNotify    &operator=(const TRtcNotify &r);
+	PTMsgBody      clone();
+	BOOL           operator == (TMsgPara&);
+
+	INT            size();
+	INT            encode(CHAR* &buf);
+	INT            decode(CHAR* &buf);
+	BOOL           decodeFromXML(TiXmlHandle& xmlParser,PCGFSM fsm);
+
+	void           print(ostrstream& st);
+};
+
+
 
 
 _CLASSDEF(TRtcMessage)
@@ -308,6 +332,11 @@ inline TRtcInfo::TRtcInfo()
 
 inline TRtcUpdate::TRtcUpdate()
 {
+	seq 					  = 0;
+	content_length 			  = 0;
+}
+
+inline TRtcNotify::TRtcNotify(){
 	seq 					  = 0;
 	content_length 			  = 0;
 }

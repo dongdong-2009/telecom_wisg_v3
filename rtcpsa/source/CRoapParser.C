@@ -213,6 +213,13 @@ CRoapParser* CRoapParser::createUpdate(string offerSessionId, string answerSessi
 	return create(ROAP_UPDATE, offerSessionId, answerSessionId, seq, "",
 			0, 0, "", false, content_length, content);
 }
+
+CRoapParser* CRoapParser::createNotify(string offerSessionId, string answerSessionId,
+			int seq, int content_length, string content){
+	return create(ROAP_NOTIFY, offerSessionId, answerSessionId, seq, "",
+			0, 0, "", false, content_length, content);
+}
+
 CRoapParser* CRoapParser::createMessage(string offerSessionId, string answerSessionId,
 			int seq, int msgSize, string msgContent){
 	return create(ROAP_MESSAGE, offerSessionId, answerSessionId, seq, "",
