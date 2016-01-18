@@ -62,12 +62,14 @@ private:
 	BOOL m_isDispatcherAddrSet;
 
 	string m_webSdp;
+	string m_imsSdp;
 
 	string m_sipName;
 
 	TRtcCtrlMsg* m_rtcCtrlMsg;
 
 	TIntCtrlMsg* m_intCtrlMsg_Rtc;
+	TIntCtrlMsg* m_intCtrlMsg_Sip;
 
 	CVarChar64 m_offerSessionId;
 
@@ -77,6 +79,8 @@ private:
 	int m_accessMode;
 
 	bool m_isSdpConfirmed;
+
+	UINT m_sdpModifyFlag;
 
 	bool selectSipUser(string rtcname);
 public:
@@ -140,6 +144,20 @@ public:
 
 	string getUserName(const string& user);
 	string getHost(const string& user);
+
+	void setUACTag(TUniNetMsg * msg);
+
+	inline void resetFlag(){
+		m_sdpModifyFlag = 0;
+	}
+
+	inline bool isInviteFlag(){
+		return m_sdpModifyFlag == 1;
+	}
+
+	inline bool isUpdateFlag(){
+		return m_sdpModifyFlag == 2;
+	}
 
 
 

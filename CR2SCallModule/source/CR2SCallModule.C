@@ -44,8 +44,11 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 
 	m_rtcCtrlMsg = new TRtcCtrlMsg();
 	m_intCtrlMsg_Rtc = NULL;
+	m_intCtrlMsg_Sip = NULL;
+
 	m_isSdpConfirmed = false;
 	m_sipCtrlMsg = NULL;
+	m_sdpModifyFlag = 0;
 }
 
 CR2SCallModule::~CR2SCallModule() {
@@ -179,6 +182,11 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 	case RTC_ERROR:
 		m_fsmContext.onMessage(msg);
 		break;
+	case SIP_RESPONSE:{
+		PTSipCtrlMsg ctrlMsg = (PTSipCtrlMsg) msg->ctrlMsgHdr;
+
+		break;
+	}
 	default:
 		LOG4CXX_ERROR(logger, "procMsg:unknow msgName "<<msg->getMsgNameStr())
 		;
@@ -202,53 +210,7 @@ BOOL CR2SCallModule::msgMap(TUniNetMsg *pSrcMsg, TUniNetMsg *pDestMsg) {
 			m_isReCall);
 }
 
-void CR2SCallModule::sendBackError(UINT errorType) {
-	TUniNetMsg *pNewMsg = new TUniNetMsg();
-	pNewMsg->dialogType = DIALOG_CONTINUE;
-	pNewMsg->msgType = RTC_TYPE;
-	pNewMsg->msgName = RTC_ERROR;
-	//pNewMsg->tAddr = LOGADDR_DISPATCHER;
-	TRtcCtrlMsg * pCtrl = new TRtcCtrlMsg();
-	pCtrl->from = m_caller;
-	pCtrl->to = m_callee;
-	pCtrl->offerSessionId = m_offerSessionId;
-	pCtrl->rtcType = ROAP_ERROR;
-	if (m_isCaller) {
-		//printf("from %s,to %s\n", pCtrl->from.c_str(), pCtrl->to.c_str());
-		std::swap(pCtrl->from, pCtrl->to);
-	}
-	pCtrl->answerSessionId = "webrtc_4ff57274d9a89b47c415be9c1";
-	pNewMsg->ctrlMsgHdr = pCtrl;
-	pNewMsg->setCtrlMsgHdr();
-	TRtcError * pError = new TRtcError();
-	pError->seq = m_seq;
-	pNewMsg->msgBody = pError;
-	pError->errorType = errorType;
-	pNewMsg->setMsgBody();
-	sendToDispatcher(pNewMsg);
 
-}
-
-void CR2SCallModule::sendBackOK(TUniNetMsg *msg) {
-	TUniNetMsg *pNewMsg = new TUniNetMsg();
-	pNewMsg->dialogType = DIALOG_CONTINUE;
-	pNewMsg->msgType = RTC_TYPE;
-	pNewMsg->msgName = RTC_OK;
-	pNewMsg->tAddr = msg->oAddr;
-
-	TRtcCtrlMsg *pCtrl = (TRtcCtrlMsg*) msg->cloneCtrlMsg();
-	std::swap(pCtrl->from, pCtrl->to);
-	pCtrl->rtcType = ROAP_OK;
-	pNewMsg->ctrlMsgHdr = pCtrl;
-	pNewMsg->setCtrlMsgHdr();
-
-	TRtcOK* pOk = new TRtcOK();
-	pOk->seq = ((TRtcShutdown*) msg->msgBody)->seq;
-	pNewMsg->msgBody = pOk;
-	pNewMsg->setMsgBody();
-
-	sendToDispatcher(pNewMsg);
-}
 
 bool CR2SCallModule::checkSipUserAvailable(TUniNetMsg * msg) {
 	if (m_accessMode == 1 || m_accessMode == 2) {
@@ -421,6 +383,14 @@ void CR2SCallModule::sendNoSdpInviteToIMS(){
 //	void send200OKForUpdateToIMS(TUniNetMsg * msg);
 //	void send200OKForInviteToIMS(TUniNetMsg * msg);
 //	void sendByeToIMS();
+
+void CR2SCallModule::setUACTag(TUniNetMsg * msg){
+	PTSipCtrlMsg ctrlMsg = (PTSipCtrlMsg) msg->ctrlMsgHdr;
+
+	m_sipCtrlMsg->to.tag = ctrlMsg->to.tag;
+}
+
+
 void CR2SCallModule::sendCancelToIMS(){
 	PTSipCancel pCancel = new TSipCancel();
 	pCancel->req_uri = m_sipCtrlMsg->to.url;
@@ -430,5 +400,175 @@ void CR2SCallModule::sendCancelToIMS(){
 
 void CR2SCallModule::sendPrackToIMS(TUniNetMsg * msg){
 	PTSipPrack pPrack = new TSipPrack();
+	pPrack->req_uri = m_sipCtrlMsg->to.url;
+
+	if(msg!= NULL){
+		PTIntResponse pResp = (PTIntResponse)msg->msgBody;
+		pPrack->content_type.type = "application";
+		pPrack->content_type.subtype = "sdp";
+		pPrack->body.content = pResp->body;
+		pPrack->body.content_length = pResp->body.length();
+	}
+
+	sendToDispatcher(SIP_PRACK, SIP_TYPE, DIALOG_CONTINUE, m_sipCtrlMsg->clone(), pPrack);
 }
+
+void CR2SCallModule::sendAckToIMS(TUniNetMsg * msg){
+	PTSipReq pAck = new TSipReq();
+	pAck->req_uri = m_sipCtrlMsg->to.url;
+
+	if(msg != NULL){
+		PTIntResponse pResp = (PTIntResponse)msg->msgBody;
+		pAck->content_type.type = "application";
+		pAck->content_type.subtype = "sdp";
+		pAck->body.content = pResp->body;
+		pAck->body.content_length = pResp->body.length();
+	}
+
+	sendToDispatcher(SIP_ACK, SIP_TYPE, DIALOG_CONTINUE, m_sipCtrlMsg->clone(), pAck);
+}
+
+void CR2SCallModule::send200OKForUpdateToIMS(TUniNetMsg * msg){
+	PTSipResp pAns = new PTSipResp();
+	pAns->statusCode = 200;
+	pAns->reason_phase = "OK";
+
+	if(msg != NULL){
+		PTIntResponse pResp = (PTIntResponse)msg->msgBody;
+		pAns->content_type.type = "application";
+		pAns->content_type.subtype = "sdp";
+		pAns->body.content = pResp->body;
+		pAns->body.content_length = pResp->body.length();
+	}
+
+	PTSipCtrlMsg ctrlMsg = m_sipCtrlMsg->clone();
+
+	ctrlMsg->cseq_method = "UPDATE";
+
+	sendToDispatcher(SIP_RESPONSE, SIP_TYPE, DIALOG_CONTINUE, m_sipCtrlMsg->clone(), pAns);
+}
+
+
+void CR2SCallModule::send200OKForInviteToIMS(TUniNetMsg * msg){
+	PTSipResp pAns = new PTSipResp();
+	pAns->statusCode = 200;
+	pAns->reason_phase = "OK";
+
+	if(msg != NULL){
+		PTIntResponse pResp = (PTIntResponse)msg->msgBody;
+		pAns->content_type.type = "application";
+		pAns->content_type.subtype = "sdp";
+		pAns->body.content = pResp->body;
+		pAns->body.content_length = pResp->body.length();
+	}
+
+	PTSipCtrlMsg ctrlMsg = m_sipCtrlMsg->clone();
+	ctrlMsg->cseq_method = "INVITE";
+	sendToDispatcher(SIP_RESPONSE, SIP_TYPE, DIALOG_CONTINUE, m_sipCtrlMsg->clone(), pAns);
+}
+
+void CR2SCallModule::sendByeToIMS()
+{
+	PTSipBye pBye = new PTSipBye();
+	pBye->req_uri = m_sipCtrlMsg->to.url;
+
+	sendToDispatcher(SIP_BYE, SIP_TYPE, DIALOG_CONTINUE, m_sipCtrlMsg->clone(), pBye);
+}
+
+
+//void sendReqToBear_Sip();
+//void sendCloseToBear_Sip();
+void CR2SCallModule::sendReqToBear_Sip(){
+	if(m_intCtrlMsg_Sip == NULL){
+			m_intCtrlMsg_Sip->from = "sip_call";
+			m_intCtrlMsg_Sip->to = "bear";
+			CHAR buf[33];
+			CSipMsgHelper::generateRandomNumberStr(buf);
+			string str = buf;
+			str += buf;
+
+			m_intCtrlMsg_Sip->sessionId = str.c_str();
+			m_intCtrlMsg_Sip->intType = INT_REQUEST;
+	}
+
+	PTIntRequest pReq = new TIntRequest();
+	pReq->body = m_imsSdp.c_str();
+
+	sendToDispatcher(INT_REQUEST, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Sip->clone(), pReq);
+}
+
+void CR2SCallModule::sendCloseToBear_Sip()
+{
+	if(m_intCtrlMsg_Sip != NULL)
+	{
+		PTIntClose pClose = new TIntClose();
+		sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Sip->clone(), pReq);
+	}
+}
+
+
+void CR2SCallModule::isResp1xx(TUniNetMsg * msg){
+	if (msg->msgType != SIP_TYPE && msg->msgName != SIP_RESPONSE)
+		return false;
+
+	INT statusCode = ((PTSipResp) msg->msgBody)->statusCode;
+	if (statusCode / 100 == 1)
+		return true;
+	else
+		return false;
+}
+
+void CR2SCallModule::isResp2xx(TUniNetMsg * msg){
+	if (msg->msgType != SIP_TYPE && msg->msgName != SIP_RESPONSE)
+		return false;
+
+	if (((PTSipResp) msg->msgBody)->statusCode == 200)
+		return true;
+	else
+		return false;
+}
+
+void CR2SCallModule::isResp3xx_6xx(TUniNetMsg * msg){
+	if (msg->msgType != SIP_TYPE && msg->msgName != SIP_RESPONSE)
+		return false;
+
+	INT statusCode = ((PTSipResp) msg->msgBody)->statusCode;
+	if (statusCode < 700 && statusCode > 300)
+		return true;
+	else
+		return false;
+}
+
+void CR2SCallModule::isWithSDP(TUniNetMsg *msg){
+	if (msg->msgType != SIP_TYPE)
+		return false;
+
+	if(msg->msgName == SIP_RESPONSE)
+	{
+		PTSipResp pResp = (PTSipResp) msg->msgBody;
+		return pResp->body.content_length == 0;
+	}
+
+	if(msg->msgName == SIP_UPDATE)
+	{
+		PTSipUpdate pUpdate = (PTSipUpdate) msg->msgBody;
+		return pUpdate->body.content_length == 0;
+	}
+
+	if(msg->msgName == SIP_INVITE)
+	{
+		PTSipInvite pInvite = (PTSipInvite) msg->msgBody;
+		return pInvite->body.content_length == 0;
+	}
+	return false;
+}
+
+bool CR2SCallModule::setInviteFlag(){
+	m_sdpModifyFlag = 1;
+}
+
+bool CR2SCallModule::setUpdateFlag(){
+	m_sdpModifyFlag = 2;
+}
+
 
