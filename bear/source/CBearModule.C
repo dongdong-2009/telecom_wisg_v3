@@ -315,5 +315,6 @@ void CBearModule::onTimeOut(TTimeMarkExt timerMark) {
 			"[CBearModule]DEBUG: The CSipCallModule task received a timeout event: "
 			<< timerMark.timerId);
 	m_fsmContext.onTimeOut(timerMark);
+	//CUACTask::setTimer(timerMark, NULL, NULL);
 }
 

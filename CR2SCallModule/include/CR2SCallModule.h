@@ -63,15 +63,18 @@ private:
 
 	string m_webSdp;
 
+	string m_sipName;
+
 	TRtcCtrlMsg* m_rtcCtrlMsg;
 
-	TIntCtrlMsg* m_intCtrlMsg;
+	TIntCtrlMsg* m_intCtrlMsg_Rtc;
 
 	CVarChar64 m_offerSessionId;
 
+	TSipCtrlMsg * m_sipCtrlMsg;
 
 	UINT m_seq;
-	int accessMode;
+	int m_accessMode;
 
 	bool m_isSdpConfirmed;
 
@@ -80,17 +83,17 @@ public:
 	// map rtc message to sip message
 	BOOL msgMap(TUniNetMsg *pSrcMsg, TUniNetMsg *pDestMsg);
 
-	// 收到rtc发过来的Bye消息直接回ok，不用等sip的200 ok
-	void sendBackOK(TUniNetMsg *msg);
-	void sendBackError(UINT errorType);
-	// 判断bye消息是否来自rtc，是的话调用sendBackOK函数
-	bool isByeFromRtc(TUniNetMsg *msg){
-		return msg->msgType == SIP_TYPE;
-	}
-
-	bool isByeFromSip(TUniNetMsg *msg){
-		return msg->msgType == RTC_TYPE;
-	}
+//	// 收到rtc发过来的Bye消息直接回ok，不用等sip的200 ok
+//	void sendBackOK(TUniNetMsg *msg);
+//	void sendBackError(UINT errorType);
+//	// 判断bye消息是否来自rtc，是的话调用sendBackOK函数
+//	bool isByeFromRtc(TUniNetMsg *msg){
+//		return msg->msgType == SIP_TYPE;
+//	}
+//
+//	bool isByeFromSip(TUniNetMsg *msg){
+//		return msg->msgType == RTC_TYPE;
+//	}
 
 	bool checkSipUserAvailable(TUniNetMsg *msg);
 
@@ -102,12 +105,43 @@ public:
 	void forwardErrorToWeb(TUniNetMsg * msg);
 	void sendShutdownToWeb();
 	void sendNotifyToWeb(TUniNetMsg *msg);
-
-
 	bool isSdpConfirmed();
-
-
 	void sendReqToBear_Rtc();
 	void sendCloseToBear_Rtc();
+
+
+	void sendNoSdpInviteToIMS();
+	void sendCancelToIMS();
+	void sendPrackToIMS(TUniNetMsg * msg);
+	void sendAckToIMS(TUniNetMsg * msg);
+	void send200OKForUpdateToIMS(TUniNetMsg * msg);
+	void send200OKForInviteToIMS(TUniNetMsg * msg);
+	void sendByeToIMS();
+
+
+	void notifyRtcOrigCallSdp();
+	void notifyRtcOrigCallError(TUniNetMsg * msg);
+	void notifyRtcOrigCallClose();
+	void notifyRtcOrigCallError(const int errorType);
+
+
+	void sendReqToBear_Sip();
+	void sendCloseToBear_Sip();
+
+	bool isWithSDP(TUniNetMsg * msg);
+	bool isResp1xx(TUniNetMsg * msg);
+	bool isResp3xx_6xx(TUniNetMsg * msg);
+	bool isResp2xx(TUniNetMsg * msg);
+
+	bool setUpdateFlag();
+	bool setInviteFlag();
+
+	bool compAndModifySdpWithRtc(TUniNetMsg * msg);
+
+	string getUserName(const string& user);
+	string getHost(const string& user);
+
+
+
 };
 #endif

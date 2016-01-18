@@ -35,7 +35,7 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	if (accessMode == -1) {
 		accessMode = 0;
 	} else {
-		this->accessMode = accessMode;
+		this->m_accessMode = accessMode;
 	}
 
 	log4cxx::xml::DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
@@ -43,8 +43,9 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	logger = log4cxx::Logger::getLogger("SgFileAppender");
 
 	m_rtcCtrlMsg = new TRtcCtrlMsg();
-	m_intCtrlMsg = NULL;
+	m_intCtrlMsg_Rtc = NULL;
 	m_isSdpConfirmed = false;
+	m_sipCtrlMsg = NULL;
 }
 
 CR2SCallModule::~CR2SCallModule() {
@@ -71,14 +72,14 @@ bool CR2SCallModule::selectSipUser(string rtcname) {
 	PTSelectResult result = CDB::instance()->getSelectResult();
 
 	if (result->rowNum > 0) {
-		string sipname = result->pRows->arrayField[0].value.stringValue;
+		m_sipName = result->pRows->arrayField[0].value.stringValue;
 		sprintf(
 				pcSQLStatement,
 				"UPDATE user_map_table SET rtcname = '%s', isCalling = 1 WHERE sipname = '%s'",
-				rtcname.c_str(), sipname.c_str());
+				rtcname.c_str(), m_sipName.c_str());
 		CDB::instance()->execSQL(pcSQLStatement);
 
-		LOG4CXX_INFO(logger, "selectSipUser: rtcname: "<<rtcname<<" map to sipname: "<<sipname);
+		LOG4CXX_INFO(logger, "selectSipUser: rtcname: "<<rtcname<<" map to sipname: "<<m_sipName);
 		return true;
 	} else {
 		LOG4CXX_ERROR(logger, "selectSipUser: No IMS sip code idle.");
@@ -250,7 +251,7 @@ void CR2SCallModule::sendBackOK(TUniNetMsg *msg) {
 }
 
 bool CR2SCallModule::checkSipUserAvailable(TUniNetMsg * msg) {
-	if (accessMode == 1 || accessMode == 2) {
+	if (m_accessMode == 1 || m_accessMode == 2) {
 		PTRtcCtrlMsg pRtcCtrl = (PTRtcCtrlMsg) msg->ctrlMsgHdr;
 		return selectSipUser(pRtcCtrl->from.c_str());
 	} else {
@@ -332,25 +333,102 @@ bool CR2SCallModule::isSdpConfirmed(){
 }
 
 void CR2SCallModule::sendReqToBear_Rtc(){
-	if(m_intCtrlMsg == NULL){
-		m_intCtrlMsg->from = "rtc_call";
-		m_intCtrlMsg->to = "bear";
-		m_intCtrlMsg->sessionId = m_offerSessionId;
-		m_intCtrlMsg->intType = INT_REQUEST;
+	if(m_intCtrlMsg_Rtc == NULL){
+		m_intCtrlMsg_Rtc->from = "rtc_call";
+		m_intCtrlMsg_Rtc->to = "bear";
+		m_intCtrlMsg_Rtc->sessionId = m_offerSessionId;
+		m_intCtrlMsg_Rtc->intType = INT_REQUEST;
 	}
 
 	PTIntRequest pReq = new TIntRequest();
 	pReq->body = m_webSdp.c_str();
 
-	sendToDispatcher(INT_REQUEST, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg->clone(), pReq);
+	sendToDispatcher(INT_REQUEST, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Rtc->clone(), pReq);
 }
 
 void CR2SCallModule::sendCloseToBear_Rtc()
 {
-	if(m_intCtrlMsg != NULL)
+	if(m_intCtrlMsg_Rtc != NULL)
 	{
 		PTIntClose pClose = new TIntClose();
-		sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg->clone(), pReq);
+		sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Rtc->clone(), pReq);
 	}
+}
+
+
+
+
+char * CR2SCallModule::getUserName(const string& user){
+
+	int i = user.find('@');
+	if(i != -1)
+		return user.substr(0, i).c_str();
+	else
+		return user.c_str();
+}
+
+char * CR2SCallModule::getHost(const string& user){
+	int i = user.find('@');
+	if(i != -1)
+		return user.substr(i + 1).c_str();
+	else
+		return NULL;
+}
+
+void CR2SCallModule::sendNoSdpInviteToIMS(){
+	if(m_sipCtrlMsg == NULL){
+		m_sipCtrlMsg = new TSipCtrlMsg();
+		m_sipCtrlMsg->sip_callId.number = CMsgMapHelper::generateSipCallIDNumber(m_rtcCtrlMsg->offerSessionId);
+
+		if(m_accessMode == 1 || m_accessMode == 2){
+			m_sipCtrlMsg->from.displayname = getUserName(m_sipName);
+			if(getHost(m_sipName) != NULL)
+			{
+				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip", getUserName(m_sipName), getHost(m_sipName), NULL);
+			}
+			else{
+				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("tel", getUserName(m_sipName), NULL, NULL);
+			}
+		}
+		else{
+			string from = m_rtcCtrlMsg->from.c_str();
+			m_sipCtrlMsg->from.displayname = getUserName(from);
+			m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip", getUserName(from), getHost(from), NULL);
+		}
+
+		m_sipCtrlMsg->from.tag = m_rtcCtrlMsg->offerSessionId;
+
+		string toStr  = m_rtcCtrlMsg->to.c_str();
+		m_sipCtrlMsg->to.displayname = getUserName(toStr);
+		m_sipCtrlMsg->to.url = CSipMsgHelper::createSipURI("tel", getUserName(m_sipName), NULL, NULL);//tel后不能有域名
+	}
+
+	//协议栈自动添加
+//	char str[64];
+//	sprintf(str, "%d", pRtcOffer->seq);
+//	m_sipCtrlMsg->cseq_number = str;
+//	m_sipCtrlMsg->cseq_method = "INVITE";
+
+	PTSipInvite pInvite = new TSipInvite();
+	pInvite->req_uri = m_sipCtrlMsg->to.url;
+
+	sendToDispatcher(SIP_INVITE, SIP_TYPE, DIALOG_BEGIN, m_sipCtrlMsg, pInvite);
+}
+//	void sendNoSdpInviteToIMS();
+//	void sendCancelToIMS();
+//	void sendPrackToIMS(TUniNetMsg * msg);
+//	void sendAckToIMS(TUniNetMsg * msg);
+//	void send200OKForUpdateToIMS(TUniNetMsg * msg);
+//	void send200OKForInviteToIMS(TUniNetMsg * msg);
+//	void sendByeToIMS();
+void CR2SCallModule::sendCancelToIMS(){
+	PTSipCancel pCancel = new TSipCancel();
+	pCancel->req_uri = m_sipCtrlMsg->to.url;
+
+	sendToDispatcher(SIP_CANCEL,SIP_TYPE, DIALOG_CONTINUE, m_sipCtrlMsg->clone(), pCancel);
+}
+
+void CR2SCallModule::sendPrackToIMS(TUniNetMsg * msg){
+	PTSipPrack pPrack = new TSipPrack();
 }
 
