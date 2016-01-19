@@ -56,9 +56,9 @@ usage:
 	@echo "    make compilesm                       compile SM"
 
 all: sipmsgdef rtc_msgdef internal_msgdef rtc_db rtc_psa msgmapper dispatcher \
-	rtc_sip_callmodule.so psasip msglib bear_module
+	rtc_sip_callmodule psasip msglib bear_module
 clean: clean.rtc_psa clean.rtc_msgdef clean.rtc_db clean.internal_msgdef clean.dispatcher clean.deploy clean.message_xml_parse \
-	 clean.rtc_sip_callmodule.so  clean.msgmapper clean.bear_module\
+	 clean.rtc_sip_callmodule  clean.msgmapper clean.bear_module\
 	clean.psasip clean.msglib clean.sipmsgdef
 compilesm: compilertcsm compilesipsm
 
@@ -224,7 +224,7 @@ OBJS_RTC_SIP_CALL = ./rtc_sip_callmodule/source/CR2SCallModule.o \
 					./rtc_sip_callmodule/source/CSipTermCall_sm.o
 					
 rtc_sip_callmodule: $(OBJS_RTC_SIP_CALL)
-	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/rtc_sip_callmodule.so $(OBJS_SIP_CALL) -L$(DEPLOY_DIR) -lmsgmapper $(LIBS) -lsipmsgdef 
+	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/rtc_sip_callmodule.so $(OBJS_SIP_CALL) -L$(DEPLOY_DIR) -lmsgmapper $(LIBS) -lsipmsgdef -lintmsg
 	@echo "**************Finsh making rtc_sip_callmodule.so**********************"
 clean.rtc_sip_callmodule:
 	rm -f $(OBJS_RTC_SIP_CALL) $(OUTPUT_DIR)/rtc_sip_callmodule.so

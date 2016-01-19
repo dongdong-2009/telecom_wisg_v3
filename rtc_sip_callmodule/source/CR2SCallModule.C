@@ -15,8 +15,7 @@ CLONE_COMP(CR2SCallModule)
 CREATE_COMP(CR2SCallModule)
 
 CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
-	CUACSTask(afsm), m_fsmContext(*this), m_isDispatcherAddrSet(FALSE),
-			m_isReCall(false) {
+	CUACSTask(afsm), m_rtcContext(*this), m_sipContext(*this), m_isDispatcherAddrSet(FALSE){
 	// get LOGADDR_DISPATCHER from conf
 	CProperties* properties = CPropertiesManager::getInstance()->getProperties(
 			"rtc.env");
@@ -49,6 +48,9 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	m_isSdpConfirmed = false;
 	m_sipCtrlMsg = NULL;
 	m_sdpModifyFlag = 0;
+
+	m_isRtcInit = false;
+	m_isSipInit = true;
 }
 
 CR2SCallModule::~CR2SCallModule() {
@@ -63,7 +65,8 @@ PTUACData CR2SCallModule::createData() {
 }
 
 void CR2SCallModule::initState() {
-	m_fsmContext.enterStartState();
+	m_sipContext.enterStartState();
+	m_rtcContext.enterStartState();
 }
 
 bool CR2SCallModule::selectSipUser(string rtcname) {
@@ -136,18 +139,20 @@ void CR2SCallModule::sendToDispatcher(TUniNetMsgName msgName,
 
 }
 
-void CR2SCallModule::endTask() {
-	LOG4CXX_DEBUG(logger, "endTask current state:" <<m_fsmContext.getState().getName());
-	// 产生一条DIALOG——END消息，发给dispatcher，清除会话信息
-	TUniNetMsg *pMsg = new TUniNetMsg();
-	pMsg->dialogType = DIALOG_END;
-	pMsg->msgType = RTC_TYPE; // 无所谓，先判断dialogType
-	pMsg->msgName = RTC_OK;
-	pMsg->tAddr.logAddr = LOGADDR_DISPATCHER;
-	pMsg->ctrlMsgHdr = m_rtcCtrlMsg->clone();
-	pMsg->setCtrlMsgHdr();
+void CR2SCallModule::endTask_Rtc() {
+	LOG4CXX_DEBUG(logger, "endTask current state:" <<m_rtcContext.getState().getName());
 
-	sendToDispatcher(pMsg);
+	// 产生一条DIALOG——END消息，发给dispatcher，清除会话信息
+	sendToDispatcher(RTC_OK, RTC_TYPE, DIALOG_END, m_rtcCtrlMsg->clone(), NULL);
+	end();
+	LOG4CXX_DEBUG(logger, "endTask finished");
+}
+
+void CR2SCallModule::endTask_Sip() {
+	LOG4CXX_DEBUG(logger, "endTask current state:" <<m_sipContext.getState().getName());
+
+	// 产生一条DIALOG——END消息，发给dispatcher，清除会话信息
+	sendToDispatcher(SIP_BYE, SIP_TYPE, DIALOG_END, m_sipCtrlMsg->clone(), NULL);
 	end();
 	LOG4CXX_DEBUG(logger, "endTask finished");
 }
@@ -158,7 +163,8 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 		m_dispatcherAddr = msg->oAddr;
 		m_isDispatcherAddrSet = TRUE;
 	}
-	LOG4CXX_DEBUG(logger, "procMsg: current state: "<< m_fsmContext.getState().getName() << ", recv msgName "<<msg->getMsgNameStr());
+	LOG4CXX_DEBUG(logger, "procMsg: RTC current state: "<< m_rtcContext.getState().getName() << ", recv msgName "<<msg->getMsgNameStr());
+	LOG4CXX_DEBUG(logger, "procMsg: SIP current state: "<< m_sipContext.getState().getName() << ", recv msgName "<<msg->getMsgNameStr());
 	LOG4CXX_DEBUG(logger, "procMsg: recv Msg:\n"<<CTUniNetMsgHelper::toString(msg));
 	switch (msg->msgName) {
 	case RTC_OFFER: {
@@ -173,18 +179,82 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 		str += buf;
 		m_rtcCtrlMsg->answerSessionId = str.c_str();
 		swap(m_rtcCtrlMsg->from, m_rtcCtrlMsg->to);
+
+		if(!m_isRtcInit)
+			m_rtcContext.enterStartState();
+		m_rtcContext.onOffer(msg);
 		break;
 	}
 	case RTC_ANSWER:
-	case RTC_INFO:
-	case RTC_OK:
-	case RTC_SHUTDOWN:
-	case RTC_ERROR:
-		m_fsmContext.onMessage(msg);
+		m_rtcContext.onAnswer(msg);
 		break;
-	case SIP_RESPONSE:{
-		PTSipCtrlMsg ctrlMsg = (PTSipCtrlMsg) msg->ctrlMsgHdr;
+	case RTC_OK:
+		m_rtcContext.onOK(msg);
+		break;
+	case RTC_SHUTDOWN:
+		m_rtcContext.onShutDown(msg);
+		break;
+	case RTC_ERROR:
+		m_rtcContext.onError(msg);
+		break;
 
+	case INT_RESPONSE:
+	{
+		PTIntCtrlMsg intCtrlMsg = (PTIntCtrlMsg)msg->ctrlMsgHdr;
+		if(intCtrlMsg->to.c_str() == "sip_call"){
+			m_sipContext.onSdpAnswer(msg);
+		}
+		else if(intCtrlMsg->to.c_str() == "rtc_call"){
+			m_rtcContext.onSdpAnswer(msg);
+		}
+		break;
+	}
+
+	case INT_ERROR:
+	{
+		PTIntCtrlMsg intCtrlMsg = (PTIntCtrlMsg)msg->ctrlMsgHdr;
+		if(intCtrlMsg->to.c_str() == "sip_call"){
+			m_sipContext.onError(msg);
+		}
+		else if(intCtrlMsg->to.c_str() == "rtc_call"){
+			m_rtcContext.onError(msg);
+		}
+		break;
+	}
+
+	case INT_CLOSE:
+	{
+		PTIntCtrlMsg intCtrlMsg = (PTIntCtrlMsg)msg->ctrlMsgHdr;
+		if(intCtrlMsg->to.c_str() == "sip_call"){
+			m_sipContext.onClose(msg);
+		}
+		else if(intCtrlMsg->to.c_str() == "rtc_call"){
+			m_rtcContext.onClose(msg);
+		}
+		break;
+	}
+
+	case SIP_RESPONSE:{
+		m_sipContext.onResponse(msg);
+		break;
+	}
+
+	case SIP_ACK:{
+		m_sipContext.onAck(msg);
+		break;
+	}
+
+	case SIP_INVITE:{
+		m_sipContext.onInvite(msg);
+	}
+	case SIP_BYE:
+	{
+		m_sipContext.onBye(msg);
+		break;
+	}
+	case SIP_UPDATE:
+	{
+		m_sipContext.onUpdate(msg);
 		break;
 	}
 	default:
@@ -194,20 +264,19 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 		//endTask();
 		break;
 	}
-	LOG4CXX_DEBUG(logger, "after procMsg state: %s"<<m_fsmContext.getState().getName());
+	LOG4CXX_DEBUG(logger, "after procMsg state: %s"<<m_rtcContext.getState().getName());
 }
 
 //处理定时器超时
 void CR2SCallModule::onTimeOut(TTimeMarkExt timerMark) {
-	sendBackError(ERROR_TIMEOUT);
 	LOG4CXX_INFO(logger, "The CR2SCallModule task received a timeout event:"<<timerMark.timerId);
-	m_fsmContext.onTimeOut(timerMark);
+	m_rtcContext.onTimeOut(timerMark);
 }
 
 //
 BOOL CR2SCallModule::msgMap(TUniNetMsg *pSrcMsg, TUniNetMsg *pDestMsg) {
-	return CRtcToSip::instance()->msgMap(pSrcMsg, pDestMsg, m_caller,
-			m_isReCall);
+	//return CRtcToSip::instance()->msgMap(pSrcMsg, pDestMsg, m_caller,
+		//	m_isReCall);
 }
 
 
@@ -240,7 +309,7 @@ void CR2SCallModule::sendAnswerToWeb(TUniNetMsg * msg) {
 	pAnswer->sdp = pResp->body;
 
 	TUniNetMsg * newMsg = new TUniNetMsg();
-	sendToDispatcher(RTC_ANSER, RTC_TYPE, DIALOG_CONTINUE, m_rtcCtrlMsg->clone(), pAnswer);
+	sendToDispatcher(RTC_ANSWER, RTC_TYPE, DIALOG_CONTINUE, m_rtcCtrlMsg->clone(), pAnswer);
 	//m_rtcCtrlMsg
 }
 
@@ -277,7 +346,7 @@ void CR2SCallModule::sendNotifyToWeb(TUniNetMsg * msg){
 	pNotify->content = pReq->body;
 	pNotify->content_length = pNotify->content.length();
 
-	PTRtcCtrlMsg ctrlMsg = m_rtcCtrlMsg->clone();
+	PTRtcCtrlMsg ctrlMsg = (PTRtcCtrlMsg)m_rtcCtrlMsg->clone();
 
 	sendToDispatcher(RTC_NOTIFY, RTC_TYPE, DIALOG_CONTINUE, m_rtcCtrlMsg->clone(), pNotify);
 }
@@ -305,14 +374,14 @@ void CR2SCallModule::sendCloseToBear_Rtc()
 	if(m_intCtrlMsg_Rtc != NULL)
 	{
 		PTIntClose pClose = new TIntClose();
-		sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Rtc->clone(), pReq);
+		sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Rtc->clone(), pClose);
 	}
 }
 
 
 
 
-char * CR2SCallModule::getUserName(const string& user){
+const char * CR2SCallModule::getUserName(const string& user){
 
 	int i = user.find('@');
 	if(i != -1)
@@ -321,7 +390,7 @@ char * CR2SCallModule::getUserName(const string& user){
 		return user.c_str();
 }
 
-char * CR2SCallModule::getHost(const string& user){
+const char * CR2SCallModule::getHost(const string& user){
 	int i = user.find('@');
 	if(i != -1)
 		return user.substr(i + 1).c_str();
@@ -415,7 +484,7 @@ void CR2SCallModule::sendAckToIMS(TUniNetMsg * msg){
 }
 
 void CR2SCallModule::send200OKForUpdateToIMS(TUniNetMsg * msg){
-	PTSipResp pAns = new PTSipResp();
+	PTSipResp pAns = new TSipResp();
 	pAns->statusCode = 200;
 	pAns->reason_phase = "OK";
 
@@ -427,7 +496,7 @@ void CR2SCallModule::send200OKForUpdateToIMS(TUniNetMsg * msg){
 		pAns->body.content_length = pResp->body.length();
 	}
 
-	PTSipCtrlMsg ctrlMsg = m_sipCtrlMsg->clone();
+	PTSipCtrlMsg ctrlMsg = (PTSipCtrlMsg)m_sipCtrlMsg->clone();
 
 	ctrlMsg->cseq_method = "UPDATE";
 
@@ -436,7 +505,7 @@ void CR2SCallModule::send200OKForUpdateToIMS(TUniNetMsg * msg){
 
 
 void CR2SCallModule::send200OKForInviteToIMS(TUniNetMsg * msg){
-	PTSipResp pAns = new PTSipResp();
+	PTSipResp pAns = new TSipResp();
 	pAns->statusCode = 200;
 	pAns->reason_phase = "OK";
 
@@ -448,14 +517,14 @@ void CR2SCallModule::send200OKForInviteToIMS(TUniNetMsg * msg){
 		pAns->body.content_length = pResp->body.length();
 	}
 
-	PTSipCtrlMsg ctrlMsg = m_sipCtrlMsg->clone();
+	PTSipCtrlMsg ctrlMsg = (PTSipCtrlMsg)m_sipCtrlMsg->clone();
 	ctrlMsg->cseq_method = "INVITE";
 	sendToDispatcher(SIP_RESPONSE, SIP_TYPE, DIALOG_CONTINUE, m_sipCtrlMsg->clone(), pAns);
 }
 
 void CR2SCallModule::sendByeToIMS()
 {
-	PTSipBye pBye = new PTSipBye();
+	PTSipBye pBye = new TSipBye();
 	pBye->req_uri = m_sipCtrlMsg->to.url;
 
 	sendToDispatcher(SIP_BYE, SIP_TYPE, DIALOG_CONTINUE, m_sipCtrlMsg->clone(), pBye);
@@ -488,12 +557,12 @@ void CR2SCallModule::sendCloseToBear_Sip()
 	if(m_intCtrlMsg_Sip != NULL)
 	{
 		PTIntClose pClose = new TIntClose();
-		sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Sip->clone(), pReq);
+		sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Sip->clone(), pClose);
 	}
 }
 
 
-void CR2SCallModule::isResp1xx(TUniNetMsg * msg){
+bool CR2SCallModule::isResp1xx(TUniNetMsg * msg){
 	if (msg->msgType != SIP_TYPE && msg->msgName != SIP_RESPONSE)
 		return false;
 
@@ -504,7 +573,7 @@ void CR2SCallModule::isResp1xx(TUniNetMsg * msg){
 		return false;
 }
 
-void CR2SCallModule::isResp2xx(TUniNetMsg * msg){
+bool CR2SCallModule::isResp2xx(TUniNetMsg * msg){
 	if (msg->msgType != SIP_TYPE && msg->msgName != SIP_RESPONSE)
 		return false;
 
@@ -514,7 +583,7 @@ void CR2SCallModule::isResp2xx(TUniNetMsg * msg){
 		return false;
 }
 
-void CR2SCallModule::isResp3xx_6xx(TUniNetMsg * msg){
+bool CR2SCallModule::isResp3xx_6xx(TUniNetMsg * msg){
 	if (msg->msgType != SIP_TYPE && msg->msgName != SIP_RESPONSE)
 		return false;
 
@@ -525,7 +594,7 @@ void CR2SCallModule::isResp3xx_6xx(TUniNetMsg * msg){
 		return false;
 }
 
-void CR2SCallModule::isWithSDP(TUniNetMsg *msg){
+bool CR2SCallModule::isWithSDP(TUniNetMsg *msg){
 	if (msg->msgType != SIP_TYPE)
 		return false;
 
@@ -553,7 +622,7 @@ void CR2SCallModule::notifySipTermCallSdp(TUniNetMsg * msg) {
 	//onNotify(NULL);
 }
 
-void CR2SCallModule::notifySipTermClose() {
+void CR2SCallModule::notifySipTermCallClose() {
 	//onClose(NULL)
 }
 
@@ -577,4 +646,24 @@ void CR2SCallModule::notifyRtcOrigCallClose(){
 void CR2SCallModule::notifyRtcOrigCallError(const int errorType){
 
 }
+
+void CR2SCallModule::handleUnexpectedMsg(TUniNetMsg * msg){
+
+}
+
+bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg){
+	//set ims rtc body
+	return true;
+}
+bool CR2SCallModule::compSdpWithOld(TUniNetMsg * msg){
+	//set ims rtc body
+
+	return true;
+}
+
+string CR2SCallModule::checkRespCseqMothod(TUniNetMsg * msg){
+
+	return "PRACK";
+}
+
 

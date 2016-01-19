@@ -1,5 +1,5 @@
-#ifndef _RTC_MSG_DEF_H
-#define _RTC_MSG_DEF_H
+#ifndef _INT_MSG_DEF_H
+#define _INT_MSG_DEF_H
 
 #include "msgdef_int.h"
 #include "msgtypedef_int.h"

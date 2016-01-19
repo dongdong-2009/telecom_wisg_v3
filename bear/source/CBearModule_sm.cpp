@@ -17,13 +17,13 @@
  * Date:           2016-1-11
  * Version:        1.0
  * Description:
-     Bear state machineã
+     Bear state machine???
 
 *******************************************************************************/
 
 
 #include "CBearModule.h"
-#include "./CBearModule_sm.h"
+#include "CBearModule_sm.h"
 
 using namespace statemap;
 
@@ -35,19 +35,7 @@ CBearState_BEAR_JOIN CBearState::BEAR_JOIN("CBearState::BEAR_JOIN", 3);
 CBearState_BEAR_MODIFYING CBearState::BEAR_MODIFYING("CBearState::BEAR_MODIFYING", 4);
 CBearState_CLOSED CBearState::CLOSED("CBearState::CLOSED", 5);
 
-void CBearModuleState::onBye(CBearModuleContext& context)
-{
-    Default(context);
-    return;
-}
-
 void CBearModuleState::onBye(CBearModuleContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
-}
-
-void CBearModuleState::onClose(CBearModuleContext& context)
 {
     Default(context);
     return;
@@ -59,31 +47,13 @@ void CBearModuleState::onClose(CBearModuleContext& context, TUniNetMsg* msg)
     return;
 }
 
-void CBearModuleState::onJoin(CBearModuleContext& context)
-{
-    Default(context);
-    return;
-}
-
 void CBearModuleState::onJoin(CBearModuleContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CBearModuleState::onResponse(CBearModuleContext& context)
-{
-    Default(context);
-    return;
-}
-
 void CBearModuleState::onResponse(CBearModuleContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
-}
-
-void CBearModuleState::onSdpRequest(CBearModuleContext& context)
 {
     Default(context);
     return;
@@ -111,35 +81,35 @@ void CBearModuleState::Default(CBearModuleContext& context)
     return;
 }
 
-void CBearState_Default::onBye(CBearModuleContext& context)
+void CBearState_Default::onBye(CBearModuleContext& context, TUniNetMsg* msg)
 {
 
 
     return;
 }
 
-void CBearState_Default::onClose(CBearModuleContext& context)
+void CBearState_Default::onClose(CBearModuleContext& context, TUniNetMsg* msg)
 {
 
 
     return;
 }
 
-void CBearState_Default::onJoin(CBearModuleContext& context)
+void CBearState_Default::onJoin(CBearModuleContext& context, TUniNetMsg* msg)
 {
 
 
     return;
 }
 
-void CBearState_Default::onSdpRequest(CBearModuleContext& context)
+void CBearState_Default::onSdpRequest(CBearModuleContext& context, TUniNetMsg* msg)
 {
 
 
     return;
 }
 
-void CBearState_Default::onResponse(CBearModuleContext& context)
+void CBearState_Default::onResponse(CBearModuleContext& context, TUniNetMsg* msg)
 {
 
 
@@ -148,21 +118,7 @@ void CBearState_Default::onResponse(CBearModuleContext& context)
 
 void CBearState_Default::onTimeOut(CBearModuleContext& context, TTimeMarkExt timerMark)
 {
-    CBearModule& ctxt(context.getOwner());
 
-    CBearModuleState& endState = context.getState();
-
-    context.clearState();
-    try
-    {
-        ctxt.endTask();
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
 
     return;
 }

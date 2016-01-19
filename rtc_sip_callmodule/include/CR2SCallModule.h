@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include <map>
-
+#include "db.h"
 #include "uacstask.h"
 #include "rtc_msg_def.h"
 #include "int_msg_def.h"
@@ -14,7 +14,7 @@
 #include "CSipTermCall_sm.h"
 #include "CMsgDispatcher.h"
 
-#include "db.h"
+
 
 
 _CLASSDEF(CR2SCallModule)
@@ -25,6 +25,14 @@ const int RTC_CONNECTION_TIMEOUT = 20;
 const int RTC_SHUTDOWN_TIMEOUT = 21;
 const int RTC_WAITSIP_TIMEOUT = 22;
 const int RTC_WAITBEAR_TIMEOUT = 23;
+
+const int SIP_200OK_TIMEOUT = 30;
+const int SIP_ACK_TIMEOUT = 31;
+
+const int SIP_CONNECTING_TIMEOUT = 32;
+const int SIP_RING_TIMEOUT = 33;
+const int SIP_ACTIVE_TIMEOUT = 34;
+const int SIP_WAITBEAR_TIMEOUT = 35;
 
 
 
@@ -42,7 +50,8 @@ public:
 	 * 需要向Dispatcher模块发送信息,通知这个处理状态机实例的结束
 	 * 删除Dispatcher模块存储的会话状态信息
 	 */
-	void endTask();
+	void endTask_Rtc();
+	void endTask_Sip();
 
 	// method from CUACSTask
 	//处理消息
@@ -56,7 +65,8 @@ protected:
 	virtual PTUACData createData();//需要子类实例化一个TUACData对象。
 	virtual void initState(); //需要子类实例化一个状态类对象。通常是转到初始状态。
 private:
-
+	CRtcOrigCallContext m_rtcContext;
+	CSipTermCallContext m_sipContext;
 
 	INT LOGADDR_DISPATCHER;	// 231
 
@@ -68,10 +78,10 @@ private:
 
 	string m_sipName;
 
-	TRtcCtrlMsg* m_rtcCtrlMsg;
 
 	TIntCtrlMsg* m_intCtrlMsg_Rtc;
 	TIntCtrlMsg* m_intCtrlMsg_Sip;
+	TRtcCtrlMsg* m_rtcCtrlMsg;
 
 	CVarChar64 m_offerSessionId;
 
@@ -84,6 +94,10 @@ private:
 
 	UINT m_sdpModifyFlag;
 
+	bool m_isSipInit;
+	bool m_isRtcInit;
+	bool m_switchFlag;
+
 	bool selectSipUser(string rtcname);
 public:
 	// map rtc message to sip message
@@ -94,7 +108,7 @@ public:
 	bool checkSipUserAvailable(TUniNetMsg *msg);
 
 	void notifySipTermCallSdp(TUniNetMsg *msg);
-	void notifySipTermClose();
+	void notifySipTermCallClose();
 
 	void sendAnswerToWeb(TUniNetMsg *msg);
 	void sendErrorToWeb(const int errorType);
@@ -130,9 +144,14 @@ public:
 	bool isResp2xx(TUniNetMsg * msg);
 
 	bool compAndModifySdpWithRtc(TUniNetMsg * msg);
+	bool compSdpWithOld(TUniNetMsg * msg);
+	string checkRespCseqMothod(TUniNetMsg * msg);
 
-	string getUserName(const string& user);
-	string getHost(const string& user);
+	const char * getUserName(const string& user);
+	const char * getHost(const string& user);
+
+
+
 
 	inline void setUACTag(TUniNetMsg * msg){
 		m_sipCtrlMsg->to.tag = ((PTSipCtrlMsg) msg->ctrlMsgHdr)->to.tag;
@@ -150,11 +169,11 @@ public:
 		return m_sdpModifyFlag == 2;
 	}
 
-	inline bool setUpdateFlag(){
+	inline void setUpdateFlag(){
 		m_sdpModifyFlag = 2;
 	}
 
-	inline bool setInviteFlag(){
+	inline void setInviteFlag(){
 		m_sdpModifyFlag = 1;
 	}
 
@@ -164,6 +183,14 @@ public:
 
 	inline bool isFromSip(TUniNetMsg * msg){
 		return msg == NULL;
+	}
+
+	inline bool isSwitch(){
+		return m_switchFlag;
+	}
+
+	inline void resetSwitchFlag(){
+		m_switchFlag = false;
 	}
 
 };

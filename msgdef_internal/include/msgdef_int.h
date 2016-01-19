@@ -9,8 +9,8 @@
 .
  * 
  ******************************************************************************/
-#ifndef __MSGDEF_RTC_H_
-#define __MSGDEF_RTC_H_
+#ifndef __MSGDEF_INT_H_
+#define __MSGDEF_INT_H_
 
 #include "comtypedef.h"
 #include "comtypedef_uninet.h"
@@ -26,8 +26,6 @@
 #include <time.h>
 #include <strstream>
 using namespace std;
-
-
 
 _CLASSDEF(TIntCtrlMsg)
 class TIntCtrlMsg:public TCtrlMsg
@@ -101,7 +99,7 @@ _CLASSDEF(TIntError)
 class TIntError:public TMsgBody
 {
 	public:
-		UINT       		error;
+		UINT       		errorType;
 
 		inline         TIntError();
 
@@ -156,7 +154,7 @@ inline TIntResponse::TIntResponse()
 
 inline TIntError::TIntError()
 {
-	error = 0;
+	errorType = 0;
 }
 
 inline TIntClose::TIntClose()

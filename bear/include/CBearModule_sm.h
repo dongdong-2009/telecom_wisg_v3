@@ -38,15 +38,10 @@ public:
     virtual void Entry(CBearModuleContext&) {};
     virtual void Exit(CBearModuleContext&) {};
 
-    virtual void onBye(CBearModuleContext& context);
     virtual void onBye(CBearModuleContext& context, TUniNetMsg* msg);
-    virtual void onClose(CBearModuleContext& context);
     virtual void onClose(CBearModuleContext& context, TUniNetMsg* msg);
-    virtual void onJoin(CBearModuleContext& context);
     virtual void onJoin(CBearModuleContext& context, TUniNetMsg* msg);
-    virtual void onResponse(CBearModuleContext& context);
     virtual void onResponse(CBearModuleContext& context, TUniNetMsg* msg);
-    virtual void onSdpRequest(CBearModuleContext& context);
     virtual void onSdpRequest(CBearModuleContext& context, TUniNetMsg* msg);
     virtual void onTimeOut(CBearModuleContext& context, TTimeMarkExt timerMark);
 
@@ -76,11 +71,11 @@ public:
     : CBearModuleState(name, stateId)
     {};
 
-    virtual void onBye(CBearModuleContext& context);
-    virtual void onClose(CBearModuleContext& context);
-    virtual void onJoin(CBearModuleContext& context);
-    virtual void onSdpRequest(CBearModuleContext& context);
-    virtual void onResponse(CBearModuleContext& context);
+    virtual void onBye(CBearModuleContext& context, TUniNetMsg* msg);
+    virtual void onClose(CBearModuleContext& context, TUniNetMsg* msg);
+    virtual void onJoin(CBearModuleContext& context, TUniNetMsg* msg);
+    virtual void onSdpRequest(CBearModuleContext& context, TUniNetMsg* msg);
+    virtual void onResponse(CBearModuleContext& context, TUniNetMsg* msg);
     virtual void onTimeOut(CBearModuleContext& context, TTimeMarkExt timerMark);
 };
 
@@ -198,19 +193,9 @@ public:
         return (dynamic_cast<CBearModuleState&>(*_state));
     };
 
-    void onBye()
-    {
-        (getState()).onBye(*this);
-    };
-
     void onBye(TUniNetMsg* msg)
     {
         (getState()).onBye(*this, msg);
-    };
-
-    void onClose()
-    {
-        (getState()).onClose(*this);
     };
 
     void onClose(TUniNetMsg* msg)
@@ -218,29 +203,14 @@ public:
         (getState()).onClose(*this, msg);
     };
 
-    void onJoin()
-    {
-        (getState()).onJoin(*this);
-    };
-
     void onJoin(TUniNetMsg* msg)
     {
         (getState()).onJoin(*this, msg);
     };
 
-    void onResponse()
-    {
-        (getState()).onResponse(*this);
-    };
-
     void onResponse(TUniNetMsg* msg)
     {
         (getState()).onResponse(*this, msg);
-    };
-
-    void onSdpRequest()
-    {
-        (getState()).onSdpRequest(*this);
     };
 
     void onSdpRequest(TUniNetMsg* msg)

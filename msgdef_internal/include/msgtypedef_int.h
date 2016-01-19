@@ -1,5 +1,5 @@
-#ifndef MSGTYPEDEF_RTC_H_
-#define MSGTYPEDEF_RTC_H_
+#ifndef MSGTYPEDEF_INT_H_
+#define MSGTYPEDEF_INT_H_
 
 #include "comtypedef_uninet.h"
 

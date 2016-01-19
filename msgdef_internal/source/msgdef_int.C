@@ -260,19 +260,19 @@ void TIntResponse::print(ostrstream& st)
 PTMsgBody TIntError::clone()
 {
 	PTIntError amsg = new TIntError();
-	amsg->error						= error;
+	amsg->errorType						= errorType;
 	return amsg;
 }
 TIntError& TIntError::operator=(const TIntError &r)
 {
-	error						  = r.error;
+	errorType						  = r.errorType;
 	return *this;
 }
 
 BOOL TIntError::operator == (TMsgPara& msg)
 {
 	COMPARE_MSG_BEGIN(TIntError,msg)
-	COMPARE_FORCE_INT(TIntError, error);
+	COMPARE_FORCE_INT(TIntError, errorType);
 
 	COMPARE_END
 }
@@ -288,13 +288,13 @@ INT TIntError::size()
 
 INT TIntError::encode(CHAR* &buf)
 {
-	ENCODE_INT( buf , error )
+	ENCODE_INT( buf , errorType )
 	return size();
 }
 
 INT TIntError::decode(CHAR* &buf)
 {
-	DECODE_INT(buf, error)
+	DECODE_INT(errorType, buf)
 
 	return size();
 }
@@ -303,7 +303,7 @@ BOOL TIntError::decodeFromXML(TiXmlHandle& xmlParser,PCGFSM fsm)
 {
 	FILL_FIELD_BEGIN
 
-	FILL_FORCE_INT(TIntError, error)
+	FILL_FORCE_INT(TIntError, errorType)
 
 	FILL_FIELD_END
 }
@@ -311,7 +311,7 @@ BOOL TIntError::decodeFromXML(TiXmlHandle& xmlParser,PCGFSM fsm)
 void TIntError::print(ostrstream& st)
 {
 	st<<"==| TIntError =="<<endl;
-	st<<"$error						  = "<<error<<endl;
+	st<<"$error						  = "<<errorType<<endl;
 
 }
 

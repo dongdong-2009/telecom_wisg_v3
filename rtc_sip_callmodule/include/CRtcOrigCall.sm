@@ -60,7 +60,7 @@ IDLE
 RTC_CONFIRMING
 {
 	//收到来自SIP TERM CALL的Notify
-	onNotify(msg:TUniNetMsg*) 
+	onNotify(msg:TUniNetMsg*)
 	[true == ctxt.isSdpConfirmed()]
 	BEAR_CONFIRMING
 	{//SIP端返回SDP
@@ -73,7 +73,7 @@ RTC_CONFIRMING
 	[false == ctxt.isSdpConfirmed()]
 	CLOSED
 	{
-		stopTimer(msg);
+		stopTimer();
 		sendErrorToWeb(ERROR_NOMATCH);
 	}
 	
@@ -184,7 +184,7 @@ BEAR_CONFIRMED
 	}
 	
 	onClose(msg:TUniNetMsg*)
-	[false == ctxt.isFromSip] 
+	[false == ctxt.isFromSip(msg)] 
 	CLOSED
 	{// 来自媒体服务器的挂断
 		stopTimer();
@@ -207,6 +207,7 @@ ACTIVE
 	onNotify(msg:TUniNetMsg*)
 	nil
 	{//SIP端 a/v 切换
+		resetSwitchFlag();
 		sendNotifyToWeb(msg);
 	}
 	
@@ -219,7 +220,7 @@ ACTIVE
 	}
 	
 	onClose(msg:TUniNetMsg*)
-	[true == isFromSip(msg)]
+	[true == ctxt.isFromSip(msg)]
 	CLOSED
 	{
 		sendShutdownToWeb();
@@ -227,7 +228,7 @@ ACTIVE
 	}
 	
 	onClose(msg:TUniNetMsg*)
-	[false == isFromSip(msg)]
+	[false == ctxt.isFromSip(msg)]
 	CLOSED
 	{
 		notifySipTermCallClose();
@@ -317,7 +318,7 @@ ACTIVE_WAIT2
 	}
 	
 	onClose(msg:TUniNetMsg*)
-	[false == ctxt.isFromSip] 
+	[false == ctxt.isFromSip(msg)] 
 	CLOSED
 	{// 来自媒体服务器的挂断
 		stopTimer();
@@ -383,6 +384,12 @@ Default
 		handleUnexpectedMsg(msg);		
 	}
 	
+	onAnswer(msg:TUniNetMsg*)
+	nil
+	{
+		handleUnexpectedMsg(msg);
+	}
+	
 	onNotify(msg:TUniNetMsg*)
 	nil
 	{
@@ -392,7 +399,7 @@ Default
 	onTimeOut(timerMark:TTimeMarkExt)
 	nil
 	{
-		handleUnexpectedMsg(msg);
+		//handleUnexpectedMsg(msg);
 	}
 }
 

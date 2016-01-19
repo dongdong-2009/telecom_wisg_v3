@@ -40,73 +40,73 @@ CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING CSipTermCallState::ACTIVE_WAIT_BEAR
 CSipTermCallState_ACTIVE_WAIT_ACK CSipTermCallState::ACTIVE_WAIT_ACK("CSipTermCallState::ACTIVE_WAIT_ACK", 9);
 CSipTermCallState_CLOSED CSipTermCallState::CLOSED("CSipTermCallState::CLOSED", 10);
 
-void CR2SCallModuleState::onAck(CSipTermCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Sip::onAck(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onBye(CSipTermCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Sip::onBye(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onClose(CSipTermCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Sip::onClose(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onError(CSipTermCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Sip::onError(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onInvite(CSipTermCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Sip::onInvite(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onNotify(CSipTermCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Sip::onNotify(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onResponse(CSipTermCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Sip::onResponse(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onSdpAnswer(CSipTermCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Sip::onSdpAnswer(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onTimeOut(CSipTermCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Sip::onTimeOut(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onTimeOut(CSipTermCallContext& context, TTimeMarkExt timerMark)
+void CR2SCallModuleState_Sip::onTimeOut(CSipTermCallContext& context, TTimeMarkExt timerMark)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onUpdate(CSipTermCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Sip::onUpdate(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::Default(CSipTermCallContext& context)
+void CR2SCallModuleState_Sip::Default(CSipTermCallContext& context)
 {
     throw (
         TransitionUndefinedException(
@@ -120,7 +120,7 @@ void CSipTermCallState_Default::onSdpAnswer(CSipTermCallContext& context, TUniNe
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Sip& endState = context.getState();
 
     context.clearState();
     try
@@ -141,7 +141,7 @@ void CSipTermCallState_Default::onNotify(CSipTermCallContext& context, TUniNetMs
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Sip& endState = context.getState();
 
     context.clearState();
     try
@@ -162,7 +162,7 @@ void CSipTermCallState_Default::onResponse(CSipTermCallContext& context, TUniNet
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Sip& endState = context.getState();
 
     context.clearState();
     try
@@ -183,7 +183,7 @@ void CSipTermCallState_Default::onClose(CSipTermCallContext& context, TUniNetMsg
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Sip& endState = context.getState();
 
     context.clearState();
     try
@@ -204,7 +204,7 @@ void CSipTermCallState_Default::onError(CSipTermCallContext& context, TUniNetMsg
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Sip& endState = context.getState();
 
     context.clearState();
     try
@@ -225,7 +225,7 @@ void CSipTermCallState_Default::onAck(CSipTermCallContext& context, TUniNetMsg* 
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Sip& endState = context.getState();
 
     context.clearState();
     try
@@ -246,7 +246,7 @@ void CSipTermCallState_Default::onUpdate(CSipTermCallContext& context, TUniNetMs
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Sip& endState = context.getState();
 
     context.clearState();
     try
@@ -267,7 +267,7 @@ void CSipTermCallState_Default::onInvite(CSipTermCallContext& context, TUniNetMs
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Sip& endState = context.getState();
 
     context.clearState();
     try
@@ -288,7 +288,7 @@ void CSipTermCallState_Default::onBye(CSipTermCallContext& context, TUniNetMsg* 
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Sip& endState = context.getState();
 
     context.clearState();
     try
@@ -362,7 +362,7 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
 
     if (true == ctxt.isResp1xx(msg) && false == ctxt.isWithSDP(msg))
     {
-        CR2SCallModuleState& endState = context.getState();
+        CR2SCallModuleState_Sip& endState = context.getState();
 
         context.clearState();
         try
@@ -838,11 +838,11 @@ void CSipTermCallState_BEAR_CONFIRMED::onResponse(CSipTermCallContext& context, 
             ctxt.sendCloseToBear_Sip();
             ctxt.notifyRtcOrigCallClose();
             ctxt.sendCancelToIMS();
-            context.setState(CSipTermCallState::BEAR_CLIENT_READY);
+            context.setState(CSipTermCallState::CLOSED);
         }
         catch (...)
         {
-            context.setState(CSipTermCallState::BEAR_CLIENT_READY);
+            context.setState(CSipTermCallState::CLOSED);
             throw;
         }
         (context.getState()).Entry(context);
@@ -921,7 +921,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onUpdate(CSipTermCallContext& context, TU
 
     if (false == ctxt.isWithSDP(msg))
     {
-        CR2SCallModuleState& endState = context.getState();
+        CR2SCallModuleState_Sip& endState = context.getState();
 
         context.clearState();
         try
@@ -1258,7 +1258,7 @@ void CSipTermCallState_ACTIVE::onClose(CSipTermCallContext& context, TUniNetMsg*
         }
         (context.getState()).Entry(context);
     }
-    else if (false == ctxt.isFromRtc)
+    else if (false == ctxt.isFromRtc(msg))
 
     {
         (context.getState()).Exit(context);
@@ -1313,7 +1313,7 @@ void CSipTermCallState_ACTIVE::onInvite(CSipTermCallContext& context, TUniNetMsg
         {
             ctxt.notifyRtcOrigCallSdp();
             ctxt.setInviteFlag();
-            ctxt.sendReqToBear_Sip(msg);
+            ctxt.sendReqToBear_Sip();
             ctxt.setTimer(SIP_WAITBEAR_TIMEOUT);
             context.setState(CSipTermCallState::ACTIVE_WAIT_BEAR_MODIFYING);
         }
@@ -1332,7 +1332,7 @@ void CSipTermCallState_ACTIVE::onInvite(CSipTermCallContext& context, TUniNetMsg
         try
         {
             ctxt.setInviteFlag();
-            ctxt.sendReqToBear_Sip(msg);
+            ctxt.sendReqToBear_Sip();
             ctxt.setTimer(SIP_WAITBEAR_TIMEOUT);
             context.setState(CSipTermCallState::ACTIVE_WAIT_BEAR_MODIFYING);
         }
@@ -1379,7 +1379,7 @@ void CSipTermCallState_ACTIVE::onUpdate(CSipTermCallContext& context, TUniNetMsg
         {
             ctxt.notifyRtcOrigCallSdp();
             ctxt.setUpdateFlag();
-            ctxt.sendReqToBear_Sip(msg);
+            ctxt.sendReqToBear_Sip();
             ctxt.setTimer(SIP_WAITBEAR_TIMEOUT);
             context.setState(CSipTermCallState::ACTIVE_WAIT_BEAR_MODIFYING);
         }
@@ -1398,7 +1398,7 @@ void CSipTermCallState_ACTIVE::onUpdate(CSipTermCallContext& context, TUniNetMsg
         try
         {
             ctxt.setUpdateFlag();
-            ctxt.sendReqToBear_Sip(msg);
+            ctxt.sendReqToBear_Sip();
             ctxt.setTimer(SIP_WAITBEAR_TIMEOUT);
             context.setState(CSipTermCallState::ACTIVE_WAIT_BEAR_MODIFYING);
         }
@@ -1461,7 +1461,7 @@ void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onClose(CSipTermCallContext& 
         }
         (context.getState()).Entry(context);
     }
-    else if (false == ctxt.isFromRtc)
+    else if (false == ctxt.isFromRtc(msg))
 
     {
         (context.getState()).Exit(context);
@@ -1519,7 +1519,7 @@ void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onSdpAnswer(CSipTermCallConte
             ctxt.resetFlag();
             ctxt.stopTimer();
             ctxt.send200OKForInviteToIMS(msg);
-            ctxt.stopTimer(SIP_ACK_TIMEOUT);
+            ctxt.setTimer(SIP_ACK_TIMEOUT);
             context.setState(CSipTermCallState::ACTIVE_WAIT_ACK);
         }
         catch (...)
@@ -1615,7 +1615,7 @@ void CSipTermCallState_ACTIVE_WAIT_ACK::onClose(CSipTermCallContext& context, TU
         }
         (context.getState()).Entry(context);
     }
-    else if (false == ctxt.isFromRtc)
+    else if (false == ctxt.isFromRtc(msg))
 
     {
         (context.getState()).Exit(context);

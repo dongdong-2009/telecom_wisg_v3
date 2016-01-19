@@ -266,31 +266,31 @@ Entry
 
 Default
 {
-	onBye
+	onBye(msg:TUniNetMsg*)
 	nil
 	{
 //		endTask();
 	}
 	
-	onClose
+	onClose(msg:TUniNetMsg*)
 	nil
 	{
 //		endTask();
 	}
 		
-	onJoin
+	onJoin(msg:TUniNetMsg*)
 	nil
 	{
 //		endTask();
 	}
 	
-	onSdpRequest
+	onSdpRequest(msg:TUniNetMsg*)
 	nil
 	{
 //		endTask();
 	}
 
-	onResponse
+	onResponse(msg:TUniNetMsg*)
 	nil
 	{
 //		endTask();
@@ -299,7 +299,7 @@ Default
 	onTimeOut(timerMark:TTimeMarkExt)
 	nil
 	{
-		endTask();
+	//	endTask();
 	}
 }
 

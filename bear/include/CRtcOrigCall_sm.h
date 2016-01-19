@@ -24,16 +24,16 @@ class CRtcOrigCallState_ACTIVE_WAIT1;
 class CRtcOrigCallState_ACTIVE_WAIT2;
 class CRtcOrigCallState_CLOSED;
 class CRtcOrigCallState_Default;
-class CR2SCallModuleState_Rtc;
+class CR2SCallModuleState;
 class CRtcOrigCallContext;
 class CR2SCallModule;
 
-class CR2SCallModuleState_Rtc :
+class CR2SCallModuleState :
     public statemap::State
 {
 public:
 
-    CR2SCallModuleState_Rtc(const char *name, int stateId)
+    CR2SCallModuleState(const char *name, int stateId)
     : statemap::State(name, stateId)
     {};
 
@@ -71,12 +71,12 @@ public:
 };
 
 class CRtcOrigCallState_Default :
-    public CR2SCallModuleState_Rtc
+    public CR2SCallModuleState
 {
 public:
 
     CRtcOrigCallState_Default(const char *name, int stateId)
-    : CR2SCallModuleState_Rtc(name, stateId)
+    : CR2SCallModuleState(name, stateId)
     {};
 
     virtual void onSdpAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg);
@@ -225,14 +225,14 @@ public:
         return (_owner);
     };
 
-    CR2SCallModuleState_Rtc& getState() const
+    CR2SCallModuleState& getState() const
     {
         if (_state == NULL)
         {
             throw statemap::StateUndefinedException();
         }
 
-        return (dynamic_cast<CR2SCallModuleState_Rtc&>(*_state));
+        return (dynamic_cast<CR2SCallModuleState&>(*_state));
     };
 
     void onAnswer(TUniNetMsg* msg)

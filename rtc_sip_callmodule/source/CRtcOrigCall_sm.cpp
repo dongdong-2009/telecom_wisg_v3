@@ -37,61 +37,67 @@ CRtcOrigCallState_ACTIVE_WAIT1 CRtcOrigCallState::ACTIVE_WAIT1("CRtcOrigCallStat
 CRtcOrigCallState_ACTIVE_WAIT2 CRtcOrigCallState::ACTIVE_WAIT2("CRtcOrigCallState::ACTIVE_WAIT2", 6);
 CRtcOrigCallState_CLOSED CRtcOrigCallState::CLOSED("CRtcOrigCallState::CLOSED", 7);
 
-void CR2SCallModuleState::onClose(CRtcOrigCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Rtc::onAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onError(CRtcOrigCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Rtc::onClose(CRtcOrigCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onNotify(CRtcOrigCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Rtc::onError(CRtcOrigCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onOK(CRtcOrigCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Rtc::onNotify(CRtcOrigCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onOffer(CRtcOrigCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Rtc::onOK(CRtcOrigCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onSdpAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Rtc::onOffer(CRtcOrigCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onShutDown(CRtcOrigCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Rtc::onSdpAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onTimeOut(CRtcOrigCallContext& context, TUniNetMsg* msg)
+void CR2SCallModuleState_Rtc::onShutDown(CRtcOrigCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::onTimeOut(CRtcOrigCallContext& context, TTimeMarkExt timerMark)
+void CR2SCallModuleState_Rtc::onTimeOut(CRtcOrigCallContext& context, TUniNetMsg* msg)
 {
     Default(context);
     return;
 }
 
-void CR2SCallModuleState::Default(CRtcOrigCallContext& context)
+void CR2SCallModuleState_Rtc::onTimeOut(CRtcOrigCallContext& context, TTimeMarkExt timerMark)
+{
+    Default(context);
+    return;
+}
+
+void CR2SCallModuleState_Rtc::Default(CRtcOrigCallContext& context)
 {
     throw (
         TransitionUndefinedException(
@@ -105,7 +111,7 @@ void CRtcOrigCallState_Default::onSdpAnswer(CRtcOrigCallContext& context, TUniNe
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Rtc& endState = context.getState();
 
     context.clearState();
     try
@@ -126,7 +132,7 @@ void CRtcOrigCallState_Default::onShutDown(CRtcOrigCallContext& context, TUniNet
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Rtc& endState = context.getState();
 
     context.clearState();
     try
@@ -147,7 +153,7 @@ void CRtcOrigCallState_Default::onClose(CRtcOrigCallContext& context, TUniNetMsg
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Rtc& endState = context.getState();
 
     context.clearState();
     try
@@ -168,7 +174,7 @@ void CRtcOrigCallState_Default::onError(CRtcOrigCallContext& context, TUniNetMsg
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Rtc& endState = context.getState();
 
     context.clearState();
     try
@@ -189,7 +195,7 @@ void CRtcOrigCallState_Default::onOK(CRtcOrigCallContext& context, TUniNetMsg* m
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Rtc& endState = context.getState();
 
     context.clearState();
     try
@@ -210,7 +216,28 @@ void CRtcOrigCallState_Default::onOffer(CRtcOrigCallContext& context, TUniNetMsg
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Rtc& endState = context.getState();
+
+    context.clearState();
+    try
+    {
+        ctxt.handleUnexpectedMsg(msg);
+        context.setState(endState);
+    }
+    catch (...)
+    {
+        context.setState(endState);
+        throw;
+    }
+
+    return;
+}
+
+void CRtcOrigCallState_Default::onAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg)
+{
+    CR2SCallModule& ctxt(context.getOwner());
+
+    CR2SCallModuleState_Rtc& endState = context.getState();
 
     context.clearState();
     try
@@ -231,7 +258,7 @@ void CRtcOrigCallState_Default::onNotify(CRtcOrigCallContext& context, TUniNetMs
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Rtc& endState = context.getState();
 
     context.clearState();
     try
@@ -250,21 +277,7 @@ void CRtcOrigCallState_Default::onNotify(CRtcOrigCallContext& context, TUniNetMs
 
 void CRtcOrigCallState_Default::onTimeOut(CRtcOrigCallContext& context, TTimeMarkExt timerMark)
 {
-    CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
-
-    context.clearState();
-    try
-    {
-        ctxt.handleUnexpectedMsg(msg);
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
 
     return;
 }
@@ -387,7 +400,7 @@ void CRtcOrigCallState_RTC_CONFIRMING::onNotify(CRtcOrigCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer(msg);
+            ctxt.stopTimer();
             ctxt.sendErrorToWeb(ERROR_NOMATCH);
             context.setState(CRtcOrigCallState::CLOSED);
         }
@@ -594,7 +607,7 @@ void CRtcOrigCallState_BEAR_CONFIRMED::onClose(CRtcOrigCallContext& context, TUn
         }
         (context.getState()).Entry(context);
     }
-    else if (false == ctxt.isFromSip)
+    else if (false == ctxt.isFromSip(msg))
 
     {
         (context.getState()).Exit(context);
@@ -692,7 +705,7 @@ void CRtcOrigCallState_ACTIVE::onClose(CRtcOrigCallContext& context, TUniNetMsg*
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    if (true == isFromSip(msg))
+    if (true == ctxt.isFromSip(msg))
     {
         (context.getState()).Exit(context);
         context.clearState();
@@ -709,7 +722,7 @@ void CRtcOrigCallState_ACTIVE::onClose(CRtcOrigCallContext& context, TUniNetMsg*
         }
         (context.getState()).Entry(context);
     }
-    else if (false == isFromSip(msg))
+    else if (false == ctxt.isFromSip(msg))
 
     {
         (context.getState()).Exit(context);
@@ -738,11 +751,12 @@ void CRtcOrigCallState_ACTIVE::onNotify(CRtcOrigCallContext& context, TUniNetMsg
 {
     CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState& endState = context.getState();
+    CR2SCallModuleState_Rtc& endState = context.getState();
 
     context.clearState();
     try
     {
+        ctxt.resetSwitchFlag();
         ctxt.sendNotifyToWeb(msg);
         context.setState(endState);
     }
@@ -950,7 +964,7 @@ void CRtcOrigCallState_ACTIVE_WAIT2::onClose(CRtcOrigCallContext& context, TUniN
         }
         (context.getState()).Entry(context);
     }
-    else if (false == ctxt.isFromSip)
+    else if (false == ctxt.isFromSip(msg))
 
     {
         (context.getState()).Exit(context);
