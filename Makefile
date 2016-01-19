@@ -21,10 +21,7 @@ INC_DIR=  -I./rtcpsa/include \
 		  -I./msgmapper/include \
 		  -I./dispatcher/include \
 		  -I./bear/include \
-		  -I./rtcserver/call_module/include \
-		  -I./rtcserver/message_module/include \
-		  -I./sipserver/call_module/include \
-		  -I./sipserver/message_module/include \
+		  -I./rtc_sip_callmodule/include \
 		  -I./message_xml_parse/include \
 	      -I./message_xml_parse/tinyxml/include \
 	      -I/usr/local/include/ \
@@ -59,9 +56,9 @@ usage:
 	@echo "    make compilesm                       compile SM"
 
 all: sipmsgdef rtc_msgdef internal_msgdef rtc_db rtc_psa msgmapper dispatcher \
-	rtc_call_module sip_call_module rtc_im_module sip_im_module psasip msglib bear_module
+	rtc_sip_callmodule.so psasip msglib bear_module
 clean: clean.rtc_psa clean.rtc_msgdef clean.rtc_db clean.internal_msgdef clean.dispatcher clean.deploy clean.message_xml_parse \
-	clean.rtc_call_module clean.sip_call_module  clean.rtc_im_module clean.sip_im_module clean.msgmapper clean.bear_module\
+	 clean.rtc_sip_callmodule.so  clean.msgmapper clean.bear_module\
 	clean.psasip clean.msglib clean.sipmsgdef
 compilesm: compilertcsm compilesipsm
 
@@ -215,64 +212,29 @@ bear_module: $(OBJS_BEAR)
 clean.bear_module:
 	rm -f $(OBJS_BEAR) $(OUTPUT_DIR)/bear_module.so
 	
-#=========== sip_server ===================
+#=========== rtc_sip_callmodule ===================
 compilesipsm:
-	cd sipserver/call_module/include ; \
-	java -jar ../../../tools/Smc.jar -c++ -d ../source -headerd . CSipCallModule.sm
+	cd rtc_sip_callmodule/include ; \
+	java -jar ../../tools/Smc.jar -c++ -d ../source -headerd . CRtcOrigCall.sm
+	java -jar ../../tools/Smc.jar -c++ -d ../source -headerd . CSipTermCall.sm
 #	cd ../../message_module/include ; \
 #
-	cd sipserver/message_module/include ; \
-	java -jar ../../../tools/Smc.jar -c++ -d ../source -headerd . CSipMessageModule.sm
-OBJS_SIP_CALL = ./sipserver/call_module/source/CSipCallModule_sm.o \
-	./sipserver/call_module/source/CSipCallModule.o
-sip_call_module: $(OBJS_SIP_CALL) $(OBJ_XML_PARSE)
-	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/sip_call_module.so $(OBJS_SIP_CALL) $(OBJ_XML_PARSE) -L$(DEPLOY_DIR) -lmsgmapper $(LIBS) -lsipmsgdef 
-	@echo "**************Finsh making sip_call_module.so**********************"
-clean.sip_call_module:
-	rm -f $(OBJS_SIP_CALL) $(OUTPUT_DIR)/sip_call_module.so
-	
-OBJS_SIP_IM = ./sipserver/message_module/source/CSipMessageModule_sm.o \
-	./sipserver/message_module/source/CSipMessageModule.o
-sip_im_module:$(OBJS_SIP_IM)
-	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/sip_im_module.so $(OBJS_SIP_IM) -L$(DEPLOY_DIR) -lmsgmapper $(LIBS) -lsipmsgdef 
-	@echo "**************Finsh making sip_im_module.so**********************"
-clean.sip_im_module:
-	rm -f $(OBJS_SIP_IM) $(OUTPUT_DIR)/sip_im_module.so
-	
-	
-
-	
-#=========== rtc_server ===================
-compilertcsm:
-	cd rtcserver/call_module/include ; \
-	java -jar ../../../tools/Smc.jar -c++ -d ../source -headerd . CRtcCallModule.sm
-	cd rtcserver/message_module/include ; \
-	java -jar ../../../tools/Smc.jar -c++ -d ../source -headerd . CRtcMessageModule.sm
-OBJS_RTC_CALL = ./rtcserver/call_module/source/CRtcCallModule_sm.o \
-	./rtcserver/call_module/source/CRtcCallModule.o
-rtc_call_module: $(OBJS_RTC_CALL)
-	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/rtc_call_module.so $(OBJS_RTC_CALL)  -L$(DEPLOY_DIR) -lmsgmapper $(LIBS) -lsipmsgdef
-	@echo "**************Finsh making rtc_call_module.so**********************"
-clean.rtc_call_module:
-	rm -f $(OBJS_RTC_CALL) $(OUTPUT_DIR)/rtc_call_module.so
-	
-OBJS_RTC_IM = ./rtcserver/message_module/source/CRtcMessageModule_sm.o \
-	./rtcserver/message_module/source/CRtcMessageModule.o
-rtc_im_module: $(OBJS_RTC_IM)
-	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/rtc_im_module.so $(OBJS_RTC_IM) -L$(DEPLOY_DIR) -lmsgmapper $(LIBS) -lsipmsgdef
-	@echo "**************Finsh making rtc_im_module.so**********************"
-clean.rtc_im_module:
-	rm -f $(OBJS_RTC_IM) $(OUTPUT_DIR)/rtc_im_module.so
+OBJS_RTC_SIP_CALL = ./rtc_sip_callmodule/source/CR2SCallModule.o \
+					./rtc_sip_callmodule/source/CRtcOrigCall_sm.o \
+					./rtc_sip_callmodule/source/CSipTermCall_sm.o
+					
+rtc_sip_callmodule: $(OBJS_RTC_SIP_CALL)
+	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/rtc_sip_callmodule.so $(OBJS_SIP_CALL) -L$(DEPLOY_DIR) -lmsgmapper $(LIBS) -lsipmsgdef 
+	@echo "**************Finsh making rtc_sip_callmodule.so**********************"
+clean.rtc_sip_callmodule:
+	rm -f $(OBJS_RTC_SIP_CALL) $(OUTPUT_DIR)/rtc_sip_callmodule.so
 	
 #=========== deploy =================
 deploy: all
 	mv ./rtc_psa.so $(DEPLOY_DIR)/app/rtc_psa.so
 #	cp ./test_server.so $(DEPLOY_DIR)/app/test_server.so
 	mv ./dispatcher.so $(DEPLOY_DIR)/app/dispatcher.so
-	mv ./rtc_call_module.so $(DEPLOY_DIR)/app/rtc_call_module.so
-	mv ./sip_call_module.so $(DEPLOY_DIR)/app/sip_call_module.so
-	mv ./rtc_im_module.so $(DEPLOY_DIR)/app/rtc_im_module.so
-	mv ./sip_im_module.so $(DEPLOY_DIR)/app/sip_im_module.so
+	mv ./rtc_sip_callmodule.so $(DEPLOY_DIR)/app/rtc_sip_callmodule.so
 	mv ./librtcmsg.a $(DEPLOY_DIR)/lib/librtcmsg.a
 	mv ./libintmsg.a $(DEPLOY_DIR)/lib/libintmsg.a
 	
@@ -290,10 +252,7 @@ clean.deploy:
 	rm -f $(DEPLOY_DIR)/app/rtc_psa.so
 #	rm -f $(DEPLOY_DIR)/app/test_server.so
 	rm -f $(DEPLOY_DIR)/app/dispatcher.so
-	rm -f $(DEPLOY_DIR)/app/rtc_call_module.so
-	rm -f $(DEPLOY_DIR)/app/sip_call_module.so
-	rm -f $(DEPLOY_DIR)/app/rtc_im_module.so
-	rm -f $(DEPLOY_DIR)/app/sip_im_module.so
+	rm -f $(DEPLOY_DIR)/app/rtc_sip_callmodule.so
 	rm -f $(DEPLOY_DIR)/lib/librtcmsg.a
 	rm -f $(DEPLOY_DIR)/lib/librtcdb.a
 #	rm -f $(DEPLOY_DIR)/lib/libmsgmapper.so

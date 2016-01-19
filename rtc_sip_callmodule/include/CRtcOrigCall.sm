@@ -1,0 +1,399 @@
+%{
+/*********************************************************************
+ * Copyright (c)2010-2012, by BUPT
+ * All rights reserved.
+
+ * FileName:       CRtcOrigCall.sm
+ * System:         webrtc
+ * SubSystem:      gateway
+ * Author:         Yadong Zhang
+ * Date:           2016-1-13
+ * Version:        1.0
+ * Description:
+     Rtc_original_call module, WebRTC主叫模块
+
+*******************************************************************************/
+%}
+/* all possible sate
+ * IDLE			initial.
+ * RTC_CONFIRMING		收到WebRTC发来的OFFER，向SIP_CALL发送NOTIFY, 告知其发起新的会话
+ * BEAR_CONFIRMING		收到SIP_CALL的NOTIFY,可能携带修改后Web SDP,向BEAR申请SDP
+ * BEAR_CONFIRMED		收到BEAR的SDP answer，向Web端返回answer，等待OK
+ * ACTIVE					收到OK，进入会话激活状态，其中如果收到SIP_CALL的NOTIFY（修改SDP请求），向Web端发送Notify请求新的offer
+ * ACTIVE_WAIT1				收到Web端的新的offer请求，向BEAR发送新的SDP request
+ * ACTIVE_WAIT2				收到BEAR的SDP answer，向Web端返回answer
+ 
+*/
+
+
+//指明.sm服务的实际Task类
+%class	CR2SCallModule
+//指明需要SMC生成的代码包含哪个文件。只能一个。如多于一个将被忽略。
+%header CR2SCallModule.h
+//初始状态
+%start CRtcOrigCallState::IDLE
+//生成的状态集合名称
+%map CRtcOrigCallState
+
+
+%%
+
+IDLE
+{
+	
+	onOffer(msg:TUniNetMsg*)
+	[true == ctxt.checkSipUserAvailable(msg)]
+	RTC_CONFIRMING
+	{//sip user code available
+		setTimer(RTC_WAITSIP_TIMEOUT);
+		notifySipTermCallSdp(msg);	//change msg to SIP INVITE
+	}
+	
+	onOffer(msg:TUniNetMsg*)
+	[false == ctxt.checkSipUserAvailable(msg)]
+	CLOSED
+	{//sip user code not available
+		sendErrorToWeb(ERROR_NOSIP);
+	}
+}
+
+RTC_CONFIRMING
+{
+	//收到来自SIP TERM CALL的Notify
+	onNotify(msg:TUniNetMsg*) 
+	[true == ctxt.isSdpConfirmed()]
+	BEAR_CONFIRMING
+	{//SIP端返回SDP
+		stopTimer();
+		sendReqToBear_Rtc();
+		setTimer(RTC_WAITBEAR_TIMEOUT);
+	}
+	
+	onNotify(msg:TUniNetMsg*)
+	[false == ctxt.isSdpConfirmed()]
+	CLOSED
+	{
+		stopTimer(msg);
+		sendErrorToWeb(ERROR_NOMATCH);
+	}
+	
+	onError(msg:TUniNetMsg*)
+	CLOSED
+	{//SIP端返回了错误信息
+		stopTimer();
+		forwardErrorToWeb(msg);
+	}
+	
+	onClose(msg:TUniNetMsg*)
+	CLOSED
+	{
+		stopTimer();
+		sendErrorToWeb(ERROR_NOMATCH);
+		
+	}
+	
+	onShutDown(msg:TUniNetMsg*)
+	CLOSED
+	{	//Web端挂断
+		stopTimer();
+		notifySipTermCallClose();	
+	}
+	
+
+	onTimeOut(timerMark:TTimeMarkExt)  
+	CLOSED
+	{	//等待SIP端响应超时，会话释放
+		stopTimer();
+		notifySipTermCallClose();
+		sendErrorToWeb(ERROR_TIMEOUT);
+	}
+	
+}
+
+BEAR_CONFIRMING
+{
+	onSdpAnswer(msg:TUniNetMsg*)   	
+	BEAR_CONFIRMED
+	{
+		stopTimer();
+		sendAnswerToWeb(msg);
+		setTimer(RTC_CONNECTION_TIMEOUT);
+	}
+	
+	onClose(msg:TUniNetMsg*)
+	[true == ctxt.isFromSip(msg)]
+	CLOSED
+	{//SIP CALL端挂断
+		stopTimer();
+		sendErrorToWeb(ERROR_REFUSED);
+		sendCloseToBear_Rtc();
+	}
+	
+	onShutDown(msg:TUniNetMsg*)
+	CLOSED
+	{//Web端挂断
+		stopTimer();
+		notifySipTermCallClose();
+		sendCloseToBear_Rtc();
+	}
+	
+	onError(msg:TUniNetMsg*)
+	CLOSED
+	{//媒体服务器错误
+		stopTimer();
+		sendErrorToWeb(ERROR_MEDIAFAILED);
+		notifySipTermCallClose();
+	}
+	
+	onTimeOut(msg:TUniNetMsg*)
+	CLOSED
+	{//等待XMS超时
+		stopTimer();
+		sendErrorToWeb(ERROR_TIMEOUT);
+		notifySipTermCallClose();
+	}
+	
+}
+
+BEAR_CONFIRMED
+{
+	onOK(msg:TUniNetMsg*)
+	ACTIVE 
+	{
+		//doNothing, 
+		//toDo set keep-alive
+		stopTimer();
+	}
+	
+	onShutDown(msg:TUniNetMsg*)
+	CLOSED
+	{
+		stopTimer();
+		notifySipTermCallClose();
+		sendCloseToBear_Rtc();
+	}
+	
+	
+	onClose(msg:TUniNetMsg*)
+	[true == ctxt.isFromSip(msg)] 
+	CLOSED
+	{//来自SIP端的挂断
+		stopTimer();
+		sendShutdownToWeb();
+		sendCloseToBear_Rtc();
+	}
+	
+	onClose(msg:TUniNetMsg*)
+	[false == ctxt.isFromSip] 
+	CLOSED
+	{// 来自媒体服务器的挂断
+		stopTimer();
+		notifySipTermCallClose();
+		sendShutdownToWeb();
+	}
+	
+	onTimeOut(timerMark:TTimeMarkExt)  	//等待响应超时，会话释放
+	CLOSED
+	{	
+		stopTimer();
+		sendCloseToBear_Rtc();
+		notifySipTermCallClose();
+		sendShutdownToWeb();
+	}
+}
+
+ACTIVE
+{
+	onNotify(msg:TUniNetMsg*)
+	nil
+	{//SIP端 a/v 切换
+		sendNotifyToWeb(msg);
+	}
+	
+	onOffer(msg:TUniNetMsg*)
+	[true == ctxt.isSwitch()]
+	ACTIVE_WAIT1
+	{
+		setTimer(RTC_WAITBEAR_TIMEOUT);
+		sendReqToBear_Rtc();
+	}
+	
+	onClose(msg:TUniNetMsg*)
+	[true == isFromSip(msg)]
+	CLOSED
+	{
+		sendShutdownToWeb();
+		sendCloseToBear_Rtc();
+	}
+	
+	onClose(msg:TUniNetMsg*)
+	[false == isFromSip(msg)]
+	CLOSED
+	{
+		notifySipTermCallClose();
+		sendShutdownToWeb();
+	}
+	
+	onShutDown(msg:TUniNetMsg*)
+	CLOSED
+	{
+		notifySipTermCallClose();
+		sendCloseToBear_Rtc();
+	}
+	
+}
+
+ACTIVE_WAIT1
+{
+	onSdpAnswer(msg:TUniNetMsg*)   	
+	BEAR_CONFIRMED
+	{
+		stopTimer();
+		sendAnswerToWeb(msg);
+		setTimer(RTC_CONNECTION_TIMEOUT);
+	}
+	
+	onClose(msg:TUniNetMsg*)
+	[true == ctxt.isFromSip(msg)]
+	CLOSED
+	{//SIP CALL端挂断
+		stopTimer();
+		sendErrorToWeb(ERROR_REFUSED);
+		sendCloseToBear_Rtc();
+	}
+	
+	onShutDown(msg:TUniNetMsg*)
+	CLOSED
+	{//Web端挂断
+		stopTimer();
+		notifySipTermCallClose();
+		sendCloseToBear_Rtc();
+	}
+	
+	onError(msg:TUniNetMsg*)
+	CLOSED
+	{//媒体服务器错误
+		stopTimer();
+		sendErrorToWeb(ERROR_MEDIAFAILED);
+		notifySipTermCallClose();
+	}
+	
+	onTimeOut(msg:TUniNetMsg*)
+	CLOSED
+	{//等待XMS超时
+		stopTimer();
+		sendErrorToWeb(ERROR_TIMEOUT);
+		notifySipTermCallClose();
+	}
+}
+
+
+ACTIVE_WAIT2
+{
+	onOK(msg:TUniNetMsg*)
+	ACTIVE 
+	{
+		//doNothing, 
+		//toDo set keep-alive
+		stopTimer();
+	}
+	
+	onShutDown(msg:TUniNetMsg*)
+	CLOSED
+	{
+		stopTimer();
+		notifySipTermCallClose();
+		sendCloseToBear_Rtc();
+	}
+	
+	
+	onClose(msg:TUniNetMsg*)
+	[true == ctxt.isFromSip(msg)] 
+	CLOSED
+	{//来自SIP端的挂断
+		stopTimer();
+		sendShutdownToWeb();
+		sendCloseToBear_Rtc();
+	}
+	
+	onClose(msg:TUniNetMsg*)
+	[false == ctxt.isFromSip] 
+	CLOSED
+	{// 来自媒体服务器的挂断
+		stopTimer();
+		notifySipTermCallClose();
+		sendShutdownToWeb();
+	}
+	
+	onTimeOut(timerMark:TTimeMarkExt)  	//等待响应超时，会话释放
+	CLOSED
+	{	
+		stopTimer();
+		sendCloseToBear_Rtc();
+		notifySipTermCallClose();
+		sendShutdownToWeb();
+	}
+	
+}
+
+
+
+
+CLOSED
+Entry
+{
+	endTask_Rtc();
+}
+{
+}
+
+
+Default
+{
+	onSdpAnswer(msg:TUniNetMsg*)
+	nil
+	{
+		handleUnexpectedMsg(msg);
+	}
+	onShutDown(msg:TUniNetMsg*)
+	nil
+	{
+		handleUnexpectedMsg(msg);
+	}
+	onClose(msg:TUniNetMsg*)
+	nil
+	{
+		handleUnexpectedMsg(msg);
+	}
+	onError(msg:TUniNetMsg*)
+	nil
+	{
+		handleUnexpectedMsg(msg);
+	}
+	
+	onOK(msg:TUniNetMsg*)
+	nil
+	{
+		handleUnexpectedMsg(msg);
+	}
+	
+	onOffer(msg:TUniNetMsg*)
+	nil
+	{
+		handleUnexpectedMsg(msg);		
+	}
+	
+	onNotify(msg:TUniNetMsg*)
+	nil
+	{
+		handleUnexpectedMsg(msg);
+	}
+	
+	onTimeOut(timerMark:TTimeMarkExt)
+	nil
+	{
+		handleUnexpectedMsg(msg);
+	}
+}
+
+%%
