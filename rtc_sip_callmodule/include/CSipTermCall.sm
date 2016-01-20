@@ -257,7 +257,7 @@ BEAR_CONFIRMED
 	
 	onResponse(msg:TUniNetMsg*)
 	[true == ctxt.isResp2xx(msg) && true == ctxt.isWithSDP(msg) && false == ctxt.compAndModifySdpWithRtc(msg)]
-	BEAR_CLIENT_READY
+	CLOSED
 	{
 		stopTimer();
 		
@@ -465,7 +465,7 @@ ACTIVE
 	{//存在音视频切换
 		notifyRtcOrigCallSdp();
 		setUpdateFlag(); 	//标志是Update的
-		sendReqToBear_Sip(msg);
+		sendReqToBear_Sip();
 		setTimer(SIP_WAITBEAR_TIMEOUT);
 	}
 	
@@ -475,7 +475,7 @@ ACTIVE
 	ACTIVE_WAIT_BEAR_MODIFYING
 	{//不存在音视频切换
 		setUpdateFlag();
-		sendReqToBear_Sip(msg);
+		sendReqToBear_Sip();
 		setTimer(SIP_WAITBEAR_TIMEOUT);
 	}
 	
@@ -494,7 +494,7 @@ ACTIVE
 	{//存在音视频切换
 		notifyRtcOrigCallSdp();
 		setInviteFlag(); 	//标志是Update的
-		sendReqToBear_Sip(msg);
+		sendReqToBear_Sip();
 		setTimer(SIP_WAITBEAR_TIMEOUT);
 	}
 	
@@ -504,7 +504,7 @@ ACTIVE
 	ACTIVE_WAIT_BEAR_MODIFYING
 	{//不存在音视频切换
 		setInviteFlag();
-		sendReqToBear_Sip(msg);
+		sendReqToBear_Sip();
 		setTimer(SIP_WAITBEAR_TIMEOUT);
 	}
 	
@@ -526,7 +526,7 @@ ACTIVE
 	
 	
 	onClose(msg:TUniNetMsg*)
-	[false == ctxt.isFromRtc]
+	[false == ctxt.isFromRtc(msg)]
 	CLOSED
 	{
 		sendByeToIMS();
@@ -564,7 +564,7 @@ ACTIVE_WAIT_BEAR_MODIFYING
 		resetFlag();
 		stopTimer();
 		send200OKForInviteToIMS(msg);
-		stopTimer(SIP_ACK_TIMEOUT);
+		setTimer(SIP_ACK_TIMEOUT);
 	}
 	
 	onBye(msg:TUniNetMsg*)
@@ -586,7 +586,7 @@ ACTIVE_WAIT_BEAR_MODIFYING
 	
 	
 	onClose(msg:TUniNetMsg*)
-	[false == ctxt.isFromRtc]
+	[false == ctxt.isFromRtc(msg)]
 	CLOSED
 	{
 		stopTimer();
@@ -634,7 +634,7 @@ ACTIVE_WAIT_ACK
 	
 	
 	onClose(msg:TUniNetMsg*)
-	[false == ctxt.isFromRtc]
+	[false == ctxt.isFromRtc(msg)]
 	CLOSED
 	{
 		stopTimer();

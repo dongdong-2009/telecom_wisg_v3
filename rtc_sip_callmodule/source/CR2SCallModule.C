@@ -14,6 +14,27 @@ log4cxx::LoggerPtr logger;
 CLONE_COMP(CR2SCallModule)
 CREATE_COMP(CR2SCallModule)
 
+timers_poll * my_timers;
+timer * timer_rtc;
+timer * timer_sip;
+pthread_t thread_id;
+
+void * thread_fun(void *data) {
+	timers_poll *timers = (timers_poll *) data;
+	timers->run();
+	return NULL;
+}
+
+int timeout_callback(timer * ptimer)
+{
+	TimerType* myType = (TimerType *) ptimer->timer_get_userdata();
+	CR2SCallModule* myMod = (CR2SCallModule*) myType->currMod;
+	myMod->timeOut(ptimer);
+    return 0;
+}
+
+
+
 CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	CUACSTask(afsm), m_rtcContext(*this), m_sipContext(*this), m_isDispatcherAddrSet(FALSE){
 	// get LOGADDR_DISPATCHER from conf
@@ -51,6 +72,27 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 
 	m_isRtcInit = false;
 	m_isSipInit = true;
+
+	/**
+	 * 设置定时器，因为MCF一个task只支持一个定时器，下面采用第三方的定时器，自定义
+	 */
+	my_timers = new timers_poll(128);
+	if (pthread_create(&thread_id, NULL, thread_fun, (void *) my_timers)!= 0) {
+		LOG4CXX_ERROR(logger,  "Create timer thread failed");
+		exit(-1);
+	}
+	TimerType * timerType = new TimerType();
+	timerType->timer_id = 0;
+	timerType->currMod = this;
+	timer_rtc = new timer(0, timeout_callback, timerType,0);
+	my_timers->timers_poll_add_timer(timer_rtc);
+
+	timerType = new TimerType();
+	timerType->timer_id = 0;
+	timerType->currMod = this;
+	timer_sip = new timer(0, timeout_callback, timerType,0);
+	my_timers->timers_poll_add_timer(timer_sip);
+
 }
 
 CR2SCallModule::~CR2SCallModule() {
@@ -116,27 +158,6 @@ void CR2SCallModule::sendToDispatcher(TUniNetMsgName msgName,
 	}
 
 	sendMsg(newMsg);
-
-	//	if(pMsg->dialogType == DIALOG_END){
-	//		sendMsg(pMsg);
-	//		return;
-	//	}
-
-	//if(pMsg->msgType == RTC_TYPE){
-	// just copy the message
-	//TUniNetMsg *pCopyMsg = (TUniNetMsg *)pMsg->cloneMsg();
-
-	//LOG4CXX_DEBUG(logger, "sendToDispatcher: RTC_TYPE, just send to dispatcher\n");
-
-	//}
-
-	//	if(pMsg->msgType == SIP_TYPE){
-	//		TUniNetMsg *pNewMsg = new TUniNetMsg();
-	//		msgMap(pMsg, pNewMsg);
-	//		LOG4CXX_DEBUG(logger, "sendToDispatcher: SIP_TYPE, map to sip msg\n"<<CTUniNetMsgHelper::toString(pNewMsg));
-	//		sendMsg(pNewMsg);
-	//	}
-
 }
 
 void CR2SCallModule::endTask_Rtc() {
@@ -201,10 +222,10 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 	case INT_RESPONSE:
 	{
 		PTIntCtrlMsg intCtrlMsg = (PTIntCtrlMsg)msg->ctrlMsgHdr;
-		if(intCtrlMsg->to.c_str() == "sip_call"){
+		if(!strcmp(intCtrlMsg->to.c_str(), "sip_call")){
 			m_sipContext.onSdpAnswer(msg);
 		}
-		else if(intCtrlMsg->to.c_str() == "rtc_call"){
+		else if(!strcmp(intCtrlMsg->to.c_str(), "rtc_call")){
 			m_rtcContext.onSdpAnswer(msg);
 		}
 		break;
@@ -213,10 +234,10 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 	case INT_ERROR:
 	{
 		PTIntCtrlMsg intCtrlMsg = (PTIntCtrlMsg)msg->ctrlMsgHdr;
-		if(intCtrlMsg->to.c_str() == "sip_call"){
+		if(!strcmp(intCtrlMsg->to.c_str(), "sip_call")){
 			m_sipContext.onError(msg);
 		}
-		else if(intCtrlMsg->to.c_str() == "rtc_call"){
+		else if(!strcmp(intCtrlMsg->to.c_str(), "rtc_call")){
 			m_rtcContext.onError(msg);
 		}
 		break;
@@ -225,10 +246,10 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 	case INT_CLOSE:
 	{
 		PTIntCtrlMsg intCtrlMsg = (PTIntCtrlMsg)msg->ctrlMsgHdr;
-		if(intCtrlMsg->to.c_str() == "sip_call"){
+		if(!strcmp(intCtrlMsg->to.c_str(), "sip_call")){
 			m_sipContext.onClose(msg);
 		}
-		else if(intCtrlMsg->to.c_str() == "rtc_call"){
+		else if(!strcmp(intCtrlMsg->to.c_str(), "rtc_call")){
 			m_rtcContext.onClose(msg);
 		}
 		break;
@@ -267,16 +288,72 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 	LOG4CXX_DEBUG(logger, "after procMsg state: %s"<<m_rtcContext.getState().getName());
 }
 
-//处理定时器超时
-void CR2SCallModule::onTimeOut(TTimeMarkExt timerMark) {
-	LOG4CXX_INFO(logger, "The CR2SCallModule task received a timeout event:"<<timerMark.timerId);
-	m_rtcContext.onTimeOut(timerMark);
+//处理定时器超时,不是mcf
+void CR2SCallModule::timeOut(timer* ptimer) {
+	TimerType * myType = (TimerType *)ptimer->timer_get_userdata();
+	UINT timer_id = myType->timer_id;
+	LOG4CXX_INFO(logger, "The CR2SCallModule task received a timeout event:"<<myType->timer_id);
+
+	TTimeMarkExt timerMark;
+	getTimeMarkExt(timer_id, timerMark);
+	switch(timer_id)
+	{
+		case SIP_200OK_TIMEOUT:
+		case SIP_ACK_TIMEOUT:
+		case SIP_ACTIVE_TIMEOUT:
+		case SIP_CONNECTING_TIMEOUT:
+		case SIP_WAITBEAR_TIMEOUT:
+		case SIP_RING_TIMEOUT:
+			m_sipContext.onTimeOut(timerMark);
+			break;
+		case RTC_CONNECTION_TIMEOUT:
+		case RTC_SHUTDOWN_TIMEOUT:
+		case RTC_WAITSIP_TIMEOUT:
+		case RTC_WAITBEAR_TIMEOUT:
+			m_rtcContext.onTimeOut(timerMark);
+			break;
+		default:
+			LOG4CXX_ERROR(logger, "timeout, unknown Type");
+			break;
+	}
+
 }
+
+void CR2SCallModule::setTimer(UINT timer_id){
+	TTimeMarkExt timerMark;
+	getTimeMarkExt(timer_id, timerMark);
+	switch(timer_id)
+	{
+	case SIP_200OK_TIMEOUT:
+	case SIP_ACK_TIMEOUT:
+	case SIP_ACTIVE_TIMEOUT:
+	case SIP_CONNECTING_TIMEOUT:
+	case SIP_WAITBEAR_TIMEOUT:
+	case SIP_RING_TIMEOUT:
+		timer_sip->timer_modify_internal(timerMark.timerDelay);
+		break;
+	case RTC_CONNECTION_TIMEOUT:
+	case RTC_SHUTDOWN_TIMEOUT:
+	case RTC_WAITSIP_TIMEOUT:
+	case RTC_WAITBEAR_TIMEOUT:
+		timer_rtc->timer_modify_internal(timerMark.timerDelay);
+		break;
+	default:
+		LOG4CXX_ERROR(logger, "timeout, unknown Type");
+		break;
+	}
+}
+
+void CR2SCallModule::onTimeOut(TTimeMarkExt timerMark){
+
+}
+
 
 //
 BOOL CR2SCallModule::msgMap(TUniNetMsg *pSrcMsg, TUniNetMsg *pDestMsg) {
 	//return CRtcToSip::instance()->msgMap(pSrcMsg, pDestMsg, m_caller,
 		//	m_isReCall);
+	return false;
 }
 
 
@@ -308,7 +385,6 @@ void CR2SCallModule::sendAnswerToWeb(TUniNetMsg * msg) {
 	pAnswer->moreComing = false;
 	pAnswer->sdp = pResp->body;
 
-	TUniNetMsg * newMsg = new TUniNetMsg();
 	sendToDispatcher(RTC_ANSWER, RTC_TYPE, DIALOG_CONTINUE, m_rtcCtrlMsg->clone(), pAnswer);
 	//m_rtcCtrlMsg
 }
@@ -346,7 +422,6 @@ void CR2SCallModule::sendNotifyToWeb(TUniNetMsg * msg){
 	pNotify->content = pReq->body;
 	pNotify->content_length = pNotify->content.length();
 
-	PTRtcCtrlMsg ctrlMsg = (PTRtcCtrlMsg)m_rtcCtrlMsg->clone();
 
 	sendToDispatcher(RTC_NOTIFY, RTC_TYPE, DIALOG_CONTINUE, m_rtcCtrlMsg->clone(), pNotify);
 }
@@ -620,10 +695,14 @@ bool CR2SCallModule::isWithSDP(TUniNetMsg *msg){
 
 void CR2SCallModule::notifySipTermCallSdp(TUniNetMsg * msg) {
 	//onNotify(NULL);
+	PTRtcOffer pOffer = (PTRtcOffer)msg->msgBody;
+	m_webSdp = pOffer->sdp.c_str();
+	m_sipContext.onNotify(NULL);	//通知SIP端发送INVITE
 }
 
 void CR2SCallModule::notifySipTermCallClose() {
 	//onClose(NULL)
+	m_sipContext.onClose(NULL);
 }
 
 //void notifyRtcOrigCallSdp();
@@ -632,19 +711,68 @@ void CR2SCallModule::notifySipTermCallClose() {
 //void notifyRtcOrigCallError(const int errorType);
 
 void CR2SCallModule::notifyRtcOrigCallSdp(){
-
+	m_rtcContext.onNotify(NULL);
 }
 
 void CR2SCallModule::notifyRtcOrigCallError(TUniNetMsg * msg){
+	TRtcError * pError = new TRtcError();
+	pError->seq = m_seq;
+
+
+	if(m_accessMode == 1 || m_accessMode == 2){
+		CUserMapHelper::resetCalling(m_sipName);
+	}
+
+	PTSipResp pSipResp = (PTSipResp) msg->msgBody;
+
+
+	if (pSipResp->statusCode == 481) {
+		pError->errorType = ERROR_NOMATCH;
+	} else if (pSipResp->statusCode == 486 || pSipResp->statusCode == 600) {
+		pError->errorType = ERROR_REFUSED;
+	} else if (pSipResp->statusCode == 408) {
+		pError->errorType = ERROR_TIMEOUT;
+	} else if (pSipResp->statusCode == 491) {
+		pError->errorType = ERROR_CONFLICT;
+	} else if (pSipResp->statusCode == 404){
+		pError->errorType = ERROR_OFFLINE;
+	} else if (pSipResp->statusCode < 700 && pSipResp->statusCode > 300) {
+		pError->errorType = ERROR_FAILED;
+	}
+
+	PTUniNetMsg newMsg = new TUniNetMsg();
+	newMsg->ctrlMsgHdr = m_rtcCtrlMsg;
+	newMsg->setCtrlMsgHdr();
+	newMsg->msgBody = pError;
+	newMsg->setMsgBody();
+
+	m_rtcContext.onError(newMsg);
 
 }
 
 void CR2SCallModule::notifyRtcOrigCallClose(){
-
+	m_sipContext.onClose(NULL);
 }
 
 void CR2SCallModule::notifyRtcOrigCallError(const int errorType){
+	TRtcError * pError = new TRtcError();
+	pError->seq = m_seq;
 
+	if(m_accessMode == 1 || m_accessMode == 2){
+		CUserMapHelper::resetCalling(m_sipName);
+	}
+
+
+	pError->errorType = errorType;
+
+
+	PTUniNetMsg msg = new TUniNetMsg();
+	msg->ctrlMsgHdr = m_rtcCtrlMsg;
+	msg->setCtrlMsgHdr();
+	msg->msgBody = pError;
+	msg->setMsgBody();
+
+	m_rtcContext.onError(msg);
 }
 
 void CR2SCallModule::handleUnexpectedMsg(TUniNetMsg * msg){
@@ -658,12 +786,14 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg){
 bool CR2SCallModule::compSdpWithOld(TUniNetMsg * msg){
 	//set ims rtc body
 
+
 	return true;
 }
 
 string CR2SCallModule::checkRespCseqMothod(TUniNetMsg * msg){
+	PTSipCtrlMsg ctrlMsg = (PTSipCtrlMsg) msg->ctrlMsgHdr;
 
-	return "PRACK";
+	return ctrlMsg->cseq_method.c_str();
 }
 
 

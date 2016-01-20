@@ -4,6 +4,7 @@
 #include "CPropertiesManager.h"
 #include "psa_sip_inf.h"
 #include "rtc_msg_def.h"
+#include "int_msg_def.h"
 #include "utils_inf.h"
 #include "CDialogController.h"
 #include <stdio.h>

@@ -13,9 +13,13 @@
 #include "CRtcOrigCall_sm.h"
 #include "CSipTermCall_sm.h"
 #include "CMsgDispatcher.h"
+#include "timerpoll.h"
 
-
-
+typedef struct
+{
+	UINT timer_id;
+	void * currMod;
+} TimerType;
 
 _CLASSDEF(CR2SCallModule)
 _DECLARE_CREATE_COMP(CR2SCallModule);
@@ -44,7 +48,6 @@ public:
 	void sendToDispatcher(TUniNetMsgName msgName,
 			TUniNetMsgType msgType, TDialogType dialog, PTCtrlMsg pCtrlMsg,
 			PTMsgBody pMsgBody);
-
 	/*
 	 * 结束状态机
 	 * 需要向Dispatcher模块发送信息,通知这个处理状态机实例的结束
@@ -56,8 +59,14 @@ public:
 	// method from CUACSTask
 	//处理消息
 	virtual  void procMsg(PTUniNetMsg msg);
-	//处理定时器超时
-	virtual  void onTimeOut (TTimeMarkExt timerMark);
+	//mcf提供的定时器，没用到
+	virtual void onTimeOut(TTimeMarkExt timerMark);
+
+	//处理定时器超时,自定义的定时器
+	void timeOut (timer * ptimer);
+
+	void setTimer (UINT timer_id);
+
 	void list(){}
 	DECLARE_CLONE();
 protected:
@@ -149,9 +158,6 @@ public:
 
 	const char * getUserName(const string& user);
 	const char * getHost(const string& user);
-
-
-
 
 	inline void setUACTag(TUniNetMsg * msg){
 		m_sipCtrlMsg->to.tag = ((PTSipCtrlMsg) msg->ctrlMsgHdr)->to.tag;

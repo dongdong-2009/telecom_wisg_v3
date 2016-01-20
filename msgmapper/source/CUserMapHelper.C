@@ -39,7 +39,7 @@ CVarChar128 CUserMapHelper::getMapRtcUser(CVarChar128 sipname)
 }
 
 
-void CUserMapHelper::resetCalling(CVarChar128 sipname)
+void CUserMapHelper::resetCalling(string sipname)
 {
 	CHAR pcSQLStatement[512];
 	

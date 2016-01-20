@@ -11,7 +11,7 @@ public:
 
 	static CVarChar128 getMapSipUser(CVarChar128 rtcname);
 	static CVarChar128 getMapRtcUser(CVarChar128 sipname);
-	static void resetCalling(CVarChar128 sipname);
+	static void resetCalling(string sipname);
 };
 
 

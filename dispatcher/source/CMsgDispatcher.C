@@ -144,7 +144,7 @@ void CMsgDispatcher::handleMsgFromMSControl(TUniNetMsg * msg){
 		}
 		break;
 	}
-	case INTERNAL_BYE:{
+	case INT_CLOSE:{
 		TMsgAddress tAddr;
 		char* uniqID = generateSipUniqID(msg);
 		if(m_pDialogCtrl->getDialogAddr(uniqID, tAddr)){
@@ -255,7 +255,7 @@ void CMsgDispatcher::handleMsgFromSipCall(TUniNetMsg* msg){
 	}
 
 	if(msg->msgType == SIP_TYPE){
-		if(msg->msgName = INTERNAL_INVITE)
+		if(msg->msgName = INT_REQUEST)
 		{//发送给MS CONTROL模块
 			TMsgAddress tAddr;
 			tAddr.logAddr = LOGADDR_MS_CONTROL;
