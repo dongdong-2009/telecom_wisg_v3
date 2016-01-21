@@ -73,6 +73,8 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	m_isRtcInit = false;
 	m_isSipInit = true;
 
+	m_endFlag = 0;
+
 	/**
 	 * 设置定时器，因为MCF一个task只支持一个定时器，下面采用第三方的定时器，自定义
 	 */
@@ -156,26 +158,32 @@ void CR2SCallModule::sendToDispatcher(TUniNetMsgName msgName,
 		newMsg->msgBody = pMsgBody;
 		newMsg->setMsgBody();
 	}
-
 	sendMsg(newMsg);
 }
 
 void CR2SCallModule::endTask_Rtc() {
-	LOG4CXX_DEBUG(logger, "endTask current state:" <<m_rtcContext.getState().getName());
-
+	LOG4CXX_DEBUG(logger, "endTask finished");
 	// 产生一条DIALOG——END消息，发给dispatcher，清除会话信息
 	sendToDispatcher(RTC_OK, RTC_TYPE, DIALOG_END, m_rtcCtrlMsg->clone(), NULL);
-	end();
-	LOG4CXX_DEBUG(logger, "endTask finished");
+	m_endFlag = m_endFlag|0x2;
+	if(m_endFlag & 3 == 3){
+		end();
+	}
 }
 
 void CR2SCallModule::endTask_Sip() {
-	LOG4CXX_DEBUG(logger, "endTask current state:" <<m_sipContext.getState().getName());
+	LOG4CXX_DEBUG(logger, "endTask finished");
+	if(m_accessMode == 1 || m_accessMode == 2){
+		CUserMapHelper::resetCalling(m_sipName);
+	}
 
 	// 产生一条DIALOG——END消息，发给dispatcher，清除会话信息
 	sendToDispatcher(SIP_BYE, SIP_TYPE, DIALOG_END, m_sipCtrlMsg->clone(), NULL);
-	end();
-	LOG4CXX_DEBUG(logger, "endTask finished");
+	m_endFlag = m_endFlag|0x1;
+	if(m_endFlag & 0x3 == 0x3){
+		end();
+	}
+
 }
 
 //处理消息
@@ -344,10 +352,17 @@ void CR2SCallModule::setTimer(UINT timer_id){
 	}
 }
 
-void CR2SCallModule::onTimeOut(TTimeMarkExt timerMark){
-
+void CR2SCallModule::stopTimer_Rtc(){
+	timer_sip->timer_modify_internal(0);
 }
 
+void CR2SCallModule::stopTimer_Sip(){
+	timer_rtc->timer_modify_internal(0);
+}
+
+void CR2SCallModule::onTimeOut(TTimeMarkExt timerMark){
+	LOG4CXX_INFO(logger, "The CR2SCallModule can't handle mcf timeout event");
+}
 
 //
 BOOL CR2SCallModule::msgMap(TUniNetMsg *pSrcMsg, TUniNetMsg *pDestMsg) {
@@ -434,14 +449,18 @@ void CR2SCallModule::sendReqToBear_Rtc(){
 	if(m_intCtrlMsg_Rtc == NULL){
 		m_intCtrlMsg_Rtc->from = "rtc_call";
 		m_intCtrlMsg_Rtc->to = "bear";
-		m_intCtrlMsg_Rtc->sessionId = m_offerSessionId;
+		CHAR buf[33];
+		CSipMsgHelper::generateRandomNumberStr(buf);
+		string str = buf;
+		str += buf;
+		m_intCtrlMsg_Rtc->sessionId = str.c_str();
 		m_intCtrlMsg_Rtc->intType = INT_REQUEST;
 	}
 
 	PTIntRequest pReq = new TIntRequest();
 	pReq->body = m_webSdp.c_str();
 
-	sendToDispatcher(INT_REQUEST, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Rtc->clone(), pReq);
+	sendToDispatcher(INT_REQUEST, INT_TYPE, DIALOG_BEGIN, m_intCtrlMsg_Rtc->clone(), pReq);
 }
 
 void CR2SCallModule::sendCloseToBear_Rtc()
@@ -624,7 +643,7 @@ void CR2SCallModule::sendReqToBear_Sip(){
 	PTIntRequest pReq = new TIntRequest();
 	pReq->body = m_imsSdp.c_str();
 
-	sendToDispatcher(INT_REQUEST, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Sip->clone(), pReq);
+	sendToDispatcher(INT_REQUEST, INT_TYPE, DIALOG_BEGIN, m_intCtrlMsg_Sip->clone(), pReq);
 }
 
 void CR2SCallModule::sendCloseToBear_Sip()
@@ -719,9 +738,6 @@ void CR2SCallModule::notifyRtcOrigCallError(TUniNetMsg * msg){
 	pError->seq = m_seq;
 
 
-	if(m_accessMode == 1 || m_accessMode == 2){
-		CUserMapHelper::resetCalling(m_sipName);
-	}
 
 	PTSipResp pSipResp = (PTSipResp) msg->msgBody;
 
@@ -757,11 +773,6 @@ void CR2SCallModule::notifyRtcOrigCallClose(){
 void CR2SCallModule::notifyRtcOrigCallError(const int errorType){
 	TRtcError * pError = new TRtcError();
 	pError->seq = m_seq;
-
-	if(m_accessMode == 1 || m_accessMode == 2){
-		CUserMapHelper::resetCalling(m_sipName);
-	}
-
 
 	pError->errorType = errorType;
 

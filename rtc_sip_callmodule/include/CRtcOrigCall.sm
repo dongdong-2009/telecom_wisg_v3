@@ -64,7 +64,7 @@ RTC_CONFIRMING
 	[true == ctxt.isSdpConfirmed()]
 	BEAR_CONFIRMING
 	{//SIP端返回SDP
-		stopTimer();
+		stopTimer_Rtc();
 		sendReqToBear_Rtc();
 		setTimer(RTC_WAITBEAR_TIMEOUT);
 	}
@@ -73,21 +73,21 @@ RTC_CONFIRMING
 	[false == ctxt.isSdpConfirmed()]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Rtc();
 		sendErrorToWeb(ERROR_NOMATCH);
 	}
 	
 	onError(msg:TUniNetMsg*)
 	CLOSED
 	{//SIP端返回了错误信息
-		stopTimer();
+		stopTimer_Rtc();
 		forwardErrorToWeb(msg);
 	}
 	
 	onClose(msg:TUniNetMsg*)
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Rtc();
 		sendErrorToWeb(ERROR_NOMATCH);
 		
 	}
@@ -95,7 +95,7 @@ RTC_CONFIRMING
 	onShutDown(msg:TUniNetMsg*)
 	CLOSED
 	{	//Web端挂断
-		stopTimer();
+		stopTimer_Rtc();
 		notifySipTermCallClose();	
 	}
 	
@@ -103,7 +103,7 @@ RTC_CONFIRMING
 	onTimeOut(timerMark:TTimeMarkExt)  
 	CLOSED
 	{	//等待SIP端响应超时，会话释放
-		stopTimer();
+		stopTimer_Rtc();
 		notifySipTermCallClose();
 		sendErrorToWeb(ERROR_TIMEOUT);
 	}
@@ -115,7 +115,7 @@ BEAR_CONFIRMING
 	onSdpAnswer(msg:TUniNetMsg*)   	
 	BEAR_CONFIRMED
 	{
-		stopTimer();
+		stopTimer_Rtc();
 		sendAnswerToWeb(msg);
 		setTimer(RTC_CONNECTION_TIMEOUT);
 	}
@@ -124,7 +124,7 @@ BEAR_CONFIRMING
 	[true == ctxt.isFromSip(msg)]
 	CLOSED
 	{//SIP CALL端挂断
-		stopTimer();
+		stopTimer_Rtc();
 		sendErrorToWeb(ERROR_REFUSED);
 		sendCloseToBear_Rtc();
 	}
@@ -132,7 +132,7 @@ BEAR_CONFIRMING
 	onShutDown(msg:TUniNetMsg*)
 	CLOSED
 	{//Web端挂断
-		stopTimer();
+		stopTimer_Rtc();
 		notifySipTermCallClose();
 		sendCloseToBear_Rtc();
 	}
@@ -140,7 +140,7 @@ BEAR_CONFIRMING
 	onError(msg:TUniNetMsg*)
 	CLOSED
 	{//媒体服务器错误
-		stopTimer();
+		stopTimer_Rtc();
 		sendErrorToWeb(ERROR_MEDIAFAILED);
 		notifySipTermCallClose();
 	}
@@ -148,7 +148,7 @@ BEAR_CONFIRMING
 	onTimeOut(msg:TUniNetMsg*)
 	CLOSED
 	{//等待XMS超时
-		stopTimer();
+		stopTimer_Rtc();
 		sendErrorToWeb(ERROR_TIMEOUT);
 		notifySipTermCallClose();
 	}
@@ -162,13 +162,13 @@ BEAR_CONFIRMED
 	{
 		//doNothing, 
 		//toDo set keep-alive
-		stopTimer();
+		stopTimer_Rtc();
 	}
 	
 	onShutDown(msg:TUniNetMsg*)
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Rtc();
 		notifySipTermCallClose();
 		sendCloseToBear_Rtc();
 	}
@@ -178,7 +178,7 @@ BEAR_CONFIRMED
 	[true == ctxt.isFromSip(msg)] 
 	CLOSED
 	{//来自SIP端的挂断
-		stopTimer();
+		stopTimer_Rtc();
 		sendShutdownToWeb();
 		sendCloseToBear_Rtc();
 	}
@@ -187,7 +187,7 @@ BEAR_CONFIRMED
 	[false == ctxt.isFromSip(msg)] 
 	CLOSED
 	{// 来自媒体服务器的挂断
-		stopTimer();
+		stopTimer_Rtc();
 		notifySipTermCallClose();
 		sendShutdownToWeb();
 	}
@@ -195,7 +195,7 @@ BEAR_CONFIRMED
 	onTimeOut(timerMark:TTimeMarkExt)  	//等待响应超时，会话释放
 	CLOSED
 	{	
-		stopTimer();
+		stopTimer_Rtc();
 		sendCloseToBear_Rtc();
 		notifySipTermCallClose();
 		sendShutdownToWeb();
@@ -249,7 +249,7 @@ ACTIVE_WAIT1
 	onSdpAnswer(msg:TUniNetMsg*)   	
 	BEAR_CONFIRMED
 	{
-		stopTimer();
+		stopTimer_Rtc();
 		sendAnswerToWeb(msg);
 		setTimer(RTC_CONNECTION_TIMEOUT);
 	}
@@ -258,7 +258,7 @@ ACTIVE_WAIT1
 	[true == ctxt.isFromSip(msg)]
 	CLOSED
 	{//SIP CALL端挂断
-		stopTimer();
+		stopTimer_Rtc();
 		sendErrorToWeb(ERROR_REFUSED);
 		sendCloseToBear_Rtc();
 	}
@@ -266,7 +266,7 @@ ACTIVE_WAIT1
 	onShutDown(msg:TUniNetMsg*)
 	CLOSED
 	{//Web端挂断
-		stopTimer();
+		stopTimer_Rtc();
 		notifySipTermCallClose();
 		sendCloseToBear_Rtc();
 	}
@@ -274,7 +274,7 @@ ACTIVE_WAIT1
 	onError(msg:TUniNetMsg*)
 	CLOSED
 	{//媒体服务器错误
-		stopTimer();
+		stopTimer_Rtc();
 		sendErrorToWeb(ERROR_MEDIAFAILED);
 		notifySipTermCallClose();
 	}
@@ -282,7 +282,7 @@ ACTIVE_WAIT1
 	onTimeOut(msg:TUniNetMsg*)
 	CLOSED
 	{//等待XMS超时
-		stopTimer();
+		stopTimer_Rtc();
 		sendErrorToWeb(ERROR_TIMEOUT);
 		notifySipTermCallClose();
 	}
@@ -296,13 +296,13 @@ ACTIVE_WAIT2
 	{
 		//doNothing, 
 		//toDo set keep-alive
-		stopTimer();
+		stopTimer_Rtc();
 	}
 	
 	onShutDown(msg:TUniNetMsg*)
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Rtc();
 		notifySipTermCallClose();
 		sendCloseToBear_Rtc();
 	}
@@ -312,7 +312,7 @@ ACTIVE_WAIT2
 	[true == ctxt.isFromSip(msg)] 
 	CLOSED
 	{//来自SIP端的挂断
-		stopTimer();
+		stopTimer_Rtc();
 		sendShutdownToWeb();
 		sendCloseToBear_Rtc();
 	}
@@ -321,7 +321,7 @@ ACTIVE_WAIT2
 	[false == ctxt.isFromSip(msg)] 
 	CLOSED
 	{// 来自媒体服务器的挂断
-		stopTimer();
+		stopTimer_Rtc();
 		notifySipTermCallClose();
 		sendShutdownToWeb();
 	}
@@ -329,7 +329,7 @@ ACTIVE_WAIT2
 	onTimeOut(timerMark:TTimeMarkExt)  	//等待响应超时，会话释放
 	CLOSED
 	{	
-		stopTimer();
+		stopTimer_Rtc();
 		sendCloseToBear_Rtc();
 		notifySipTermCallClose();
 		sendShutdownToWeb();

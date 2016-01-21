@@ -17,7 +17,7 @@
  * Date:           2016-1-13
  * Version:        1.0
  * Description:
-     Rtc_original_call module, WebRTC???????¡§????
+     Rtc_original_call module, WebRTC???????ï¿½ï¿½????
 
 *******************************************************************************/
 
@@ -335,7 +335,7 @@ void CRtcOrigCallState_RTC_CONFIRMING::onClose(CRtcOrigCallContext& context, TUn
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.sendErrorToWeb(ERROR_NOMATCH);
         context.setState(CRtcOrigCallState::CLOSED);
     }
@@ -357,7 +357,7 @@ void CRtcOrigCallState_RTC_CONFIRMING::onError(CRtcOrigCallContext& context, TUn
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.forwardErrorToWeb(msg);
         context.setState(CRtcOrigCallState::CLOSED);
     }
@@ -381,7 +381,7 @@ void CRtcOrigCallState_RTC_CONFIRMING::onNotify(CRtcOrigCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Rtc();
             ctxt.sendReqToBear_Rtc();
             ctxt.setTimer(RTC_WAITBEAR_TIMEOUT);
             context.setState(CRtcOrigCallState::BEAR_CONFIRMING);
@@ -400,7 +400,7 @@ void CRtcOrigCallState_RTC_CONFIRMING::onNotify(CRtcOrigCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Rtc();
             ctxt.sendErrorToWeb(ERROR_NOMATCH);
             context.setState(CRtcOrigCallState::CLOSED);
         }
@@ -426,7 +426,7 @@ void CRtcOrigCallState_RTC_CONFIRMING::onShutDown(CRtcOrigCallContext& context, 
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.notifySipTermCallClose();
         context.setState(CRtcOrigCallState::CLOSED);
     }
@@ -448,7 +448,7 @@ void CRtcOrigCallState_RTC_CONFIRMING::onTimeOut(CRtcOrigCallContext& context, T
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.notifySipTermCallClose();
         ctxt.sendErrorToWeb(ERROR_TIMEOUT);
         context.setState(CRtcOrigCallState::CLOSED);
@@ -473,7 +473,7 @@ void CRtcOrigCallState_BEAR_CONFIRMING::onClose(CRtcOrigCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Rtc();
             ctxt.sendErrorToWeb(ERROR_REFUSED);
             ctxt.sendCloseToBear_Rtc();
             context.setState(CRtcOrigCallState::CLOSED);
@@ -501,7 +501,7 @@ void CRtcOrigCallState_BEAR_CONFIRMING::onError(CRtcOrigCallContext& context, TU
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.sendErrorToWeb(ERROR_MEDIAFAILED);
         ctxt.notifySipTermCallClose();
         context.setState(CRtcOrigCallState::CLOSED);
@@ -524,7 +524,7 @@ void CRtcOrigCallState_BEAR_CONFIRMING::onSdpAnswer(CRtcOrigCallContext& context
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.sendAnswerToWeb(msg);
         ctxt.setTimer(RTC_CONNECTION_TIMEOUT);
         context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
@@ -547,7 +547,7 @@ void CRtcOrigCallState_BEAR_CONFIRMING::onShutDown(CRtcOrigCallContext& context,
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.notifySipTermCallClose();
         ctxt.sendCloseToBear_Rtc();
         context.setState(CRtcOrigCallState::CLOSED);
@@ -570,7 +570,7 @@ void CRtcOrigCallState_BEAR_CONFIRMING::onTimeOut(CRtcOrigCallContext& context, 
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.sendErrorToWeb(ERROR_TIMEOUT);
         ctxt.notifySipTermCallClose();
         context.setState(CRtcOrigCallState::CLOSED);
@@ -595,7 +595,7 @@ void CRtcOrigCallState_BEAR_CONFIRMED::onClose(CRtcOrigCallContext& context, TUn
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Rtc();
             ctxt.sendShutdownToWeb();
             ctxt.sendCloseToBear_Rtc();
             context.setState(CRtcOrigCallState::CLOSED);
@@ -614,7 +614,7 @@ void CRtcOrigCallState_BEAR_CONFIRMED::onClose(CRtcOrigCallContext& context, TUn
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Rtc();
             ctxt.notifySipTermCallClose();
             ctxt.sendShutdownToWeb();
             context.setState(CRtcOrigCallState::CLOSED);
@@ -641,7 +641,7 @@ void CRtcOrigCallState_BEAR_CONFIRMED::onOK(CRtcOrigCallContext& context, TUniNe
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         context.setState(CRtcOrigCallState::ACTIVE);
     }
     catch (...)
@@ -662,7 +662,7 @@ void CRtcOrigCallState_BEAR_CONFIRMED::onShutDown(CRtcOrigCallContext& context, 
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.notifySipTermCallClose();
         ctxt.sendCloseToBear_Rtc();
         context.setState(CRtcOrigCallState::CLOSED);
@@ -685,7 +685,7 @@ void CRtcOrigCallState_BEAR_CONFIRMED::onTimeOut(CRtcOrigCallContext& context, T
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.sendCloseToBear_Rtc();
         ctxt.notifySipTermCallClose();
         ctxt.sendShutdownToWeb();
@@ -830,7 +830,7 @@ void CRtcOrigCallState_ACTIVE_WAIT1::onClose(CRtcOrigCallContext& context, TUniN
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Rtc();
             ctxt.sendErrorToWeb(ERROR_REFUSED);
             ctxt.sendCloseToBear_Rtc();
             context.setState(CRtcOrigCallState::CLOSED);
@@ -858,7 +858,7 @@ void CRtcOrigCallState_ACTIVE_WAIT1::onError(CRtcOrigCallContext& context, TUniN
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.sendErrorToWeb(ERROR_MEDIAFAILED);
         ctxt.notifySipTermCallClose();
         context.setState(CRtcOrigCallState::CLOSED);
@@ -881,7 +881,7 @@ void CRtcOrigCallState_ACTIVE_WAIT1::onSdpAnswer(CRtcOrigCallContext& context, T
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.sendAnswerToWeb(msg);
         ctxt.setTimer(RTC_CONNECTION_TIMEOUT);
         context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
@@ -904,7 +904,7 @@ void CRtcOrigCallState_ACTIVE_WAIT1::onShutDown(CRtcOrigCallContext& context, TU
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.notifySipTermCallClose();
         ctxt.sendCloseToBear_Rtc();
         context.setState(CRtcOrigCallState::CLOSED);
@@ -927,7 +927,7 @@ void CRtcOrigCallState_ACTIVE_WAIT1::onTimeOut(CRtcOrigCallContext& context, TUn
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.sendErrorToWeb(ERROR_TIMEOUT);
         ctxt.notifySipTermCallClose();
         context.setState(CRtcOrigCallState::CLOSED);
@@ -952,7 +952,7 @@ void CRtcOrigCallState_ACTIVE_WAIT2::onClose(CRtcOrigCallContext& context, TUniN
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Rtc();
             ctxt.sendShutdownToWeb();
             ctxt.sendCloseToBear_Rtc();
             context.setState(CRtcOrigCallState::CLOSED);
@@ -971,7 +971,7 @@ void CRtcOrigCallState_ACTIVE_WAIT2::onClose(CRtcOrigCallContext& context, TUniN
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Rtc();
             ctxt.notifySipTermCallClose();
             ctxt.sendShutdownToWeb();
             context.setState(CRtcOrigCallState::CLOSED);
@@ -998,7 +998,7 @@ void CRtcOrigCallState_ACTIVE_WAIT2::onOK(CRtcOrigCallContext& context, TUniNetM
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         context.setState(CRtcOrigCallState::ACTIVE);
     }
     catch (...)
@@ -1019,7 +1019,7 @@ void CRtcOrigCallState_ACTIVE_WAIT2::onShutDown(CRtcOrigCallContext& context, TU
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.notifySipTermCallClose();
         ctxt.sendCloseToBear_Rtc();
         context.setState(CRtcOrigCallState::CLOSED);
@@ -1042,7 +1042,7 @@ void CRtcOrigCallState_ACTIVE_WAIT2::onTimeOut(CRtcOrigCallContext& context, TTi
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Rtc();
         ctxt.sendCloseToBear_Rtc();
         ctxt.notifySipTermCallClose();
         ctxt.sendShutdownToWeb();

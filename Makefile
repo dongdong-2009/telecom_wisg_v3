@@ -18,7 +18,6 @@ INC_DIR=  -I./rtcpsa/include \
 		  -I./msgdef_rtc/include \
 		  -I./msgdef_internal/include \
 		  -I./dbhandler/include \
-		  -I./msgmapper/include \
 		  -I./dispatcher/include \
 		  -I./bear/include \
 		  -I./rtc_sip_callmodule/include \
@@ -55,10 +54,10 @@ usage:
 	@echo "    make compilemsg                      compile msg"
 	@echo "    make compilesm                       compile SM"
 
-all: sipmsgdef rtc_msgdef internal_msgdef rtc_db rtc_psa msgmapper dispatcher \
+all: sipmsgdef rtc_msgdef internal_msgdef rtc_db rtc_psa dispatcher \
 	rtc_sip_callmodule psasip msglib bear_module
 clean: clean.rtc_psa clean.rtc_msgdef clean.rtc_db clean.internal_msgdef clean.dispatcher clean.deploy clean.message_xml_parse \
-	 clean.rtc_sip_callmodule  clean.msgmapper clean.bear_module\
+	 clean.rtc_sip_callmodule clean.bear_module\
 	clean.psasip clean.msglib clean.sipmsgdef
 compilesm: compilertcsm compilesipsm
 
@@ -138,7 +137,7 @@ compilemsg:
 
 OBJS_RTC_MSGDEF = ./msgdef_rtc/source/msgdef_rtc.o
 rtc_msgdef: $(OBJS_RTC_MSGDEF)
-	ar -crv $(OUTPUT_DIR)/librtcmsg.a $(OBJS_RTC_MSGDEF)
+	ar -crv $(DEPLOY_DIR)/lib/librtcmsg.a $(OBJS_RTC_MSGDEF)
 	@echo "*************** Finish making librtcmsg.a ***************"
 clean.rtc_msgdef:
 	rm -f $(OBJS_RTC_MSGDEF) $(OUTPUT_DIR)/librtcmsg.a
@@ -152,7 +151,7 @@ compilemsg:
 
 OBJS_INT_MSGDEF = ./msgdef_internal/source/msgdef_int.o
 internal_msgdef: $(OBJS_INT_MSGDEF)
-	ar -crv $(OUTPUT_DIR)/libintmsg.a $(OBJS_INT_MSGDEF)
+	ar -crv $(DEPLOY_DIR)/lib/libintmsg.a $(OBJS_INT_MSGDEF)
 	@echo "*************** Finish making libintmsg.a ***************"
 clean.internal_msgdef:
 	rm -f $(OBJS_INT_MSGDEF) $(OUTPUT_DIR)/libintmsg.a
@@ -160,27 +159,16 @@ clean.internal_msgdef:
 #=========== rtc_db ===================
 OBJS_RTC_DB = ./dbhandler/source/dbHandler.o
 rtc_db: $(OBJS_RTC_DB)
-	ar -crv $(OUTPUT_DIR)/librtcdb.a $(OBJS_RTC_DB)
+	ar -crv $(DEPLOY_DIR)/lib/librtcdb.a $(OBJS_RTC_DB)
 	@echo "*************** Finish making librtcdb.a ***************"
 clean.rtc_db:
 	rm -f $(OBJS_RTC_DB) $(OUTPUT_DIR)/librtcdb.a
 
-#=========== msgmapper ===================
-OBJS_MSGMAPPER = ./msgmapper/source/CRtcToSip.o ./msgmapper/source/CSipToRtc.o ./msgmapper/source/CMsgMapHelper.o ./msgmapper/source/CUserMapHelper.o
-msgmapper: $(OBJS_MSGMAPPER) rtc_msgdef
-#	ar -crv $(OUTPUT_DIR)/libmsgmapper.a $(OBJS_MSGMAPPER) 
-#	@echo "*************** Finish making libmsgmapper.a ***************"
-	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/libmsgmapper.so $(OBJS_MSGMAPPER) 
-#	mv $(OUTPUT_DIR)/libmsgmapper.so $(DEPLOY_DIR)/libmsgmapper.so
-	@echo "*************** Finish making libmsgmapper.so ***************"
-clean.msgmapper:
-	rm -f $(OUTPUT_DIR)/libmsgmapper.so $(OBJS_MSGMAPPER)
 	
 #=========== dispatcher ===================
 OBJS_DISPATCHER = ./dispatcher/source/CDialogController.o ./dispatcher/source/CMsgDispatcher.o
 dispatcher: $(OBJS_DISPATCHER)
-#	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/dispatcher.so $(OBJS_DISPATCHER) $(LIBS) -lmsgmapper
-	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/dispatcher.so $(OBJS_DISPATCHER) -L$(DEPLOY_DIR) -lmsgmapper $(LIBS) 
+	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/dispatcher.so $(OBJS_DISPATCHER) -L$(DEPLOY_DIR) $(LIBS) 
 	@echo "**************Finsh making dispatcher.so**********************"
 clean.dispatcher:	
 	rm -f $(OBJS_DISPATCHER) $(OUTPUT_DIR)/dispatcher.so
@@ -224,7 +212,7 @@ OBJS_RTC_SIP_CALL = ./rtc_sip_callmodule/source/CR2SCallModule.o \
 					./rtc_sip_callmodule/source/CSipTermCall_sm.o
 					
 rtc_sip_callmodule: $(OBJS_RTC_SIP_CALL)
-	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/rtc_sip_callmodule.so $(OBJS_SIP_CALL) -L$(DEPLOY_DIR) -lmsgmapper $(LIBS) -lsipmsgdef -lintmsg
+	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/rtc_sip_callmodule.so $(OBJS_SIP_CALL) -L$(DEPLOY_DIR) $(LIBS) -lsipmsgdef -lintmsg
 	@echo "**************Finsh making rtc_sip_callmodule.so**********************"
 clean.rtc_sip_callmodule:
 	rm -f $(OBJS_RTC_SIP_CALL) $(OUTPUT_DIR)/rtc_sip_callmodule.so
@@ -235,17 +223,11 @@ deploy: all
 #	cp ./test_server.so $(DEPLOY_DIR)/app/test_server.so
 	mv ./dispatcher.so $(DEPLOY_DIR)/app/dispatcher.so
 	mv ./rtc_sip_callmodule.so $(DEPLOY_DIR)/app/rtc_sip_callmodule.so
-	mv ./librtcmsg.a $(DEPLOY_DIR)/lib/librtcmsg.a
-	mv ./libintmsg.a $(DEPLOY_DIR)/lib/libintmsg.a
-	
-	mv ./librtcdb.a $(DEPLOY_DIR)/lib/librtcdb.a
-	
-	#mv ./libmsgmapper.so /usr/lib/libmsgmapper.so
+
 	
 	#cp $(D_SIPMSGDEF)/include/*.h /usr/local/include/mcf/sip
 #	cp $(LIB_DIR)/libsipmsgdef.a /usr/local/lib/libmcfsipmsg.a
 #	chmod 644 /usr/local/lib/libmcfsipmsg.a
-	#mv $(OUTPUT_DIR)/libmsgmapper.so $(DEPLOY_DIR)/libmsgmapper.so
 	@echo "************* deploy finished*********************"
 
 clean.deploy:
@@ -255,6 +237,4 @@ clean.deploy:
 	rm -f $(DEPLOY_DIR)/app/rtc_sip_callmodule.so
 	rm -f $(DEPLOY_DIR)/lib/librtcmsg.a
 	rm -f $(DEPLOY_DIR)/lib/librtcdb.a
-#	rm -f $(DEPLOY_DIR)/lib/libmsgmapper.so
-	rm -f $(DEPLOY_DIR)/libmsgmapper.so
 	@echo "************* deploy clean finished*********************"

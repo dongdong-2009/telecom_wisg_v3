@@ -23,27 +23,33 @@ public:
 	DECLARE_CLONE();
 private:
 	void handleMsgFromSipPSA(TUniNetMsg* msg);
-	void handleMsgFromSipCall(TUniNetMsg* msg);
-	//void handleMsgFromSipIM(TUniNetMsg* msg);
-
-	void handleMsgFromMSControl(TUniNetMsg * msg);
 
 	void handleMsgFromRtcPSA(TUniNetMsg* msg);
-	void handleMsgFromRtcCall(TUniNetMsg* msg);
-	//void handleMsgFromRtcIM(TUniNetMsg* msg);
+
+	void handleMsgFromRtcSipCall(TUniNetMsg* msg);
+	void handleMsgFromBear(TUniNetMsg * msg);
 
 
 	void sendMsgtoInstance(TUniNetMsg* msg, TMsgAddress instAddr, TDialogType dialogtype);
-	char* generateSipUniqID(TUniNetMsg* msg);
-	char* generateRtcUniqID(TUniNetMsg* msg);
+	inline char* generateSipUniqID(TUniNetMsg* msg)
+	{
+		TSipCtrlMsg* pSipCtrl = (TSipCtrlMsg*) (msg->ctrlMsgHdr);
+		return pSipCtrl->sip_callId.number.c_str();
+	}
+	inline char* generateRtcUniqID(TUniNetMsg* msg){
+		PTRtcCtrlMsg pCtrl = (PTRtcCtrlMsg) msg->ctrlMsgHdr;
+		return pCtrl->offerSessionId.c_str();
+	}
+
+	inline char* generateIntUniqID(TUniNetMsg* msg){
+		PTIntCtrlMsg pCtrl = (PTIntCtrlMsg) msg->ctrlMsgHdr;
+		return pCtrl->sessionId.c_str();
+	}
 
 	INT LOGADDR_SIP_PSA;	// default 11
 	INT LOGADDR_RTC_PSA;    // default 18
-	INT LOGADDR_SIP_CALL;	// default 232
-	INT LOGADDR_RTC_CALL;   // default 233
-	INT LOGADDR_SIP_IM;		// default 234
-	INT LOGADDR_RTC_IM;    	// default 235
-	INT LOGADDR_MS_CONTROL;	// default 236
+	INT LOGADDR_RTC_SIP_CALL;	// default 232
+	INT LOGADDR_BEAR_MOD;   // default 233
 
 	INT LOGADDR_DISPATCHER;	// default 231
 

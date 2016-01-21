@@ -9,7 +9,6 @@
 #include "rtc_msg_def.h"
 #include "int_msg_def.h"
 #include "CPropertiesManager.h"
-#include "CRtcToSip.h"
 #include "CRtcOrigCall_sm.h"
 #include "CSipTermCall_sm.h"
 #include "CMsgDispatcher.h"
@@ -62,10 +61,14 @@ public:
 	//mcf提供的定时器，没用到
 	virtual void onTimeOut(TTimeMarkExt timerMark);
 
+
 	//处理定时器超时,自定义的定时器
 	void timeOut (timer * ptimer);
 
 	void setTimer (UINT timer_id);
+
+	void stopTimer_Sip();
+	void stopTimer_Rtc();
 
 	void list(){}
 	DECLARE_CLONE();
@@ -106,6 +109,8 @@ private:
 	bool m_isSipInit;
 	bool m_isRtcInit;
 	bool m_switchFlag;
+
+	UINT m_endFlag;
 
 	bool selectSipUser(string rtcname);
 public:

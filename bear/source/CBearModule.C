@@ -213,7 +213,7 @@ void CBearModule::sendSdpAnswerToCall(TUniNetMsg * msg) {
 	PTIntResponse pResp = new TIntResponse();
 	pResp->body = ((PTSipResp) msg->msgBody)->body.content;
 
-	sendMsgToDispatcher(INTERNAL_RESPONSE, SIP_TYPE, DIALOG_CONTINUE, pCtrlMsg,
+	sendMsgToDispatcher(INTERNAL_RESPONSE, SIP_TYPE, DIALOG_BEGIN, pCtrlMsg,
 			pResp);
 }
 

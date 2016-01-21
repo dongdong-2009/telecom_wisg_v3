@@ -60,7 +60,7 @@ CALLPROC
 	nil 
 	{	
 		
-		stopTimer();
+		stopTimer_Sip();
 		
 		setTimer(SIP_CONNECTING_TIMEOUT);
 	}
@@ -69,7 +69,7 @@ CALLPROC
 	[true == ctxt.isResp3xx_6xx(msg)]   //如果收到的是3xx~6xx的错误响应，释放会话
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		notifyRtcOrigCallError(msg);
 	}
 	
@@ -77,7 +77,7 @@ CALLPROC
 	[true == ctxt.isResp1xx(msg) && true == ctxt.isWithSDP(msg) && true == ctxt.compAndModifySdpWithRtc(msg)]
 	BEAR_GATEWAY_READY
 	{//compAndModifySdpWithRtc：如果rtc 音视频，sip音频，会修改rtc端sdp，去掉视频，如果rtc音频，sip音视频，去掉sip端sdp视频
-		stopTimer();
+		stopTimer_Sip();
 		setUACTag(msg);
 		notifyRtcOrigCallSdp();
 		sendReqToBear_Sip();
@@ -88,7 +88,7 @@ CALLPROC
 	[true == ctxt.isResp1xx(msg) && true == ctxt.isWithSDP(msg) && false == ctxt.compAndModifySdpWithRtc(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		setUACTag(msg);
 		notifyRtcOrigCallClose();
 	}
@@ -98,7 +98,7 @@ CALLPROC
 	[true == ctxt.isResp2xx(msg) && true == ctxt.isWithSDP(msg)]    	//收到200 OK 携带SDP，会话建立成功
 	BEAR_CLIENT_READY
 	{
-		stopTimer();
+		stopTimer_Sip();
 		setUACTag(msg);
 		sendReqToBear_Sip();	//返回SDP给CALL模块
 		setTimer(SIP_WAITBEAR_TIMEOUT);		
@@ -108,7 +108,7 @@ CALLPROC
 	[true == ctxt.isResp2xx(msg) && false == ctxt.isWithSDP(msg)] 
 	CLOSED
 	{//收到200 OK, 但不携带SDP，该情况基本不出现
-		stopTimer();
+		stopTimer_Sip();
 				
 		setUACTag(msg);
 
@@ -119,7 +119,7 @@ CALLPROC
 	onClose(msg:TUniNetMsg*)
 	CLOSED
 	{//RTC_CALL端挂断
-		stopTimer();
+		stopTimer_Sip();
 		sendCancelToIMS();
 	}
 	
@@ -127,7 +127,7 @@ CALLPROC
 	onTimeOut(timerMark:TTimeMarkExt)  
 	CLOSED
 	{	//IMS响应超时
-		stopTimer();
+		stopTimer_Sip();
 		notifyRtcOrigCallClose();
 		sendCancelToIMS();
 	}
@@ -139,7 +139,7 @@ BEAR_GATEWAY_READY
 	onSdpAnswer(msg:TUniNetMsg*)   	
 	BEAR_CONFIRMED
 	{//收到来自bear的SDP
-		stopTimer();
+		stopTimer_Sip();
 		sendPrackToIMS(msg);
 		setTimer(SIP_200OK_TIMEOUT);
 	}
@@ -147,7 +147,7 @@ BEAR_GATEWAY_READY
 	onClose(msg:TUniNetMsg*)
 	CLOSED
 	{//RTC挂断电话
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		sendCancelToIMS();
 	}
@@ -156,7 +156,7 @@ BEAR_GATEWAY_READY
 	onError(msg:TUniNetMsg*)
 	CLOSED
 	{//MS错误
-		stopTimer();
+		stopTimer_Sip();
 		sendCancelToIMS();
 		notifyRtcOrigCallClose();
 	}
@@ -165,7 +165,7 @@ BEAR_GATEWAY_READY
 	onTimeOut(msg:TUniNetMsg*)
 	CLOSED
 	{//等待XMS超时
-		stopTimer();
+		stopTimer_Sip();
 		sendCancelToIMS();
 		notifyRtcOrigCallError(ERROR_TIMEOUT);
 		notifyRtcOrigCallClose();
@@ -189,7 +189,7 @@ BEAR_CONFIRMING
 	[true == ctxt.isResp2xx(msg)]
 	BEAR_CONFIRMED
 	{ //doNothing，listening color ring
-		stopTimer();
+		stopTimer_Sip();
 		setTimer(SIP_RING_TIMEOUT);
 	}
 	
@@ -197,7 +197,7 @@ BEAR_CONFIRMING
 	[false == ctxt.isResp2xx(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		sendCancelToIMS();
 		notifyRtcOrigCallClose();
@@ -207,7 +207,7 @@ BEAR_CONFIRMING
 	[true == ctxt.isFromRtc(msg)]//msg == NULL
 	CLOSED
 	{//RTC_CALL端挂断
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		sendCancelToIMS();
 	}
@@ -216,7 +216,7 @@ BEAR_CONFIRMING
 	[false == ctxt.isFromRtc(msg)]
 	CLOSED
 	{//MS挂断
-		stopTimer();
+		stopTimer_Sip();
 		notifyRtcOrigCallClose();
 		sendCancelToIMS();
 	}
@@ -225,7 +225,7 @@ BEAR_CONFIRMING
 	onTimeOut(timerMark:TTimeMarkExt)  	//等待IMS的PRACK响应超时，会话释放
 	CLOSED
 	{	
-		stopTimer();
+		stopTimer_Sip();
 		sendCancelToIMS();
 		sendCloseToBear_Sip();
 		notifyRtcOrigCallClose();
@@ -238,7 +238,7 @@ BEAR_CONFIRMED
 	["INVITE" != ctxt.checkRespCseqMothod(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		
 		sendCancelToIMS();
 		sendCloseToBear_Sip();
@@ -249,7 +249,7 @@ BEAR_CONFIRMED
 	[true == ctxt.isResp2xx(msg) && true == ctxt.isWithSDP(msg) && true == ctxt.compAndModifySdpWithRtc(msg)]
 	BEAR_CLIENT_READY
 	{
-		stopTimer();
+		stopTimer_Sip();
 		
 		sendReqToBear_Sip();
 		setTimer(SIP_WAITBEAR_TIMEOUT);
@@ -259,7 +259,7 @@ BEAR_CONFIRMED
 	[true == ctxt.isResp2xx(msg) && true == ctxt.isWithSDP(msg) && false == ctxt.compAndModifySdpWithRtc(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		
 		sendCloseToBear_Sip();
 		notifyRtcOrigCallClose();
@@ -270,7 +270,7 @@ BEAR_CONFIRMED
 	[true == ctxt.isResp2xx(msg) && false == ctxt.isWithSDP(msg)]
 	ACTIVE
 	{
-		stopTimer();
+		stopTimer_Sip();
 		
 		//ToDO setTimer Session-Expires
 		sendAckToIMS(NULL);
@@ -280,7 +280,7 @@ BEAR_CONFIRMED
 	[true == ctxt.isResp3xx_6xx(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		notifyRtcOrigCallClose();
 	}
@@ -289,7 +289,7 @@ BEAR_CONFIRMED
 	[false == ctxt.isWithSDP(msg)]
 	nil
 	{	
-		stopTimer();
+		stopTimer_Sip();
 		send200OKForUpdateToIMS(NULL); //no sdp
 	}
 
@@ -297,7 +297,7 @@ BEAR_CONFIRMED
 	[true == ctxt.compAndModifySdpWithRtc(msg)]
 	BEAR_MODYFYING
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendReqToBear_Sip();
 		setTimer(SIP_WAITBEAR_TIMEOUT);
 	}
@@ -306,7 +306,7 @@ BEAR_CONFIRMED
 	[false == ctxt.compAndModifySdpWithRtc(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		notifyRtcOrigCallClose();
 		sendCancelToIMS();
@@ -316,7 +316,7 @@ BEAR_CONFIRMED
 	[true == ctxt.isFromRtc(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendCancelToIMS();
 		sendCloseToBear_Sip();
 	}
@@ -325,7 +325,7 @@ BEAR_CONFIRMED
 	[false == ctxt.isFromRtc(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendCancelToIMS();
 		notifyRtcOrigCallClose();
 	}
@@ -334,7 +334,7 @@ BEAR_CONFIRMED
 	onTimeOut(timerMark:TTimeMarkExt)
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendCancelToIMS();
 		sendCloseToBear_Sip();
 		notifyRtcOrigCallClose();
@@ -348,7 +348,7 @@ BEAR_CLIENT_READY
 	onSdpAnswer(msg:TUniNetMsg*)
 	ACTIVE
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendAckToIMS(msg);
 		
 		//ToDo setTimer Session-Expires
@@ -357,7 +357,7 @@ BEAR_CLIENT_READY
 	onClose(msg:TUniNetMsg*)
 	CLOSED
 	{//RTC挂断电话
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		sendCancelToIMS();
 	}
@@ -366,7 +366,7 @@ BEAR_CLIENT_READY
 	onError(msg:TUniNetMsg*)
 	CLOSED
 	{//MS错误
-		stopTimer();
+		stopTimer_Sip();
 		sendCancelToIMS();
 		notifyRtcOrigCallClose();
 	}
@@ -375,7 +375,7 @@ BEAR_CLIENT_READY
 	onTimeOut(timerMark:TTimeMarkExt)
 	CLOSED
 	{//等待XMS超时
-		stopTimer();
+		stopTimer_Sip();
 		notifyRtcOrigCallError(ERROR_TIMEOUT);
 		sendCancelToIMS();
 		notifyRtcOrigCallClose();
@@ -391,7 +391,7 @@ BEAR_MODYFYING
 	onSdpAnswer(msg:TUniNetMsg*)
 	BEAR_CONFIRMED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		send200OKForUpdateToIMS(msg);
 	}
 	
@@ -399,7 +399,7 @@ BEAR_MODYFYING
 	["INVITE" != ctxt.checkRespCseqMothod(msg) || false != ctxt.isResp3xx_6xx(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		
 		sendCancelToIMS();
 		sendCloseToBear_Sip();
@@ -410,7 +410,7 @@ BEAR_MODYFYING
 	[true == ctxt.isResp3xx_6xx(msg)]
 	CLOSED
 	{//IMS端挂断
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		notifyRtcOrigCallClose();
 	}
@@ -419,7 +419,7 @@ BEAR_MODYFYING
 	onClose(msg:TUniNetMsg*)
 	CLOSED
 	{//RTC挂断电话
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		sendCancelToIMS();
 	}
@@ -428,7 +428,7 @@ BEAR_MODYFYING
 	onError(msg:TUniNetMsg*)
 	CLOSED
 	{//MS错误
-		stopTimer();
+		stopTimer_Sip();
 		sendCancelToIMS();
 		notifyRtcOrigCallClose();
 	}
@@ -437,7 +437,7 @@ BEAR_MODYFYING
 	onTimeOut(timerMark:TTimeMarkExt)
 	CLOSED
 	{//等待XMS超时
-		stopTimer();
+		stopTimer_Sip();
 		notifyRtcOrigCallError(ERROR_TIMEOUT);
 		sendCancelToIMS();
 		notifyRtcOrigCallClose();
@@ -553,7 +553,7 @@ ACTIVE_WAIT_BEAR_MODIFYING
 	ACTIVE
 	{
 		resetFlag();
-		stopTimer();
+		stopTimer_Sip();
 		send200OKForUpdateToIMS(msg);
 	}
 	
@@ -562,7 +562,7 @@ ACTIVE_WAIT_BEAR_MODIFYING
 	ACTIVE_WAIT_ACK
 	{
 		resetFlag();
-		stopTimer();
+		stopTimer_Sip();
 		send200OKForInviteToIMS(msg);
 		setTimer(SIP_ACK_TIMEOUT);
 	}
@@ -570,7 +570,7 @@ ACTIVE_WAIT_BEAR_MODIFYING
 	onBye(msg:TUniNetMsg*)
 	CLOSED
 	{//IMS挂断电话
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		notifyRtcOrigCallClose();
 	}
@@ -579,7 +579,7 @@ ACTIVE_WAIT_BEAR_MODIFYING
 	[true == ctxt.isFromRtc(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		sendByeToIMS();
 	}
@@ -589,7 +589,7 @@ ACTIVE_WAIT_BEAR_MODIFYING
 	[false == ctxt.isFromRtc(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendByeToIMS();
 		notifyRtcOrigCallClose();
 	}
@@ -597,7 +597,7 @@ ACTIVE_WAIT_BEAR_MODIFYING
 	onTimeOut(timerMark:TTimeMarkExt)
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		sendByeToIMS();
 		notifyRtcOrigCallClose();
@@ -618,7 +618,7 @@ ACTIVE_WAIT_ACK
 	onBye(msg:TUniNetMsg*)
 	CLOSED
 	{//IMS挂断电话
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		notifyRtcOrigCallClose();
 	}
@@ -627,7 +627,7 @@ ACTIVE_WAIT_ACK
 	[true == ctxt.isFromRtc(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		sendByeToIMS();
 	}
@@ -637,7 +637,7 @@ ACTIVE_WAIT_ACK
 	[false == ctxt.isFromRtc(msg)]
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendByeToIMS();
 		notifyRtcOrigCallClose();
 	}
@@ -645,7 +645,7 @@ ACTIVE_WAIT_ACK
 	onTimeOut(timerMark:TTimeMarkExt)
 	CLOSED
 	{
-		stopTimer();
+		stopTimer_Sip();
 		sendCloseToBear_Sip();
 		sendByeToIMS();
 		notifyRtcOrigCallClose();

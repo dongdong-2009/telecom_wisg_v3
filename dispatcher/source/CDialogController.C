@@ -2,10 +2,12 @@
 
 CDialogController::CDialogController(){
 	m_mapDialog.clear();
+	m_mapBear.clear();
 }
 
 CDialogController::~CDialogController(){
 	m_mapDialog.clear();
+	m_mapBear.clear();
 }
 
 BOOL CDialogController::storeDialog(const string &uniqID, TMsgAddress addr){
@@ -16,7 +18,7 @@ BOOL CDialogController::storeDialog(const string &uniqID, TMsgAddress addr){
 }
 
 BOOL CDialogController::getDialogAddr(const string &uniqID, TMsgAddress& addr){
-	DubugOut();
+	//DubugOut();
 	map<string, TMsgAddress>::iterator it = m_mapDialog.find(uniqID);
 	if(it != m_mapDialog.end()){
 		addr = it->second;
@@ -27,20 +29,33 @@ BOOL CDialogController::getDialogAddr(const string &uniqID, TMsgAddress& addr){
 
 BOOL CDialogController::clearDialog(const string &uniqID){
 	int n = m_mapDialog.erase(uniqID);
-
-	//erase msgmapper sessionIdtoCallIdTag, just work if the uniqid is sip callid number
-	CVarChar128 Id128;
-	Id128 = uniqID.c_str();
-	CMsgMapHelper::clearRtcToSipMap(Id128);
-	//erase msgmapper FromTagTotoTagWithAnswerId, just work if the uniqid is offersessionid
-	//	(Note: fromtag is same with offersessionid)
-//	CVarChar32 Id32;
-//	Id32 = uniqID.c_str();
-//	CMsgMapHelper::clearMapFromTagTotoTagWithAnswerId(Id32);
-
-	DubugOut();
 	return n == 1;
 }
+
+
+BOOL CDialogController::storeBear(const string &uniqID, TMsgAddress addr){
+	pair<map<string, TMsgAddress>::iterator, bool> ret;
+	ret = m_mapBear.insert(pair<string, TMsgAddress>(uniqID, addr));
+	//DubugOut();
+	return ret.second;
+}
+
+BOOL CDialogController::getBearAddr(const string &uniqID, TMsgAddress& addr){
+	//DubugOut();
+	map<string, TMsgAddress>::iterator it = m_mapDialog.find(uniqID);
+	if(it != m_mapBear.end()){
+		addr = it->second;
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL CDialogController::clearBear(const string &uniqID){
+	int n = m_mapBear.erase(uniqID);
+	return n == 1;
+}
+
+
 
 void CDialogController::DubugOut(){
 	if(true){

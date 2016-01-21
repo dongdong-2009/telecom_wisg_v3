@@ -17,7 +17,7 @@
  * Date:           2016-1-16
  * Version:        1.0
  * Description:
-     Sip_terminal_call module, WebRTC???????¡§????
+     Sip_terminal_call module, WebRTC???????ï¿½ï¿½????
 
 *******************************************************************************/
 
@@ -342,7 +342,7 @@ void CSipTermCallState_CALLPROC::onClose(CSipTermCallContext& context, TUniNetMs
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCancelToIMS();
         context.setState(CSipTermCallState::CLOSED);
     }
@@ -367,7 +367,7 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.setTimer(SIP_CONNECTING_TIMEOUT);
             context.setState(endState);
         }
@@ -384,7 +384,7 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.notifyRtcOrigCallError(msg);
             context.setState(CSipTermCallState::CLOSED);
         }
@@ -402,7 +402,7 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.setUACTag(msg);
             ctxt.notifyRtcOrigCallSdp();
             ctxt.sendReqToBear_Sip();
@@ -423,7 +423,7 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.setUACTag(msg);
             ctxt.notifyRtcOrigCallClose();
             context.setState(CSipTermCallState::CLOSED);
@@ -442,7 +442,7 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.setUACTag(msg);
             ctxt.sendReqToBear_Sip();
             ctxt.setTimer(SIP_WAITBEAR_TIMEOUT);
@@ -462,7 +462,7 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.setUACTag(msg);
             ctxt.notifyRtcOrigCallClose();
             ctxt.sendCancelToIMS();
@@ -490,7 +490,7 @@ void CSipTermCallState_CALLPROC::onTimeOut(CSipTermCallContext& context, TTimeMa
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.notifyRtcOrigCallClose();
         ctxt.sendCancelToIMS();
         context.setState(CSipTermCallState::CLOSED);
@@ -513,7 +513,7 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onClose(CSipTermCallContext& context,
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCloseToBear_Sip();
         ctxt.sendCancelToIMS();
         context.setState(CSipTermCallState::CLOSED);
@@ -536,7 +536,7 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onError(CSipTermCallContext& context,
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCancelToIMS();
         ctxt.notifyRtcOrigCallClose();
         context.setState(CSipTermCallState::CLOSED);
@@ -559,7 +559,7 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onSdpAnswer(CSipTermCallContext& cont
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendPrackToIMS(msg);
         ctxt.setTimer(SIP_200OK_TIMEOUT);
         context.setState(CSipTermCallState::BEAR_CONFIRMED);
@@ -582,7 +582,7 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onTimeOut(CSipTermCallContext& contex
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCancelToIMS();
         ctxt.notifyRtcOrigCallError(ERROR_TIMEOUT);
         ctxt.notifyRtcOrigCallClose();
@@ -608,7 +608,7 @@ void CSipTermCallState_BEAR_CONFIRMING::onClose(CSipTermCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCloseToBear_Sip();
             ctxt.sendCancelToIMS();
             context.setState(CSipTermCallState::CLOSED);
@@ -627,7 +627,7 @@ void CSipTermCallState_BEAR_CONFIRMING::onClose(CSipTermCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.notifyRtcOrigCallClose();
             ctxt.sendCancelToIMS();
             context.setState(CSipTermCallState::CLOSED);
@@ -675,7 +675,7 @@ void CSipTermCallState_BEAR_CONFIRMING::onResponse(CSipTermCallContext& context,
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.setTimer(SIP_RING_TIMEOUT);
             context.setState(CSipTermCallState::BEAR_CONFIRMED);
         }
@@ -693,7 +693,7 @@ void CSipTermCallState_BEAR_CONFIRMING::onResponse(CSipTermCallContext& context,
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCloseToBear_Sip();
             ctxt.sendCancelToIMS();
             ctxt.notifyRtcOrigCallClose();
@@ -721,7 +721,7 @@ void CSipTermCallState_BEAR_CONFIRMING::onTimeOut(CSipTermCallContext& context, 
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCancelToIMS();
         ctxt.sendCloseToBear_Sip();
         ctxt.notifyRtcOrigCallClose();
@@ -747,7 +747,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onClose(CSipTermCallContext& context, TUn
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCancelToIMS();
             ctxt.sendCloseToBear_Sip();
             context.setState(CSipTermCallState::CLOSED);
@@ -766,7 +766,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onClose(CSipTermCallContext& context, TUn
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCancelToIMS();
             ctxt.notifyRtcOrigCallClose();
             context.setState(CSipTermCallState::CLOSED);
@@ -795,7 +795,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onResponse(CSipTermCallContext& context, 
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCancelToIMS();
             ctxt.sendCloseToBear_Sip();
             ctxt.notifyRtcOrigCallClose();
@@ -815,7 +815,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onResponse(CSipTermCallContext& context, 
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendReqToBear_Sip();
             ctxt.setTimer(SIP_WAITBEAR_TIMEOUT);
             context.setState(CSipTermCallState::BEAR_CLIENT_READY);
@@ -834,7 +834,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onResponse(CSipTermCallContext& context, 
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCloseToBear_Sip();
             ctxt.notifyRtcOrigCallClose();
             ctxt.sendCancelToIMS();
@@ -854,7 +854,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onResponse(CSipTermCallContext& context, 
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendAckToIMS(NULL);
             context.setState(CSipTermCallState::ACTIVE);
         }
@@ -872,7 +872,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onResponse(CSipTermCallContext& context, 
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCloseToBear_Sip();
             ctxt.notifyRtcOrigCallClose();
             context.setState(CSipTermCallState::CLOSED);
@@ -899,7 +899,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onTimeOut(CSipTermCallContext& context, T
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCancelToIMS();
         ctxt.sendCloseToBear_Sip();
         ctxt.notifyRtcOrigCallClose();
@@ -926,7 +926,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onUpdate(CSipTermCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.send200OKForUpdateToIMS(NULL);
             context.setState(endState);
         }
@@ -943,7 +943,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onUpdate(CSipTermCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendReqToBear_Sip();
             ctxt.setTimer(SIP_WAITBEAR_TIMEOUT);
             context.setState(CSipTermCallState::BEAR_MODYFYING);
@@ -962,7 +962,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onUpdate(CSipTermCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCloseToBear_Sip();
             ctxt.notifyRtcOrigCallClose();
             ctxt.sendCancelToIMS();
@@ -990,7 +990,7 @@ void CSipTermCallState_BEAR_CLIENT_READY::onClose(CSipTermCallContext& context, 
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCloseToBear_Sip();
         ctxt.sendCancelToIMS();
         context.setState(CSipTermCallState::CLOSED);
@@ -1013,7 +1013,7 @@ void CSipTermCallState_BEAR_CLIENT_READY::onError(CSipTermCallContext& context, 
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCancelToIMS();
         ctxt.notifyRtcOrigCallClose();
         context.setState(CSipTermCallState::CLOSED);
@@ -1036,7 +1036,7 @@ void CSipTermCallState_BEAR_CLIENT_READY::onSdpAnswer(CSipTermCallContext& conte
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendAckToIMS(msg);
         context.setState(CSipTermCallState::ACTIVE);
     }
@@ -1058,7 +1058,7 @@ void CSipTermCallState_BEAR_CLIENT_READY::onTimeOut(CSipTermCallContext& context
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.notifyRtcOrigCallError(ERROR_TIMEOUT);
         ctxt.sendCancelToIMS();
         ctxt.notifyRtcOrigCallClose();
@@ -1082,7 +1082,7 @@ void CSipTermCallState_BEAR_MODYFYING::onClose(CSipTermCallContext& context, TUn
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCloseToBear_Sip();
         ctxt.sendCancelToIMS();
         context.setState(CSipTermCallState::CLOSED);
@@ -1105,7 +1105,7 @@ void CSipTermCallState_BEAR_MODYFYING::onError(CSipTermCallContext& context, TUn
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCancelToIMS();
         ctxt.notifyRtcOrigCallClose();
         context.setState(CSipTermCallState::CLOSED);
@@ -1130,7 +1130,7 @@ void CSipTermCallState_BEAR_MODYFYING::onResponse(CSipTermCallContext& context, 
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCancelToIMS();
             ctxt.sendCloseToBear_Sip();
             ctxt.notifyRtcOrigCallClose();
@@ -1150,7 +1150,7 @@ void CSipTermCallState_BEAR_MODYFYING::onResponse(CSipTermCallContext& context, 
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCloseToBear_Sip();
             ctxt.notifyRtcOrigCallClose();
             context.setState(CSipTermCallState::CLOSED);
@@ -1177,7 +1177,7 @@ void CSipTermCallState_BEAR_MODYFYING::onSdpAnswer(CSipTermCallContext& context,
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.send200OKForUpdateToIMS(msg);
         context.setState(CSipTermCallState::BEAR_CONFIRMED);
     }
@@ -1199,7 +1199,7 @@ void CSipTermCallState_BEAR_MODYFYING::onTimeOut(CSipTermCallContext& context, T
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.notifyRtcOrigCallError(ERROR_TIMEOUT);
         ctxt.sendCancelToIMS();
         ctxt.notifyRtcOrigCallClose();
@@ -1424,7 +1424,7 @@ void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onBye(CSipTermCallContext& co
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCloseToBear_Sip();
         ctxt.notifyRtcOrigCallClose();
         context.setState(CSipTermCallState::CLOSED);
@@ -1449,7 +1449,7 @@ void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onClose(CSipTermCallContext& 
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCloseToBear_Sip();
             ctxt.sendByeToIMS();
             context.setState(CSipTermCallState::CLOSED);
@@ -1468,7 +1468,7 @@ void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onClose(CSipTermCallContext& 
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendByeToIMS();
             ctxt.notifyRtcOrigCallClose();
             context.setState(CSipTermCallState::CLOSED);
@@ -1498,7 +1498,7 @@ void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onSdpAnswer(CSipTermCallConte
         try
         {
             ctxt.resetFlag();
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.send200OKForUpdateToIMS(msg);
             context.setState(CSipTermCallState::ACTIVE);
         }
@@ -1517,7 +1517,7 @@ void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onSdpAnswer(CSipTermCallConte
         try
         {
             ctxt.resetFlag();
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.send200OKForInviteToIMS(msg);
             ctxt.setTimer(SIP_ACK_TIMEOUT);
             context.setState(CSipTermCallState::ACTIVE_WAIT_ACK);
@@ -1544,7 +1544,7 @@ void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onTimeOut(CSipTermCallContext
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCloseToBear_Sip();
         ctxt.sendByeToIMS();
         ctxt.notifyRtcOrigCallClose();
@@ -1578,7 +1578,7 @@ void CSipTermCallState_ACTIVE_WAIT_ACK::onBye(CSipTermCallContext& context, TUni
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCloseToBear_Sip();
         ctxt.notifyRtcOrigCallClose();
         context.setState(CSipTermCallState::CLOSED);
@@ -1603,7 +1603,7 @@ void CSipTermCallState_ACTIVE_WAIT_ACK::onClose(CSipTermCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendCloseToBear_Sip();
             ctxt.sendByeToIMS();
             context.setState(CSipTermCallState::CLOSED);
@@ -1622,7 +1622,7 @@ void CSipTermCallState_ACTIVE_WAIT_ACK::onClose(CSipTermCallContext& context, TU
         context.clearState();
         try
         {
-            ctxt.stopTimer();
+            ctxt.stopTimer_Sip();
             ctxt.sendByeToIMS();
             ctxt.notifyRtcOrigCallClose();
             context.setState(CSipTermCallState::CLOSED);
@@ -1649,7 +1649,7 @@ void CSipTermCallState_ACTIVE_WAIT_ACK::onTimeOut(CSipTermCallContext& context, 
     context.clearState();
     try
     {
-        ctxt.stopTimer();
+        ctxt.stopTimer_Sip();
         ctxt.sendCloseToBear_Sip();
         ctxt.sendByeToIMS();
         ctxt.notifyRtcOrigCallClose();

@@ -24,9 +24,13 @@ public:
 	BOOL getDialogAddr(const string &uniqID, TMsgAddress& addr);
 	BOOL clearDialog(const string &uniqID);
 
+	BOOL storeBear(const string &uniqID, TMsgAddress addr);
+	BOOL getBearAddr(const string &uniqID, TMsgAddress & addr);
+	BOOL clearBear(const string &uniqID);
 private:
 	// 存储的是标识会话的uniqid到UAC地址的映射
 	map<string, TMsgAddress> m_mapDialog;
+	map<string, TMsgAddress> m_mapBear;
 
 	void DubugOut();
 
