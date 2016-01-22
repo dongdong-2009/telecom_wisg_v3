@@ -8,11 +8,14 @@
 #include "uacstask.h"
 #include "rtc_msg_def.h"
 #include "int_msg_def.h"
+#include "CUserMapHelper.h"
 #include "CPropertiesManager.h"
 #include "CRtcOrigCall_sm.h"
 #include "CSipTermCall_sm.h"
 #include "CMsgDispatcher.h"
 #include "timerpoll.h"
+#include "constdef.h"
+
 
 typedef struct
 {

@@ -1,7 +1,6 @@
 #ifndef DIALOG_CONTROLLER_H
 #define DIALOG_CONTROLLER_H
 #include "msgdef_uninet.h"
-#include "CMsgMapHelper.h"
 #include <iostream>
 #include <string>
 #include <map>
