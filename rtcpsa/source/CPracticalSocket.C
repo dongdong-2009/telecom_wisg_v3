@@ -221,7 +221,7 @@ bool CPracticalSocket::connectToWCS(){
 		return false;
 	}
 
-	sendMsg(wcsSocket, "WCSG");
+	sendMsg(wcsSocket, "WISG");
 
 	wcsfd = wcsSocket;
 
