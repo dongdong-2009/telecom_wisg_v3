@@ -209,7 +209,8 @@ compilesipsm:
 #
 OBJS_RTC_SIP_CALL = ./rtc_sip_callmodule/source/CR2SCallModule.o \
 					./rtc_sip_callmodule/source/CRtcOrigCall_sm.o \
-					./rtc_sip_callmodule/source/CSipTermCall_sm.o
+					./rtc_sip_callmodule/source/CSipTermCall_sm.o \
+					./rtc_sip_callmodule/source/CUserMapHelper.o
 					
 rtc_sip_callmodule: $(OBJS_RTC_SIP_CALL)
 	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/rtc_sip_callmodule.so $(OBJS_SIP_CALL) -L$(DEPLOY_DIR) $(LIBS) -lsipmsgdef -lintmsg

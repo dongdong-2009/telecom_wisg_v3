@@ -166,7 +166,7 @@ void CR2SCallModule::endTask_Rtc() {
 	// 产生一条DIALOG——END消息，发给dispatcher，清除会话信息
 	sendToDispatcher(RTC_OK, RTC_TYPE, DIALOG_END, m_rtcCtrlMsg->clone(), NULL);
 	m_endFlag = m_endFlag|0x2;
-	if(m_endFlag & 3 == 3){
+	if((m_endFlag & 0x3) == 0x3){
 		end();
 	}
 }
@@ -180,7 +180,7 @@ void CR2SCallModule::endTask_Sip() {
 	// 产生一条DIALOG——END消息，发给dispatcher，清除会话信息
 	sendToDispatcher(SIP_BYE, SIP_TYPE, DIALOG_END, m_sipCtrlMsg->clone(), NULL);
 	m_endFlag = m_endFlag|0x1;
-	if(m_endFlag & 0x3 == 0x3){
+	if((m_endFlag & 0x3) == 0x3){
 		end();
 	}
 
@@ -495,7 +495,9 @@ const char * CR2SCallModule::getHost(const string& user){
 void CR2SCallModule::sendNoSdpInviteToIMS(){
 	if(m_sipCtrlMsg == NULL){
 		m_sipCtrlMsg = new TSipCtrlMsg();
-		m_sipCtrlMsg->sip_callId.number = CMsgMapHelper::generateSipCallIDNumber(m_rtcCtrlMsg->offerSessionId);
+		string str = m_rtcCtrlMsg->offerSessionId.c_str();
+		str += str;
+		m_sipCtrlMsg->sip_callId.number = str.c_str();
 
 		if(m_accessMode == 1 || m_accessMode == 2){
 			m_sipCtrlMsg->from.displayname = getUserName(m_sipName);
