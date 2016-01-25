@@ -10,7 +10,10 @@ log4cxx::LoggerPtr logger;
 
 timers_poll * my_timers;
 timer * timer_rtc;
+TimerType * timerType_rtc;
+
 timer * timer_sip;
+TimerType * timerType_sip;
 pthread_t thread_id;
 
 void * thread_fun(void *data) {
@@ -72,16 +75,17 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 		LOG4CXX_ERROR(logger, "Create timer thread failed");
 		exit(-1);
 	}
-	TimerType * timerType = new TimerType();
-	timerType->timer_id = 0;
-	timerType->currMod = this;
-	timer_rtc = new timer(0, timeout_callback, timerType, 0);
+
+	timerType_rtc = new TimerType();
+	timerType_rtc->timer_id = 0;
+	timerType_rtc->currMod = this;
+	timer_rtc = new timer(0, timeout_callback, timerType_rtc, 0);
 	my_timers->timers_poll_add_timer(timer_rtc);
 
-	timerType = new TimerType();
-	timerType->timer_id = 0;
-	timerType->currMod = this;
-	timer_sip = new timer(0, timeout_callback, timerType, 0);
+	timerType_sip = new TimerType();
+	timerType_sip->timer_id = 0;
+	timerType_sip->currMod = this;
+	timer_sip = new timer(0, timeout_callback, timerType_sip, 0);
 	my_timers->timers_poll_add_timer(timer_sip);
 
 }
@@ -97,17 +101,20 @@ CR2SCallModule::~CR2SCallModule() {
 		m_rtcCtrlMsg = NULL;
 	}
 
-	pthread_cancel(thread_id);
+	my_timers->timers_poll_deactive();//终止定时器
+
+	delete timerType_rtc;
 	delete	timer_rtc;
 	timer_rtc = NULL;
 
+	delete timerType_sip;
 	delete timer_sip;
 	timer_sip = NULL;
 
 	delete my_timers;
 	my_timers = NULL;
 
-
+	logger = 0;
 
 }
 

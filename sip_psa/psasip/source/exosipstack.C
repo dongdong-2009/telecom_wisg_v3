@@ -76,6 +76,13 @@ CExosipStack::CExosipStack(INT psaid) :
 
 }
 
+CExosipStack::~CExosipStack(){
+
+	LOG4CXX_INFO(logger, "call CExosipStack distructure")
+
+	logger = 0;
+}
+
 
 BOOL CExosipStack::init(USHORT port) {
 	log4cxx::xml::DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);

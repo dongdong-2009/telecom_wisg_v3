@@ -198,6 +198,10 @@ CPracticalSocket::~CPracticalSocket() {
 	m_mapOfferOrAnswer.clear();
 
 	close(wcsfd);
+
+	LOG4CXX_INFO(logger, "call CRtcStack distructure")
+
+	logger = 0;
 }
 
 bool CPracticalSocket::connectToWCS(){

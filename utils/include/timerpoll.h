@@ -73,8 +73,6 @@ public:
 
     ~timer()
     {
-    	if(userdata)
-			delete userdata;
         timer_stop();
     }
 
@@ -114,7 +112,7 @@ public:
 
     ~ timers_poll()
     {
-
+    	timers_map.clear();
     }
 private:
     int epfd;

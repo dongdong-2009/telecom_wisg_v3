@@ -52,6 +52,9 @@ CMsgDispatcher::~CMsgDispatcher() {
 		delete m_pDialogCtrl;
 		m_pDialogCtrl = NULL;
 	}
+	LOG4CXX_INFO(logger, "call CMsgDispatcher distructure")
+
+	logger = 0;
 }
 
 void CMsgDispatcher::procMsg(TUniNetMsg* msg) {
