@@ -224,7 +224,7 @@ deploy: all
 #	cp ./test_server.so $(DEPLOY_DIR)/app/test_server.so
 	mv ./dispatcher.so $(DEPLOY_DIR)/app/dispatcher.so
 	mv ./rtc_sip_callmodule.so $(DEPLOY_DIR)/app/rtc_sip_callmodule.so
-
+	mv ./bear_module.so $(DEPLOY_DIR)/app/bear_module.so
 	
 	#cp $(D_SIPMSGDEF)/include/*.h /usr/local/include/mcf/sip
 #	cp $(LIB_DIR)/libsipmsgdef.a /usr/local/lib/libmcfsipmsg.a
