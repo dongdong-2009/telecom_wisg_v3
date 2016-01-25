@@ -520,7 +520,7 @@ void CR2SCallModule::sendNoSdpInviteToIMS(){
 	PTSipInvite pInvite = new TSipInvite();
 	pInvite->req_uri = m_sipCtrlMsg->to.url;
 
-	sendToDispatcher(SIP_INVITE, SIP_TYPE, DIALOG_BEGIN, m_sipCtrlMsg, pInvite);
+	sendToDispatcher(SIP_INVITE, SIP_TYPE, DIALOG_BEGIN, m_sipCtrlMsg->clone(), pInvite);
 }
 //	void sendNoSdpInviteToIMS();
 //	void sendCancelToIMS();
