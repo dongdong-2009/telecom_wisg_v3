@@ -85,7 +85,7 @@ void* handleThread(void *pParam) {
 					break;
 				}
 				packetlen = ntohl(packetlen);
-				LOG4CXX_DEBUG(logger, "handleThread:: to recv"<<packetlen);
+				LOG4CXX_DEBUG(logger, "handleThread:: to recv "<<packetlen);
 				// recv message content
 				u_int32_t bufferSize = sizeof(buf) - 1;
 				string strMsg;
@@ -117,7 +117,7 @@ void* handleThread(void *pParam) {
 					packetlen -= bytes;
 				}
 
-				LOG4CXX_DEBUG(logger, "CPracticalSocket recv strMsg"<<strMsg.c_str());
+				LOG4CXX_DEBUG(logger, "CPracticalSocket recv strMsg "<<strMsg.c_str());
 
 				if(strMsg.find("heartBeatResponse") != string::npos){
 					heartBeatPTimer->timer_modify_internal(0);

@@ -277,7 +277,7 @@ void CRtcStack::doActive(){
 			return ;
 		}
 
-		LOG4CXX_INFO(m_logger, "doActive:: recvMsg "<<plainMsg<<"\nmsgType %s"<<pMsg->getMsgNameStr());
+		LOG4CXX_INFO(m_logger, "doActive:: recvMsg "<<plainMsg<<"\nmsgType "<<pMsg->getMsgNameStr());
 
 		TRtcCtrlMsg *pCtrl = (TRtcCtrlMsg *)pMsg->ctrlMsgHdr;
 		string offersessionId(pCtrl->offerSessionId.c_str());

@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <map>
 #include "db.h"
-#include "uacstask.h"
+#include <uacstask.h>
 #include "rtc_msg_def.h"
 #include "int_msg_def.h"
 #include "CUserMapHelper.h"
@@ -15,6 +15,7 @@
 #include "CMsgDispatcher.h"
 #include "timerpoll.h"
 #include "constdef.h"
+#include "msgdef_uninet.h"
 
 
 typedef struct
