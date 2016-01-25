@@ -17,6 +17,8 @@
 #include "constdef.h"
 #include "msgdef_uninet.h"
 
+_CLASSDEF(CR2SCallModule)
+_DECLARE_CREATE_COMP(CR2SCallModule);
 
 typedef struct
 {
@@ -24,8 +26,7 @@ typedef struct
 	void * currMod;
 } TimerType;
 
-_CLASSDEF(CR2SCallModule)
-_DECLARE_CREATE_COMP(CR2SCallModule);
+
 
 //注意下面仅仅是定时器ID，不是超时时间 在timer.cfg配置其具体信息:名字,时延,重发次数等
 const int RTC_CONNECTION_TIMEOUT = 20;

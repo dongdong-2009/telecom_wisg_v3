@@ -330,8 +330,7 @@ TIntClose& TIntClose::operator=(const TIntClose &r)
 
 BOOL TIntClose::operator == (TMsgPara& msg)
 {
-	COMPARE_MSG_BEGIN(TIntClose,msg)
-
+//	COMPARE_MSG_BEGIN(TIntClose,msg)
 
 	COMPARE_END
 }
