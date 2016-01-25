@@ -1,4 +1,5 @@
 *.[oa]
 *.so
 core.*
+*.log
 !unidir/lib/libutils.a
