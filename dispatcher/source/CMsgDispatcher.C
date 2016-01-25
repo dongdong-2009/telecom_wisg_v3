@@ -178,6 +178,7 @@ void CMsgDispatcher::handleMsgFromSipPSA(TUniNetMsg* msg) {
 
 void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 	//call module调用endTask时发送过来，不用再转发
+	LOG4CXX_DEBUG(logger, "handleMsgFromRtcSipCall recv Msg:\n"<<CTUniNetMsgHelper::toString(msg));
 	string uniqID;
 	switch (msg->msgType) {
 	case SIP_TYPE:

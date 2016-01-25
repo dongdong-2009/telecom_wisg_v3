@@ -308,7 +308,6 @@ void CSipTermCallState_Default::onBye(CSipTermCallContext& context, TUniNetMsg* 
 void CSipTermCallState_Default::onTimeOut(CSipTermCallContext& context, TTimeMarkExt timerMark)
 {
 
-
     return;
 }
 

@@ -287,7 +287,7 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 		//endTask();
 		break;
 	}
-	LOG4CXX_DEBUG(logger, "after procMsg state: %s"<<m_rtcContext.getState().getName());
+	LOG4CXX_DEBUG(logger, "after procMsg state: "<<m_rtcContext.getState().getName());
 }
 
 //处理定时器超时,不是mcf
@@ -504,10 +504,12 @@ void CR2SCallModule::sendNoSdpInviteToIMS(){
 			}
 		}
 		else{
-			string from = m_rtcCtrlMsg->from.c_str();
+			string from = m_rtcCtrlMsg->to.c_str();
 			m_sipCtrlMsg->from.displayname = getUserName(from);
 			m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip", getUserName(from), getHost(from), NULL);
 		}
+
+		LOG4CXX_DEBUG(logger, "sendNoSdpInviteToIMS: from url "<< m_sipCtrlMsg->from.url.username.c_str());
 
 		m_sipCtrlMsg->from.tag = m_rtcCtrlMsg->offerSessionId;
 
