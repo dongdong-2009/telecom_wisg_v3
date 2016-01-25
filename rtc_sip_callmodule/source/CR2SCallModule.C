@@ -64,9 +64,6 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	m_sipCtrlMsg = NULL;
 	m_sdpModifyFlag = 0;
 
-	m_isRtcInit = false;
-	m_isSipInit = true;
-
 	m_endFlag = 0;
 
 	/**
@@ -203,8 +200,6 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 		m_rtcCtrlMsg->answerSessionId = str.c_str();
 		swap(m_rtcCtrlMsg->from, m_rtcCtrlMsg->to);
 
-		if(!m_isRtcInit)
-			m_rtcContext.enterStartState();
 		m_rtcContext.onOffer(msg);
 		break;
 	}
@@ -509,13 +504,13 @@ void CR2SCallModule::sendNoSdpInviteToIMS(){
 			m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip", getUserName(from), getHost(from), NULL);
 		}
 
-		LOG4CXX_DEBUG(logger, "sendNoSdpInviteToIMS: from url "<< m_sipCtrlMsg->from.url.username.c_str());
+
 
 		m_sipCtrlMsg->from.tag = m_rtcCtrlMsg->offerSessionId;
 
-		string toStr  = m_rtcCtrlMsg->to.c_str();
+		string toStr  = m_rtcCtrlMsg->from.c_str();
 		m_sipCtrlMsg->to.displayname = getUserName(toStr);
-		m_sipCtrlMsg->to.url = CSipMsgHelper::createSipURI("tel", getUserName(m_sipName), NULL, NULL);//tel后不能有域名
+		m_sipCtrlMsg->to.url = CSipMsgHelper::createSipURI("tel", getUserName(toStr), NULL, NULL);//tel后不能有域名
 	}
 
 	//协议栈自动添加
@@ -714,6 +709,7 @@ void CR2SCallModule::notifySipTermCallSdp(TUniNetMsg * msg) {
 	//onNotify(NULL);
 	PTRtcOffer pOffer = (PTRtcOffer)msg->msgBody;
 	m_webSdp = pOffer->sdp.c_str();
+
 	m_sipContext.onNotify(NULL);	//通知SIP端发送INVITE
 }
 

@@ -115,8 +115,6 @@ private:
 
 	UINT m_sdpModifyFlag;
 
-	bool m_isSipInit;
-	bool m_isRtcInit;
 	bool m_switchFlag;
 
 	UINT m_endFlag;
