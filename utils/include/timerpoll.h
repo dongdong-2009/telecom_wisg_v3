@@ -73,6 +73,8 @@ public:
 
     ~timer()
     {
+    	if(userdata)
+			delete userdata;
         timer_stop();
     }
 

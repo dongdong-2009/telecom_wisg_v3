@@ -56,7 +56,7 @@ CMsgDispatcher::~CMsgDispatcher() {
 
 void CMsgDispatcher::procMsg(TUniNetMsg* msg) {
 	LOG4CXX_DEBUG(logger, "dispatcher get msg from "<<msg->oAddr.logAddr);
-	LOG4CXX_DEBUG(logger, "dispatcher recv msg "<<CTUniNetMsgHelper::toString(msg));
+	LOG4CXX_DEBUG(logger, "dispatcher recv msg\n "<<CTUniNetMsgHelper::toString(msg));
 	if (msg->oAddr.logAddr == (UINT) LOGADDR_SIP_PSA) {
 		handleMsgFromSipPSA(msg);
 	} else if (msg->oAddr.logAddr == (UINT) LOGADDR_RTC_PSA) {
@@ -179,7 +179,7 @@ void CMsgDispatcher::handleMsgFromSipPSA(TUniNetMsg* msg) {
 
 void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 	//call module调用endTask时发送过来，不用再转发
-	LOG4CXX_DEBUG(logger, "handleMsgFromRtcSipCall recv Msg:\n"<<CTUniNetMsgHelper::toString(msg));
+	//LOG4CXX_DEBUG(logger, "handleMsgFromRtcSipCall recv Msg:\n"<<CTUniNetMsgHelper::toString(msg));
 	string uniqID;
 	switch (msg->msgType) {
 	case SIP_TYPE:
