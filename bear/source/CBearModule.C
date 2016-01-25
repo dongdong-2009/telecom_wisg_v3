@@ -300,7 +300,7 @@ bool CBearModule::isWithSDP(TUniNetMsg * msg) {
 		return false;
 
 	PTSipResp pResp = (PTSipResp) msg->msgBody;
-	return pResp->body.content_length == 0;
+	return pResp->body.content_length != 0;
 }
 
 string CBearModule::checkRespCSeqMethod(TUniNetMsg * msg) {

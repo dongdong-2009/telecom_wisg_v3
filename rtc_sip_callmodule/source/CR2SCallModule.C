@@ -686,19 +686,19 @@ bool CR2SCallModule::isWithSDP(TUniNetMsg *msg){
 	if(msg->msgName == SIP_RESPONSE)
 	{
 		PTSipResp pResp = (PTSipResp) msg->msgBody;
-		return pResp->body.content_length == 0;
+		return pResp->body.content_length != 0;
 	}
 
 	if(msg->msgName == SIP_UPDATE)
 	{
 		PTSipUpdate pUpdate = (PTSipUpdate) msg->msgBody;
-		return pUpdate->body.content_length == 0;
+		return pUpdate->body.content_length != 0;
 	}
 
 	if(msg->msgName == SIP_INVITE)
 	{
 		PTSipInvite pInvite = (PTSipInvite) msg->msgBody;
-		return pInvite->body.content_length == 0;
+		return pInvite->body.content_length != 0;
 	}
 	return false;
 }
