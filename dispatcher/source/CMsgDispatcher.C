@@ -56,6 +56,7 @@ CMsgDispatcher::~CMsgDispatcher() {
 
 void CMsgDispatcher::procMsg(TUniNetMsg* msg) {
 	LOG4CXX_DEBUG(logger, "dispatcher get msg from "<<msg->oAddr.logAddr);
+	LOG4CXX_DEBUG(logger, "dispatcher recv msg "<<CTUniNetMsgHelper::toString(msg));
 	if (msg->oAddr.logAddr == (UINT) LOGADDR_SIP_PSA) {
 		handleMsgFromSipPSA(msg);
 	} else if (msg->oAddr.logAddr == (UINT) LOGADDR_RTC_PSA) {

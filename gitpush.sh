@@ -8,4 +8,3 @@ else
     git commit -m "$1"    
     git push -u origin debug
 fi
-

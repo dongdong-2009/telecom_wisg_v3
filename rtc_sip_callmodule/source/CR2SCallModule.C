@@ -504,8 +504,6 @@ void CR2SCallModule::sendNoSdpInviteToIMS(){
 			m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip", getUserName(from), getHost(from), NULL);
 		}
 
-
-
 		m_sipCtrlMsg->from.tag = m_rtcCtrlMsg->offerSessionId;
 
 		string toStr  = m_rtcCtrlMsg->from.c_str();

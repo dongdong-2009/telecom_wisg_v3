@@ -959,15 +959,15 @@ void CExosipStack::doActive(void) {
 				this->m_map_branch_tid.put(pCtrlMsg->via.branch.c_str(), event->tid);
 			}
 
+			this->storeDid(pCtrlMsg->from, pCtrlMsg->to,
+						pCtrlMsg->sip_callId, event->did);
+
+//			if (100 <= event->response->status_code && 199
+//					>= event->response->status_code) {
+//				// keep did
+//
 //				this->storeDid(pCtrlMsg->from, pCtrlMsg->to,
 //						pCtrlMsg->sip_callId, event->did);
-			
-			if (101 <= event->response->status_code && 199
-					>= event->response->status_code) {
-				// keep did
-
-				this->storeDid(pCtrlMsg->from, pCtrlMsg->to,
-						pCtrlMsg->sip_callId, event->did);
 				//osip_header_t * requireHd/*, * supportedHd*/;
 				/*	if(osip_message_get_supported(event->response, 0, &supportedHd) >= 0){
 				 string supportedStr = supportedHd->hvalue;
@@ -989,7 +989,7 @@ void CExosipStack::doActive(void) {
 
 				// 	}
 				// }
-			}
+			//}
 		}
 	} // if not parsed
 
