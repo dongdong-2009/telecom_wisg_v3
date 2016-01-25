@@ -51,15 +51,15 @@ usage:
 	@echo "        make rtc_db                      compile dbhandler"
 	@echo "    make clean                           clean all"  
 	@echo "    make deploy                          deploy components to ./unidir/"
-	@echo "    make compilemsg                      compile msg"
-	@echo "    make compilesm                       compile SM"
+#	@echo "    make compilemsg                      compile msg"
+#	@echo "    make compilesm                       compile SM"
 
 all: sipmsgdef rtc_msgdef internal_msgdef rtc_db rtc_psa dispatcher \
 	rtc_sip_callmodule psasip msglib bear_module
 clean: clean.rtc_psa clean.rtc_msgdef clean.rtc_db clean.internal_msgdef clean.dispatcher clean.deploy clean.message_xml_parse \
 	 clean.rtc_sip_callmodule clean.bear_module\
 	clean.psasip clean.msglib clean.sipmsgdef
-compilesm: compilertcsm compilesipsm
+#compilesm: compilertcsm compilesipsm
 
 
 #=========== sip_psa ================
@@ -132,8 +132,8 @@ clean.rtc_psa:
 ## make compilemsg
 MSGDEFS = msgdef_rtc.def 
 #msgdatadef_rtc.def 
-compilemsg:
-	mmc $(MSGDEFS) -m msgdef_rtc/include -i /usr/local/include/mcf:msgdef_rtc/include -h msgdef_rtc/include -c msgdef_rtc/source -x msgdef_rtc/include
+#compilemsg:
+#	mmc $(MSGDEFS) -m msgdef_rtc/include -i /usr/local/include/mcf:msgdef_rtc/include -h msgdef_rtc/include -c msgdef_rtc/source -x msgdef_rtc/include
 
 OBJS_RTC_MSGDEF = ./msgdef_rtc/source/msgdef_rtc.o
 rtc_msgdef: $(OBJS_RTC_MSGDEF)
@@ -146,8 +146,8 @@ clean.rtc_msgdef:
 ## make compilemsg
 MSGDEFS_INT = msgdef_internal.def 
 #msgdatadef_rtc.def 
-compilemsg:
-	mmc $(MSGDEFS_INT) -m msgdef_internal/include -i /usr/local/include/mcf:msgdef_internal/include -h msgdef_internal/include -c msgdef_internal/source -x msgdef_internal/include
+#compilemsg:
+#	mmc $(MSGDEFS_INT) -m msgdef_internal/include -i /usr/local/include/mcf:msgdef_internal/include -h msgdef_internal/include -c msgdef_internal/source -x msgdef_internal/include
 
 OBJS_INT_MSGDEF = ./msgdef_internal/source/msgdef_int.o
 internal_msgdef: $(OBJS_INT_MSGDEF)
@@ -213,7 +213,7 @@ OBJS_RTC_SIP_CALL = ./rtc_sip_callmodule/source/CR2SCallModule.o \
 					./rtc_sip_callmodule/source/CUserMapHelper.o
 					
 rtc_sip_callmodule: $(OBJS_RTC_SIP_CALL)
-	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/rtc_sip_callmodule.so $(OBJS_SIP_CALL) -L$(DEPLOY_DIR) $(LIBS) -lsipmsgdef -lintmsg
+	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/rtc_sip_callmodule.so $(OBJS_RTC_SIP_CALL) -L$(DEPLOY_DIR) $(LIBS) -lsipmsgdef -lintmsg
 	@echo "**************Finsh making rtc_sip_callmodule.so**********************"
 clean.rtc_sip_callmodule:
 	rm -f $(OBJS_RTC_SIP_CALL) $(OUTPUT_DIR)/rtc_sip_callmodule.so

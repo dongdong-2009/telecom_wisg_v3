@@ -1,11 +1,5 @@
 #include "CR2SCallModule.h"
 
-#include <log4cxx/logger.h>
-#include <log4cxx/basicconfigurator.h>
-#include <log4cxx/propertyconfigurator.h>
-#include <log4cxx/helpers/exception.h>
-#include <log4cxx/xml/domconfigurator.h>
-
 CLONE_COMP(CR2SCallModule)
 CREATE_COMP(CR2SCallModule)
 
@@ -13,8 +7,6 @@ using namespace log4cxx::xml;
 using namespace log4cxx;
 
 log4cxx::LoggerPtr logger;
-
-
 
 timers_poll * my_timers;
 timer * timer_rtc;
