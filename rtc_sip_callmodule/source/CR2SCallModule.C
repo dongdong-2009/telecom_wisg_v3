@@ -9,7 +9,6 @@
 CLONE_COMP(CR2SCallModule)
 CREATE_COMP(CR2SCallModule)
 
-
 using namespace log4cxx::xml;
 using namespace log4cxx;
 

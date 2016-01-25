@@ -4,8 +4,14 @@
 
 #include <algorithm>
 #include <map>
-#include "db.h"
+#include <log4cxx/logger.h>
+#include <log4cxx/basicconfigurator.h>
+#include <log4cxx/propertyconfigurator.h>
+#include <log4cxx/helpers/exception.h>
+#include <log4cxx/xml/domconfigurator.h>
 #include <uacstask.h>
+#include <db.h>
+#include <msgdef_uninet.h>
 #include "rtc_msg_def.h"
 #include "int_msg_def.h"
 #include "CUserMapHelper.h"
@@ -15,7 +21,7 @@
 #include "CMsgDispatcher.h"
 #include "timerpoll.h"
 #include "constdef.h"
-#include "msgdef_uninet.h"
+
 
 _CLASSDEF(CR2SCallModule)
 _DECLARE_CREATE_COMP(CR2SCallModule);
@@ -25,8 +31,6 @@ typedef struct
 	UINT timer_id;
 	void * currMod;
 } TimerType;
-
-
 
 //注意下面仅仅是定时器ID，不是超时时间 在timer.cfg配置其具体信息:名字,时延,重发次数等
 const int RTC_CONNECTION_TIMEOUT = 20;
