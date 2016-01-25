@@ -139,7 +139,7 @@ void CMsgDispatcher::handleMsgFromSipPSA(TUniNetMsg* msg) {
 		m_issipPsaAddrSet = TRUE;
 	}
 
-	string uniqID = generateIntUniqID(msg);
+	string uniqID = generateSipUniqID(msg);
 
 	TMsgAddress tAddr;
 	switch (msg->msgName) {
