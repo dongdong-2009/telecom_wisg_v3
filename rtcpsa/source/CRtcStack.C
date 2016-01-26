@@ -28,9 +28,9 @@ CRtcStack::~CRtcStack(){
 	delete m_pSocket;
 	m_pSocket = NULL;
 
-	LOG4CXX_INFO(logger, "call CRtcStack distructure")
+	LOG4CXX_INFO(m_logger, "call CRtcStack distructure")
 
-	logger = 0;
+	m_logger = 0;
 }
 
 BOOL CRtcStack::init(string& wcsIp, int wcsPort){
