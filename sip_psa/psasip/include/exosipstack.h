@@ -61,7 +61,7 @@ _CLASSDEF(CExosipStack)
 class CExosipStack {
 public:
 	CExosipStack(INT psaid);
-	virtual CExosipStack();
+	virtual ~CExosipStack();
 
 	// INTERFACE
 public:
