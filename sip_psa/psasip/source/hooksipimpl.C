@@ -27,6 +27,15 @@
 
 static PCPsaSip s_psasip = NULL;
 
+void release(){
+	printf("exit call release\n");
+	if(s_psasip != NULL)
+	{
+		delete s_psasip;
+		s_psasip = NULL;
+	}
+}
+
 //initPsaTest的声明必须在宏INIT_PSA_COMP之前。
 void initPsaSip(int);
 //这个宏是必须的。compLoader需要利用它来加载组件。
@@ -56,6 +65,7 @@ BOOL hookSendMsgPsaSipImpl(PTMsg msg)
 
 void initPsaSip(int psaid)
 {
+	atexit(release);
 	//设置挂钩函数
 	setHookActive(psaid, hookActivePsaSipImpl);
 //	DEBUG2(SIP, psaid,"set hookActive succeed.\n");
