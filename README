@@ -7,6 +7,12 @@
 #	
 ########################################################
 use utf-8 encoding to see the content
+放假前记录，年后要解决的问题
+1、在每个psa里加个atexit 调用析构函数，释放资源
+2、sip-psa hashTable释放，clear
+3、logger使用静态变量
+4、部署到广州测试
+5、。。。。
 
 v3
 重新设计状态机，将SIP和RTC CALL合并成一个状态及模块，媒体状态机模块BEAR新模块
