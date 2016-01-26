@@ -40,7 +40,7 @@
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-log4cxx::LoggerPtr logger;
+static log4cxx::LoggerPtr logger;
 
 set<string> m_name_pool;
 map<string, timer *> m_map_timers;
@@ -80,7 +80,7 @@ CExosipStack::~CExosipStack(){
 
 	//LOG4CXX_INFO(logger, "call CExosipStack distructure")
 
-	logger = 0;
+
 }
 
 
