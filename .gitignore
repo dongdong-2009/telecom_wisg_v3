@@ -2,4 +2,5 @@
 *.so
 core.*
 *.log
+signalgateway
 !unidir/lib/libutils.a
