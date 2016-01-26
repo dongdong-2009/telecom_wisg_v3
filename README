@@ -10,7 +10,7 @@ use utf-8 encoding to see the content
 放假前记录，年后要解决的问题
 1、在每个psa里加个atexit 调用析构函数，释放资源
 2、sip-psa hashTable释放，clear
-3、logger使用静态变量
+3、logger使用静态变量,logger == 0 ,会发生段错误
 4、部署到广州测试
 5、。。。。
 

@@ -80,7 +80,7 @@ CExosipStack::~CExosipStack(){
 
 	//LOG4CXX_INFO(logger, "call CExosipStack distructure")
 
-	logger = 0;
+	//logger = 0;
 	delete ptimer_poll;
 }
 
