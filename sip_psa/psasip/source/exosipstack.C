@@ -1948,3 +1948,21 @@ INT CExosipStack::getCid(RCTSipAddress from, RCTSipAddress to,
 
 	return cid;
 }
+
+void MyMap::put(string key, INT val){
+	_map.insert(pair<string, INT>(key, val));
+}
+
+bool MyMap::get(string key, INT& val){
+	if(_map.find(key) != _map.end()){
+		val = _map[key];
+		return TRUE;
+	}
+	return FALSE;
+}
+
+void MyMap::remove(string key){
+	if(_map.find(key) != _map.end()){
+		_map.erase(key);
+	}
+}

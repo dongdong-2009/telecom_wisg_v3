@@ -56,6 +56,15 @@ typedef struct{
 	int noncecount;
 } UserData;
 
+class MyMap{
+private:
+	map<string, INT> _map;
+public:
+	void put(string key, INT value);
+	bool get(string key, INT & val);
+	void remove(string key);
+
+};
 
 _CLASSDEF(CExosipStack)
 class CExosipStack {
@@ -72,9 +81,9 @@ public:
 
 private:
 	INT m_psaid;
-	CHashTable<const CHAR*, INT> m_map_branch_tid; // Transaction map
-	CHashTable<const CHAR*, INT> m_map_callid; // call id map
-	CHashTable<const CHAR*, INT> m_map_dialogid; // dialog id map
+	MyMap m_map_branch_tid; // Transaction map
+	MyMap m_map_callid; // call id map
+	MyMap m_map_dialogid; // dialog id map
 
 
 	map<string, vector<char *> > m_service_route;
