@@ -15,7 +15,17 @@ using namespace log4cxx;
 
 
 
+
 static PCPsaRtc s_pRtc = NULL;
+
+void release(){
+	printf("rtcpsa exit call release\n");
+	if(s_pRtc != NULL)
+	{
+		delete s_pRtc;
+		s_pRtc = NULL;
+	}
+}
 
 //initPsaTest的声明必须在宏INIT_PSA_COMP之前。
 void initPsaRtc(int);
@@ -40,6 +50,8 @@ BOOL hookSendMsgPsaRtcImpl(PTMsg msg)
 }
 
 void initPsaRtc(int psaid){
+
+	atexit(release);
 	log4cxx::xml::DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
 	log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("SgFileAppender");
 

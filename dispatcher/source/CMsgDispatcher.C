@@ -9,7 +9,7 @@
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-log4cxx::LoggerPtr logger;
+static log4cxx::LoggerPtr logger;
 
 CLONE_COMP(CMsgDispatcher)
 CREATE_COMP(CMsgDispatcher)
@@ -54,7 +54,7 @@ CMsgDispatcher::~CMsgDispatcher() {
 	}
 	LOG4CXX_INFO(logger, "call CMsgDispatcher distructure")
 
-	logger = 0;
+	//logger = 0;
 }
 
 void CMsgDispatcher::procMsg(TUniNetMsg* msg) {

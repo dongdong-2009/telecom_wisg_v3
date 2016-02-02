@@ -6,7 +6,7 @@ CREATE_COMP(CR2SCallModule)
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-log4cxx::LoggerPtr logger;
+static log4cxx::LoggerPtr logger;
 
 timers_poll * my_timers;
 timer * timer_rtc;
@@ -114,7 +114,7 @@ CR2SCallModule::~CR2SCallModule() {
 	delete my_timers;
 	my_timers = NULL;
 
-	logger = 0;
+	//logger = 0;
 
 }
 

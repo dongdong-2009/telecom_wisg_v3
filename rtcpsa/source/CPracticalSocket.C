@@ -10,7 +10,7 @@
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-log4cxx::LoggerPtr logger;
+static log4cxx::LoggerPtr logger;
 
 
 #define MAXCONN 10
@@ -201,7 +201,7 @@ CPracticalSocket::~CPracticalSocket() {
 
 	LOG4CXX_INFO(logger, "call CRtcStack distructure")
 
-	logger = 0;
+	//logger = 0;
 }
 
 bool CPracticalSocket::connectToWCS(){

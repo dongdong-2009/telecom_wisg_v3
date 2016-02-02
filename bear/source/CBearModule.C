@@ -9,7 +9,7 @@
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-log4cxx::LoggerPtr logger;
+static log4cxx::LoggerPtr logger;
 
 CLONE_COMP( CBearModule)
 CREATE_COMP( CBearModule)

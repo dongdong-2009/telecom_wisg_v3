@@ -28,7 +28,7 @@
 static PCPsaSip s_psasip = NULL;
 
 void release(){
-	printf("exit call release\n");
+	printf("sippsa exit call release\n");
 	if(s_psasip != NULL)
 	{
 		delete s_psasip;
