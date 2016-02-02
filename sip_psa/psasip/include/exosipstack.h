@@ -72,9 +72,9 @@ public:
 
 private:
 	INT m_psaid;
-	CHashTable<CHAR*, INT> m_map_branch_tid; // Transaction map
-	CHashTable<CHAR*, INT> m_map_callid; // call id map
-	CHashTable<CHAR*, INT> m_map_dialogid; // dialog id map
+	CHashTable<const CHAR*, INT> m_map_branch_tid; // Transaction map
+	CHashTable<const CHAR*, INT> m_map_callid; // call id map
+	CHashTable<const CHAR*, INT> m_map_dialogid; // dialog id map
 
 
 	map<string, vector<char *> > m_service_route;
