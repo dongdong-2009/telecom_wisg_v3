@@ -30,7 +30,6 @@ CRtcStack::~CRtcStack(){
 
 	LOG4CXX_INFO(m_logger, "call CRtcStack distructure")
 
-	m_logger = 0;
 }
 
 BOOL CRtcStack::init(string& wcsIp, int wcsPort){
