@@ -192,8 +192,6 @@ CPracticalSocket::CPracticalSocket() :
 CPracticalSocket::~CPracticalSocket() {
 	cout << "call desc" << endl;
 	stopThread();
-	pthread_join(m_tListenId, NULL);
-
 
 	m_mapOfferOrAnswer.clear();
 
