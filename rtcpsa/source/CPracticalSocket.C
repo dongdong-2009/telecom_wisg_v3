@@ -10,7 +10,7 @@
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-static log4cxx::LoggerPtr logger;
+static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("SgFileAppender"));
 
 
 #define MAXCONN 10
@@ -233,9 +233,9 @@ bool CPracticalSocket::connectToWCS(){
 bool CPracticalSocket::init(string& wcsIp, int wcsPort) {
 	selectTimeoutCount = 0;
 
-	log4cxx::xml::DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
-
-	logger = log4cxx::Logger::getLogger("SgFileAppender");
+//	log4cxx::xml::DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
+//
+//	logger = log4cxx::Logger::getLogger("SgFileAppender");
 
 	m_wcsIp = wcsIp;
 	m_wcsPort = wcsPort;

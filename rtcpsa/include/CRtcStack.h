@@ -48,7 +48,7 @@ private:
 
 	bool handleMsgFromIMS(const string& strMsg);
 
-	log4cxx::LoggerPtr m_logger;
+
 };
 
 #endif

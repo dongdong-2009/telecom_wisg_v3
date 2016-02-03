@@ -9,7 +9,7 @@
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-static log4cxx::LoggerPtr logger;
+log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("SgFileAppender"));
 
 CLONE_COMP(CMsgDispatcher)
 CREATE_COMP(CMsgDispatcher)
@@ -42,9 +42,9 @@ CMsgDispatcher::CMsgDispatcher(PCGFSM afsm) :
 	}
 	m_pDialogCtrl = new CDialogController();
 
-	DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
-
-	logger = log4cxx::Logger::getLogger("SgFileAppender");
+//	DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
+//
+//	logger = log4cxx::Logger::getLogger("SgFileAppender");
 }
 
 CMsgDispatcher::~CMsgDispatcher() {

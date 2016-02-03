@@ -40,7 +40,7 @@
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-static log4cxx::LoggerPtr logger;
+log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("SgFileAppender"));
 
 set<string> m_name_pool;
 map<string, timer *> m_map_timers;
@@ -86,9 +86,6 @@ CExosipStack::~CExosipStack(){
 
 
 BOOL CExosipStack::init(USHORT port) {
-	log4cxx::xml::DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
-	logger = log4cxx::Logger::getLogger("SgFileAppender");
-
 
 	if (eXosip_init() != 0) {
 		// 初始化失败
