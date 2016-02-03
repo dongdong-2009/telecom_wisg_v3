@@ -1,17 +1,12 @@
 #include "CPracticalSocket.h"
 #include "rtc_msg_def.h"
 
-#include <log4cxx/logger.h>
-#include <log4cxx/basicconfigurator.h>
-#include <log4cxx/propertyconfigurator.h>
-#include <log4cxx/helpers/exception.h>
-#include <log4cxx/xml/domconfigurator.h>
 
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("SgFileAppender"));
 
+MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
 
 #define MAXCONN 10
 
@@ -55,7 +50,7 @@ void* handleThread(void *pParam) {
 
 		int ret = select(maxfd + 1, &listenSet, NULL, NULL, &timeout);
 		if (ret == -1) {
-			LOG4CXX_DEBUG(logger, "handleThread:: select() failed!");
+			LOG4CXX_DEBUG(mLogger.getLogger(), "handleThread:: select() failed!");
 		} else if (ret == 0) {
 			//timeout start send heartbeatTimer
 			++ selectTimeoutCount;
@@ -78,14 +73,14 @@ void* handleThread(void *pParam) {
 				u_int32_t packetlen = 0;
 				if (recv(wcsfd, (char *) &packetlen,
 						sizeof(u_int32_t), 0) <= 0) {
-					LOG4CXX_ERROR(logger, "handleThread:: can not get the size of the msg");
+					LOG4CXX_ERROR(mLogger.getLogger(), "handleThread:: can not get the size of the msg");
 					close(wcsfd);
 					currSock.stop = true;
 					reConnectPTimer->timer_modify_internal(30);
 					break;
 				}
 				packetlen = ntohl(packetlen);
-				LOG4CXX_DEBUG(logger, "handleThread:: to recv "<<packetlen);
+				LOG4CXX_DEBUG(mLogger.getLogger(), "handleThread:: to recv "<<packetlen);
 				// recv message content
 				u_int32_t bufferSize = sizeof(buf) - 1;
 				string strMsg;
@@ -95,13 +90,13 @@ void* handleThread(void *pParam) {
 
 					int bytes = recv(wcsfd, buf, toRead, 0);
 					if (bytes == -1) {
-						LOG4CXX_ERROR(logger, "handleThread:: receive failed.");
+						LOG4CXX_ERROR(mLogger.getLogger(), "handleThread:: receive failed.");
 						close(wcsfd);
 						currSock.stop = true;
 						reConnectPTimer->timer_modify_internal(30);
 						break;
 					} else if (bytes == 0) {
-						LOG4CXX_ERROR(logger,
+						LOG4CXX_ERROR(mLogger.getLogger(),
 								"RecvThread: socket closed by the other side.");
 						close(wcsfd);
 						currSock.stop = true;
@@ -117,7 +112,7 @@ void* handleThread(void *pParam) {
 					packetlen -= bytes;
 				}
 
-				LOG4CXX_DEBUG(logger, "CPracticalSocket recv strMsg "<<strMsg.c_str());
+				LOG4CXX_DEBUG(mLogger.getLogger(), "CPracticalSocket recv strMsg "<<strMsg.c_str());
 
 				if(strMsg.find("heartBeatResponse") != string::npos){
 					heartBeatPTimer->timer_modify_internal(0);
@@ -161,7 +156,7 @@ int reConnectTimeout(timer * ptimer){
 		reConnectPTimer->timer_modify_internal(0);
 		// create listenThread
 		if (0 != pthread_create(&(currSock.m_tListenId), NULL, handleThread, &currSock)) {
-			LOG4CXX_ERROR(logger, "reConnectTimeout: RtcPsa create handleThread failed");
+			LOG4CXX_ERROR(mLogger.getLogger(), "reConnectTimeout: RtcPsa create handleThread failed");
 			currSock.stop = true;
 			exit(-1);
 		}
@@ -176,7 +171,7 @@ int reConnectTimeout(timer * ptimer){
 			reConnectPTimer->timer_modify_internal(interval);
 		}
 
-		LOG4CXX_DEBUG(logger, "Reconnect to wcs failed, will reconnect after "<<interval<<"s.");
+		LOG4CXX_DEBUG(mLogger.getLogger(), "Reconnect to wcs failed, will reconnect after "<<interval<<"s.");
 	}
 
 	return 1;
@@ -197,15 +192,14 @@ CPracticalSocket::~CPracticalSocket() {
 
 	close(wcsfd);
 
-	LOG4CXX_INFO(logger, "call CRtcStack distructure")
+	LOG4CXX_INFO(mLogger.getLogger(), "call CRtcStack distructure");
 
-	//logger = 0;
 }
 
 bool CPracticalSocket::connectToWCS(){
 	int wcsSocket = 0;
 	if ((wcsSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
-		LOG4CXX_ERROR(logger, "RtcPsa create socket failed");
+		LOG4CXX_ERROR(mLogger.getLogger(), "RtcPsa create socket failed");
 		return false;
 	}
 
@@ -219,7 +213,7 @@ bool CPracticalSocket::connectToWCS(){
 	serverAddr.sin_addr.s_addr = inet_addr(m_wcsIp.c_str());
 
 	if(-1 == connect(wcsSocket, (struct sockaddr *) &serverAddr, sizeof(struct sockaddr))){
-		LOG4CXX_ERROR(logger, "RtcPsa connect to Server failed");
+		LOG4CXX_ERROR(mLogger.getLogger(), "RtcPsa connect to Server failed");
 		return false;
 	}
 
@@ -237,9 +231,10 @@ bool CPracticalSocket::init(string& wcsIp, int wcsPort) {
 //
 //	logger = log4cxx::Logger::getLogger("SgFileAppender");
 
+
 	m_wcsIp = wcsIp;
 	m_wcsPort = wcsPort;
-	LOG4CXX_INFO(logger, "RtcPsa connect to wcs "<<wcsIp.c_str()<<":"<<wcsPort);
+	LOG4CXX_INFO(mLogger.getLogger(), "RtcPsa connect to wcs "<<wcsIp.c_str()<<":"<<wcsPort);
 
 	wcsfd = -1;
 
@@ -259,7 +254,7 @@ bool CPracticalSocket::init(string& wcsIp, int wcsPort) {
 	pthread_t thread_id = 0;
 
 	if (0 != pthread_create(&thread_id, NULL, runTimers, (void *)ptimer_poll)) {
-		LOG4CXX_ERROR(logger, "RtcPsa create run_timers thread failed");
+		LOG4CXX_ERROR(mLogger.getLogger(), "RtcPsa create run_timers thread failed");
 		exit(-1);
 		return false;
 	}
@@ -272,7 +267,7 @@ bool CPracticalSocket::init(string& wcsIp, int wcsPort) {
 
 
 
-	LOG4CXX_INFO(logger, "Socket initializes successfully")
+	LOG4CXX_INFO(mLogger.getLogger(), "Socket initializes successfully")
 	return true;
 }
 
@@ -281,13 +276,13 @@ bool CPracticalSocket::recvMsg(int& sockfd, string& msg) {
 }
 
 bool CPracticalSocket::sendMsg(int clientSock, string msg) {
-	LOG4CXX_DEBUG(logger, "will send msg " << msg << " to " << clientSock);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "will send msg " << msg << " to " << clientSock);
 	fd_set writeSet;
 	FD_ZERO(&writeSet);
 	FD_SET(clientSock, &writeSet);
 	int ret = select(clientSock + 1, NULL, &writeSet, NULL, NULL);
 	if (ret == -1) {
-		LOG4CXX_DEBUG(logger, "sendMsg: select() failed!\n");
+		LOG4CXX_DEBUG(mLogger.getLogger(), "sendMsg: select() failed!\n");
 	} else if (ret == 0) {
 		//printf("SendThread: select() time out.\n");
 	} else {
@@ -299,14 +294,14 @@ bool CPracticalSocket::sendMsg(int clientSock, string msg) {
 			int bytes = send(clientSock, (char *) &packet, msgSize
 					+ sizeof(packet.len), 0);
 			if (bytes == -1) {
-				LOG4CXX_ERROR(logger, "sendMsg: send failed!");
+				LOG4CXX_ERROR(mLogger.getLogger(), "sendMsg: send failed!");
 				return false;
 			} else if (bytes != msgSize
 					+ sizeof(packet.len)) {
-				LOG4CXX_ERROR(logger, "sendMsg: send msg truncked");
+				LOG4CXX_ERROR(mLogger.getLogger(), "sendMsg: send msg truncked");
 			} else {
 				//do nothing
-				LOG4CXX_INFO(logger, "send to webrtc server succesfully");
+				LOG4CXX_INFO(mLogger.getLogger(), "send to webrtc server succesfully");
 			}
 
 		}
@@ -339,7 +334,7 @@ bool CPracticalSocket::handleMsgFromWebrtc(const string& strMsg, int sockfd) {
 			if (roapParser.getSdp().length() != 0) {
 				if (m_mapOfferOrAnswer.find(offerSessionId)
 						!= m_mapOfferOrAnswer.end()) {
-					LOG4CXX_DEBUG(logger, "receive candidate, send offer with one candidate");
+					LOG4CXX_DEBUG(mLogger.getLogger(), "receive candidate, send offer with one candidate");
 					string offerOrAnswer = m_mapOfferOrAnswer[offerSessionId];
 		
 					CRtcProtocolParser rtcParser2(offerOrAnswer);
@@ -384,7 +379,7 @@ bool CPracticalSocket::handleMsgFromWebrtc(const string& strMsg, int sockfd) {
 			return true;
 		}
 	} catch (std::runtime_error e) {
-		LOG4CXX_ERROR(logger, "CPracticalSocket::receive exception:"<<e.what());
+		LOG4CXX_ERROR(mLogger.getLogger(), "CPracticalSocket::receive exception:"<<e.what());
 		//psaErrorLog(m_PSAID, "catch exception: %s\n", e.what());
 
 	}

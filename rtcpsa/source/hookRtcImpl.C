@@ -2,24 +2,18 @@
 #include "infoext.h"
 #include "CPsaRtc.h"
 #include "dyncomploader.h"
-
-
-#include <log4cxx/logger.h>
-#include <log4cxx/basicconfigurator.h>
-#include <log4cxx/propertyconfigurator.h>
-#include <log4cxx/helpers/exception.h>
-#include <log4cxx/xml/domconfigurator.h>
+#include "MyLogger.h"
 
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
 
-
+static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
 
 static PCPsaRtc s_pRtc = NULL;
 
 void release(){
-	printf("rtcpsa exit call release\n");
+	LOG4CXX_INFO(mLogger.getLogger(), "rtcpsa exit call release\n");
 	if(s_pRtc != NULL)
 	{
 		delete s_pRtc;
@@ -52,17 +46,15 @@ BOOL hookSendMsgPsaRtcImpl(PTMsg msg)
 void initPsaRtc(int psaid){
 
 	atexit(release);
-	log4cxx::xml::DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
-	log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("SgFileAppender");
 
 	setHookActive(psaid, hookActivePsaRtcImpl);
 	setHookSendMsg(psaid, hookSendMsgPsaRtcImpl);
 
 	s_pRtc = new CPsaRtc(psaid);
 	if(s_pRtc->init()){
-		LOG4CXX_INFO(logger, "Rtc init success, psaid is "<<psaid);
+		LOG4CXX_INFO(mLogger.getLogger(), "Rtc init success, psaid is "<<psaid);
 	}else{
-		LOG4CXX_ERROR(logger, "Rtc init failed");
+		LOG4CXX_ERROR(mLogger.getLogger(), "Rtc init failed");
 		delete s_pRtc;
 		s_pRtc = NULL;
 	}

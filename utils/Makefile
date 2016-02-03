@@ -12,7 +12,7 @@ UNIDIR = ../unidir
 INC_DIR = -I./include \
 	-I/usr/local/include/mcf 
 
-LIBS = -L. 
+LIBS = -L. -llog4cxx
 
 CXXFLAGS = -g -Wno-deprecated -Wno-write-strings -D_DEBUG $(INC_DIR)
 
@@ -39,6 +39,7 @@ OBJ_UTIL_LIB = \
 	./source/CProperties.o \
 	./source/CPropertiesManager.o \
 	./source/CTUniNetMsgHelper.o \
+	./source/MyLogger.o \
 	./source/timerpoll.o
 
 sample_util_lib : $(OBJ_UTIL_LIB)

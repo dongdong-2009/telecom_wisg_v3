@@ -24,7 +24,7 @@
  By Huang Haiping
 
  *************************************************************************/
-#include "exosipstack.h"
+
 #include "pachook.h"
 #include "msgconvertor.h"
 #include "psa_sip_inf.h"
@@ -34,13 +34,21 @@
 #include <stdio.h>
 #include <sstream>
 #include <time.h>
+#include "MyLogger.h"
+//#include <boost/thread/mutex.hpp>
+//#include <log4cxx/mLogger.getLogger().h>
+//#include <log4cxx/basicconfigurator.h>
+//#include <log4cxx/propertyconfigurator.h>
+//#include <log4cxx/helpers/exception.h>
+//#include <log4cxx/xml/domconfigurator.h>
+#include "exosipstack.h"
 
-
-
-using namespace log4cxx::xml;
 using namespace log4cxx;
+using namespace log4cxx::xml;
 
-log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("SgFileAppender"));
+static MyLogger mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
+
+//log4cxx::LoggerPtr mLogger.getLogger();
 
 set<string> m_name_pool;
 map<string, timer *> m_map_timers;
@@ -78,9 +86,8 @@ CExosipStack::CExosipStack(INT psaid) :
 
 CExosipStack::~CExosipStack(){
 
-	//LOG4CXX_INFO(logger, "call CExosipStack distructure")
+	//LOG4CXX_INFO(mLogger.getLogger(), "call CExosipStack distructure")
 
-	//logger = 0;
 	delete ptimer_poll;
 }
 
@@ -89,7 +96,7 @@ BOOL CExosipStack::init(USHORT port) {
 
 	if (eXosip_init() != 0) {
 		// 初始化失败
-		LOG4CXX_ERROR(logger, "eXosip init failed");
+		LOG4CXX_ERROR(mLogger.getLogger(), "eXosip init failed");
 
 		return FALSE;
 	}
@@ -97,18 +104,18 @@ BOOL CExosipStack::init(USHORT port) {
 	eXosip_set_option(EXOSIP_OPT_DONT_SEND_101, &i);
 	// 打开监听端口
 	if (eXosip_listen_addr(IPPROTO_UDP, NULL, port, AF_INET, FALSE) != 0) {
-		LOG4CXX_ERROR(logger,  "eXosip listen on port "<<port<<" failed");
+		LOG4CXX_ERROR(mLogger.getLogger(),  "eXosip listen on port "<<port<<" failed");
 		eXosip_quit();
 		return FALSE;
 	}
-	LOG4CXX_INFO(logger, "eXosip listening on port "<<port);
+	LOG4CXX_INFO(mLogger.getLogger(), "eXosip listening on port "<<port);
 
 	CProperties* properties = CPropertiesManager::getInstance()->getProperties(
 			"gateway.env");
 	int accessMode = properties->getIntProperty("accessMode");
 
 	if (accessMode == -1) {
-		LOG4CXX_INFO(logger, "AccessMode not set in mcf.env, Use DEFAULT 0");
+		LOG4CXX_INFO(mLogger.getLogger(), "AccessMode not set in mcf.env, Use DEFAULT 0");
 		accessMode = 0;
 	} else {
 		this->accessMode = accessMode;
@@ -132,7 +139,7 @@ BOOL CExosipStack::init(USHORT port) {
 
 		if (pthread_create(&thread_id, NULL, thread_fun, (void *) ptimer_poll)
 				!= 0) {
-			LOG4CXX_ERROR(logger,  "Create timer thread failed");
+			LOG4CXX_ERROR(mLogger.getLogger(),  "Create timer thread failed");
 			return FALSE;
 		}
 	}
@@ -214,7 +221,7 @@ int CExosipStack::sendInitRegister(timer * ptimer) {
 		char * response = new char[128];
 
 		if (osip_route_parse(rt, proxy.c_str()) != 0) {
-			LOG4CXX_ERROR(logger, "proxy not correctly set");
+			LOG4CXX_ERROR(mLogger.getLogger(), "proxy not correctly set");
 			return 0;
 		} else {
 			osip_uri_uparam_add(rt->url,osip_strdup("lr"),NULL);
@@ -255,11 +262,11 @@ int CExosipStack::sendInitRegister(timer * ptimer) {
 	char * buf = NULL;
 	size_t len;
 	osip_message_to_str(reg, &buf, &len);
-	LOG4CXX_DEBUG(logger, "SIPPSA send register:\n"<<buf);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send register:\n"<<buf);
 	osip_free(buf);
 	if (eXosip_register_send_register(reg_id, reg) != 0) {
 		eXosip_unlock();
-		LOG4CXX_ERROR(logger, "send register failed");
+		LOG4CXX_ERROR(mLogger.getLogger(), "send register failed");
 		return -1;
 	}
 
@@ -349,7 +356,7 @@ void CExosipStack::register_process_401(eXosip_event_t * je) {
 	alg = osip_www_authenticate_get_algorithm(www_header);
 
 	if (strcmp(alg, "MD5") != 0 /* && strcmp(alg, "AKAv1-MD5") != 0 && strcmp(alg, "AKAv2-MD5") != 0*/) {
-		LOG4CXX_ERROR(logger, "Authentication scheme "<<alg<< " not supported");
+		LOG4CXX_ERROR(mLogger.getLogger(), "Authentication scheme "<<alg<< " not supported");
 		return;
 	}
 	string algorithm = alg;
@@ -359,7 +366,7 @@ void CExosipStack::register_process_401(eXosip_event_t * je) {
 			algorithm);
 	string response = md5Digest.calcResponse();
 
-	LOG4CXX_DEBUG(logger, "password:"<<password<<", username:"<<username<<", realm:"<<realm<<",\n"
+	LOG4CXX_DEBUG(mLogger.getLogger(), "password:"<<password<<", username:"<<username<<", realm:"<<realm<<",\n"
 				<<"nonce:"<<nonce<<", cnonce: "<<cnonce<<", noncecount:"<<noncecount<<
 				",\nalgorithm:"<<algorithm<<", response:"<<response);
 
@@ -378,7 +385,7 @@ void CExosipStack::register_process_401(eXosip_event_t * je) {
 	eXosip_unlock();
 
 	if (r < 0) {
-		LOG4CXX_ERROR(logger, "process 401: build register failed");
+		LOG4CXX_ERROR(mLogger.getLogger(), "process 401: build register failed");
 		return;
 	}
 
@@ -414,14 +421,14 @@ void CExosipStack::register_process_401(eXosip_event_t * je) {
 	osip_authorization_to_str(auth_header, &h_value);
 
 	if (osip_message_set_authorization(reg2, h_value) != 0)
-		LOG4CXX_ERROR(logger, "Cannot set authorization\n");
+		LOG4CXX_ERROR(mLogger.getLogger(), "Cannot set authorization\n");
 
 	eXosip_lock();
 	int i = eXosip_register_send_register(reg_id, reg2);
 	eXosip_unlock();
 
 	if (i != 0) {
-		LOG4CXX_ERROR(logger, "Error sending REGISTER\n");
+		LOG4CXX_ERROR(mLogger.getLogger(), "Error sending REGISTER\n");
 		return;
 	}
 
@@ -508,11 +515,11 @@ void CExosipStack::doActive(void) {
 	if (NULL == event)
 		return;
 
-	LOG4CXX_DEBUG(logger, "eXosip receive message type:"<<event->type);
-	LOG4CXX_DEBUG(logger, "eXosip textinfo: "<<event->textinfo);
-	LOG4CXX_DEBUG(logger, "eXosip tid: "<<event->tid);
-	LOG4CXX_DEBUG(logger, "eXosip cid: "<<event->cid);
-	//LOG4CXX_DEBUG(logger, "eXosip ACK: %d\n", (int) event->ack);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip receive message type:"<<event->type);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip textinfo: "<<event->textinfo);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip tid: "<<event->tid);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip cid: "<<event->cid);
+	//LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip ACK: %d\n", (int) event->ack);
 
 	if (event->request == NULL && event->response == NULL) {
 		return;
@@ -521,7 +528,7 @@ void CExosipStack::doActive(void) {
 	size_t len;
 	if(event->request != NULL){
 		osip_message_to_str(event->request, &buf, &len);
-		LOG4CXX_DEBUG(logger, "eXosip request:\n"<<buf);
+		LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip request:\n"<<buf);
 		osip_free(buf);
 		buf = NULL;
 	}
@@ -529,7 +536,7 @@ void CExosipStack::doActive(void) {
 
 	if(event->response != NULL){
 		osip_message_to_str(event->response, &buf, &len);
-		LOG4CXX_DEBUG(logger, "eXosip response:\n"<<buf);
+		LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip response:\n"<<buf);
 		osip_free(buf);
 		buf = NULL;
 	}
@@ -561,14 +568,14 @@ void CExosipStack::doActive(void) {
 			eXosip_lock();
 			ret = eXosip_message_build_answer(event->tid, 501, &ans);
 			if (OSIP_SUCCESS != ret) {
-				LOG4CXX_ERROR(logger,
+				LOG4CXX_ERROR(mLogger.getLogger(),
 						"eXosip_message_build_answer error for register!!!\n");
 			} else {
 
 				ans->reason_phrase = osip_strdup("Not Implemented");
 				ret = eXosip_message_send_answer(event->tid, 501, ans);
 				if (OSIP_SUCCESS != ret) {
-					LOG4CXX_ERROR(logger, "error send answer for register!!!\n");
+					LOG4CXX_ERROR(mLogger.getLogger(), "error send answer for register!!!\n");
 				}
 			}
 			eXosip_unlock();
@@ -598,11 +605,11 @@ void CExosipStack::doActive(void) {
 	} else {
 		switch (event->type) {
 		case EXOSIP_REGISTRATION_FAILURE: {
-			LOG4CXX_DEBUG(logger, "Register failure");
+			LOG4CXX_DEBUG(mLogger.getLogger(), "Register failure");
 			break;
 		}
 		case EXOSIP_REGISTRATION_SUCCESS: {
-			LOG4CXX_DEBUG(logger, "Register success");
+			LOG4CXX_DEBUG(mLogger.getLogger(), "Register success");
 			break;
 		}
 		case EXOSIP_CALL_INVITE: {
@@ -1000,7 +1007,7 @@ void CExosipStack::doActive(void) {
 
 	if (!parsed) {
 		delete pMsg;
-		LOG4CXX_DEBUG(logger, "Unkown sip message type");
+		LOG4CXX_DEBUG(mLogger.getLogger(), "Unkown sip message type");
 
 		eXosip_event_free(event);
 
@@ -1073,11 +1080,11 @@ BOOL CExosipStack::doSendMsg(PTMsg msg) {
 }
 
 BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
-	LOG4CXX_DEBUG(logger, "OnSend_SIP_RESPONSE");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_RESPONSE");
 	PTSipResp mcfRes = (PTSipResp) uniMsg->msgBody;
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
-	LOG4CXX_DEBUG(logger, "Send out SIP RESPONSE: status ="<<mcfRes->statusCode);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "Send out SIP RESPONSE: status ="<<mcfRes->statusCode);
 
 	if (!strcmp(pCtrlMsg->cseq_method.c_str(), "INVITE") || !strcmp(pCtrlMsg->cseq_method.c_str(), "UPDATE")) {
 		if (100 == mcfRes->statusCode) {
@@ -1097,7 +1104,7 @@ BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
 			eXosip_lock();
 			ret = eXosip_call_build_answer(tid, mcfRes->statusCode, &ans);
 			if (OSIP_SUCCESS != ret) {
-				LOG4CXX_ERROR(logger, "eXosip can't build answer:"<<ret);
+				LOG4CXX_ERROR(mLogger.getLogger(), "eXosip can't build answer:"<<ret);
 			} else {
 				// HHP: modified by Huang Haiping 2010-09-09 fix crash when build failed
 				ExosipTranslator::convertMCF2OsipResp(*mcfRes, ans);
@@ -1159,16 +1166,16 @@ BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
 				size_t len;
 				osip_message_to_str(ans, &buf, &len);
 
-				LOG4CXX_DEBUG(logger, "SIPPSA send answer"<<buf);
+				LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send answer"<<buf);
 				osip_free(buf);
 				buf = NULL;
 
 				ret = eXosip_call_send_answer(tid, mcfRes->statusCode, ans);
 				if (OSIP_SUCCESS != ret) {
-					LOG4CXX_ERROR(logger,
+					LOG4CXX_ERROR(mLogger.getLogger(),
 							"eXosip_call_send_answer "<<mcfRes->statusCode<<" failed: "<<ret);
 				} else {
-					LOG4CXX_DEBUG(logger, "eXosip_call_send_answer success");
+					LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip_call_send_answer success");
 				}
 			}
 
@@ -1178,7 +1185,7 @@ BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
 				this->m_map_branch_tid.remove(pCtrlMsg->via.branch.c_str());
 			}
 		} else {
-			LOG4CXX_ERROR(logger, "UNKNOW Transaction: "<<
+			LOG4CXX_ERROR(mLogger.getLogger(), "UNKNOW Transaction: "<<
 					pCtrlMsg->via.branch.c_str());
 		}
 	} // RESPONSE for INVITE
@@ -1192,22 +1199,22 @@ BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
 			eXosip_lock();
 			ret = eXosip_message_build_answer(tid, mcfRes->statusCode, &ans);
 			if (OSIP_SUCCESS != ret) {
-				LOG4CXX_ERROR(logger, "eXosip build answer failed");
+				LOG4CXX_ERROR(mLogger.getLogger(), "eXosip build answer failed");
 			} else {
 				ExosipTranslator::convertMCF2OsipResp(*mcfRes, ans);
 
 				ret = eXosip_message_send_answer(tid, mcfRes->statusCode, ans);
 				if (OSIP_SUCCESS != ret) {
-					LOG4CXX_ERROR(logger, "eXosip_call_send_answer "<<mcfRes->statusCode<<" failed: "<<ret);
+					LOG4CXX_ERROR(mLogger.getLogger(), "eXosip_call_send_answer "<<mcfRes->statusCode<<" failed: "<<ret);
 				} else {
-					LOG4CXX_DEBUG(logger, "eXosip_call_send_answer success");
+					LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip_call_send_answer success");
 				}
 			}
 			eXosip_unlock();
 
 			this->m_map_branch_tid.remove(pCtrlMsg->via.branch.c_str());
 		} else {
-			LOG4CXX_ERROR(logger, "UNKNOW Transaction: "<<
+			LOG4CXX_ERROR(mLogger.getLogger(), "UNKNOW Transaction: "<<
 								pCtrlMsg->via.branch.c_str());
 		}
 	} // RESPONSE for REGISTER/MESSAGE
@@ -1224,19 +1231,19 @@ BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
 			ret = eXosip_call_build_answer(tid, mcfRes->statusCode, &ans);
 			//ret = eXosip_message_build_answer();
 			if (OSIP_SUCCESS != ret) {
-				LOG4CXX_ERROR(logger, "eXosip build answer failed");
+				LOG4CXX_ERROR(mLogger.getLogger(), "eXosip build answer failed");
 			} else {
 				ExosipTranslator::convertMCF2OsipResp(*mcfRes, ans);
 				char * buf = NULL;
 				size_t len;
 				osip_message_to_str(ans, &buf, &len);
-				LOG4CXX_DEBUG(logger, "SIPPSA send answer:\n"<<buf);
+				LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send answer:\n"<<buf);
 				osip_free(buf);
 				buf = NULL;
 				//ret = eXosip_message_send_answer(tid, mcfRes->statusCode, ans);
 				ret = eXosip_call_send_answer(tid, mcfRes->statusCode, ans);
 				if (OSIP_SUCCESS != ret) {
-					LOG4CXX_ERROR(logger, "eXosip_call_send_answer "<<mcfRes->statusCode<<" failed: "<<ret);
+					LOG4CXX_ERROR(mLogger.getLogger(), "eXosip_call_send_answer "<<mcfRes->statusCode<<" failed: "<<ret);
 				}
 			}
 			eXosip_unlock();
@@ -1251,7 +1258,7 @@ BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
 }
 
 BOOL CExosipStack::onSend_SIP_ACK(PCTUniNetMsg uniMsg) {
-	LOG4CXX_DEBUG(logger, "OnSend_SIP_ACK");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_ACK");
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
 	//	printf("Send out SIP ACK!!!!!!!!\n");
@@ -1267,7 +1274,7 @@ BOOL CExosipStack::onSend_SIP_ACK(PCTUniNetMsg uniMsg) {
 		eXosip_lock();
 		ret = eXosip_call_build_ack(did, &ack);
 		if (ret != OSIP_SUCCESS) {
-			LOG4CXX_ERROR(logger ,"eXosip_call_build_ack failed: "<<ret<<
+			LOG4CXX_ERROR(mLogger.getLogger() ,"eXosip_call_build_ack failed: "<<ret<<
 				"\t(-6:OSIP_NOTFOUND -2:OSIP_BADPARAMETER\n");
 		} else {
 			// try to fix ack send failed
@@ -1312,23 +1319,23 @@ BOOL CExosipStack::onSend_SIP_ACK(PCTUniNetMsg uniMsg) {
 			size_t len = 0;
 			osip_message_to_str(ack, &buf, &len);
 			ret = eXosip_call_send_ack(did, ack);
-			LOG4CXX_DEBUG(logger, "SIPPSA send ACK:\n "<<buf);
+			LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send ACK:\n "<<buf);
 			osip_free(buf);
 			if (ret != OSIP_SUCCESS) {
-				LOG4CXX_ERROR(logger, "eXosip_call_send_ack failed: "<<ret<<
+				LOG4CXX_ERROR(mLogger.getLogger(), "eXosip_call_send_ack failed: "<<ret<<
 					"\t(-6:OSIP_NOTFOUND -2:OSIP_BADPARAMETER\n");
 			}
 		}
 		eXosip_unlock();
 		return TRUE;
 	} else {
-		LOG4CXX_ERROR(logger, "UNKNOW Dialog for sending ACK\n");
+		LOG4CXX_ERROR(mLogger.getLogger(), "UNKNOW Dialog for sending ACK\n");
 		return FALSE;
 	}
 }
 
 BOOL CExosipStack::onSend_SIP_BYE(PCTUniNetMsg uniMsg) {
-	LOG4CXX_DEBUG(logger, "OnSend_SIP_BYE");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_BYE");
 	INT did = -1;
 	INT cid = -1;
 	BOOL revert = false; // revert from,to?
@@ -1397,18 +1404,18 @@ BOOL CExosipStack::onSend_SIP_BYE(PCTUniNetMsg uniMsg) {
 		}
 		return TRUE;
 	} else {
-		LOG4CXX_ERROR(logger, "BYE to unknown dialog!!!!!\n");
+		LOG4CXX_ERROR(mLogger.getLogger(), "BYE to unknown dialog!!!!!\n");
 		return FALSE;
 	}
 }
 
 BOOL CExosipStack::onSend_SIP_CANCEL(PCTUniNetMsg uniMsg) {
-	LOG4CXX_DEBUG(logger, "OnSend_SIP_CANCEL");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_CANCEL");
 	return this->onSend_SIP_BYE(uniMsg);
 }
 
 BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
-	LOG4CXX_DEBUG(logger, "OnSend_SIP_INVITE");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_INVITE");
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
 	PTSipInvite mcfInvite = (PTSipInvite) uniMsg->msgBody;
@@ -1434,7 +1441,7 @@ BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
 	osip_message_t * invite;
 	if (did != -1)
 	{
-		LOG4CXX_DEBUG(logger, "SipPsa build re-invite");
+		LOG4CXX_DEBUG(mLogger.getLogger(), "SipPsa build re-invite");
 		int ret = eXosip_call_build_request(did, "INVITE", &invite);
 		if (OSIP_SUCCESS != ret) {
 			printf("eXosip_call_build_initial_invite failed!\n");
@@ -1449,7 +1456,7 @@ BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
 		int ret = eXosip_call_build_initial_invite(&invite, toStr.c_str(),
 				CSipMsgHelper::toString(pCtrlMsg->from).c_str(), NULL, NULL);
 		if (OSIP_SUCCESS != ret) {
-			LOG4CXX_ERROR(logger, "eXosip_call_build_initial_invite failed!\n");
+			LOG4CXX_ERROR(mLogger.getLogger(), "eXosip_call_build_initial_invite failed!\n");
 			return FALSE;
 		}
 
@@ -1461,7 +1468,7 @@ BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
 			char * response = new char[128];
 
 			if (osip_route_parse(rt, proxy.c_str()) != 0) {
-				LOG4CXX_ERROR(logger, "Proxy cannot parse to route");
+				LOG4CXX_ERROR(mLogger.getLogger(), "Proxy cannot parse to route");
 				return NULL;
 			} else {
 				osip_uri_uparam_add(rt->url,osip_strdup("lr"),NULL);
@@ -1477,7 +1484,7 @@ BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
 			char * response = new char[128];
 
 			if (osip_route_parse(rt, proxy.c_str()) != 0) {
-				LOG4CXX_ERROR(logger, "Proxy cannot parse to route");
+				LOG4CXX_ERROR(mLogger.getLogger(), "Proxy cannot parse to route");
 				return NULL;
 			} else {
 				osip_uri_uparam_add(rt->url,osip_strdup("lr"),NULL);
@@ -1526,7 +1533,7 @@ BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
 	size_t len;
 	osip_message_to_str(invite, &buf, &len);
 
-	LOG4CXX_DEBUG(logger, "SIPPSA send invite: \n%s"<<buf);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send invite: \n%s"<<buf);
 	osip_free(buf);
 
 	eXosip_lock();
@@ -1541,7 +1548,7 @@ BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
 }
 
 BOOL CExosipStack::onSend_SIP_REGISTER(PCTUniNetMsg uniMsg) {
-	LOG4CXX_DEBUG(logger, "OnSend_SIP_REGISTER");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_REGISTER");
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
 	PTSipRegister mcfRegister = (PTSipRegister) uniMsg->msgBody;
@@ -1560,7 +1567,7 @@ BOOL CExosipStack::onSend_SIP_REGISTER(PCTUniNetMsg uniMsg) {
 	eXosip_unlock();
 
 	if (OSIP_SUCCESS != ret) {
-		LOG4CXX_ERROR(logger, "SIPPSA send REGISTER failed!!!\n");
+		LOG4CXX_ERROR(mLogger.getLogger(), "SIPPSA send REGISTER failed!!!\n");
 		return FALSE;
 	} else {
 		//DEBUGV(m_psaid, "keep exosip register rid: %d\n", rid);
@@ -1571,7 +1578,7 @@ BOOL CExosipStack::onSend_SIP_REGISTER(PCTUniNetMsg uniMsg) {
 }
 
 BOOL CExosipStack::onSend_SIP_MESSAGE(PCTUniNetMsg uniMsg) {
-	LOG4CXX_DEBUG(logger, "OnSend_SIP_MESSAGE");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_MESSAGE");
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
 	PTSipMessage mcfMsg = (PTSipMessage) uniMsg->msgBody;
@@ -1610,7 +1617,7 @@ BOOL CExosipStack::onSend_SIP_MESSAGE(PCTUniNetMsg uniMsg) {
 		char * response = new char[128];
 
 		if (osip_route_parse(rt, proxy.c_str()) != 0) {
-			LOG4CXX_ERROR(logger, "SIPPSA cannot parse to route");
+			LOG4CXX_ERROR(mLogger.getLogger(), "SIPPSA cannot parse to route");
 			return NULL;
 		} else {
 			osip_uri_uparam_add(rt->url,osip_strdup("lr"),NULL);
@@ -1625,7 +1632,7 @@ BOOL CExosipStack::onSend_SIP_MESSAGE(PCTUniNetMsg uniMsg) {
 		char * response = new char[128];
 
 		if (osip_route_parse(rt, proxy.c_str()) != 0) {
-			LOG4CXX_ERROR(logger, "SIPPSA cannot parse to route");
+			LOG4CXX_ERROR(mLogger.getLogger(), "SIPPSA cannot parse to route");
 			return NULL;
 		} else {
 			osip_uri_uparam_add(rt->url,osip_strdup("lr"),NULL);
@@ -1663,14 +1670,14 @@ BOOL CExosipStack::onSend_SIP_MESSAGE(PCTUniNetMsg uniMsg) {
 	char* buf = NULL;
 	size_t len;
 	osip_message_to_str(msg, &buf, &len);
-	LOG4CXX_DEBUG(logger, "SIPPSA send MESSAGE"<<buf);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send MESSAGE"<<buf);
 	osip_free(buf);
 
 	eXosip_lock();
 	ret = eXosip_message_send_request(msg);
 	eXosip_unlock();
 	if (OSIP_SUCCESS != ret) {
-		LOG4CXX_ERROR(logger, "SIPPSA send MESSAGE"<<buf);
+		LOG4CXX_ERROR(mLogger.getLogger(), "SIPPSA send MESSAGE"<<buf);
 		return FALSE;
 	}
 
@@ -1680,7 +1687,7 @@ BOOL CExosipStack::onSend_SIP_MESSAGE(PCTUniNetMsg uniMsg) {
 
 BOOL CExosipStack::onSend_SIP_INFO(PCTUniNetMsg uniMsg)
 {
-	LOG4CXX_DEBUG(logger, "OnSend_SIP_INFO");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_INFO");
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
 	PTSipInfo mcfMsg = (PTSipInfo) uniMsg->msgBody;
@@ -1720,7 +1727,7 @@ BOOL CExosipStack::onSend_SIP_INFO(PCTUniNetMsg uniMsg)
 		char* buf = NULL;
 		size_t len;
 		osip_message_to_str(msg, &buf, &len);
-		LOG4CXX_DEBUG(logger, "SIPPSA send INFO:\n"<<buf);
+		LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send INFO:\n"<<buf);
 		osip_free(buf);
 
 		eXosip_lock();
@@ -1746,7 +1753,7 @@ BOOL CExosipStack::onSend_SIP_INFO(PCTUniNetMsg uniMsg)
 
 BOOL CExosipStack::onSend_SIP_PRACK(PCTUniNetMsg uniMsg)
 {
-	LOG4CXX_DEBUG(logger, "OnSend_SIP_PRACK");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_PRACK");
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
 	int tid = -1;
@@ -1758,7 +1765,7 @@ BOOL CExosipStack::onSend_SIP_PRACK(PCTUniNetMsg uniMsg)
 
 		if (OSIP_SUCCESS != ret)
 		{
-			LOG4CXX_ERROR(logger, "eXosip_prack_build_request failed!\n");
+			LOG4CXX_ERROR(mLogger.getLogger(), "eXosip_prack_build_request failed!\n");
 			return FALSE;
 		}
 	//	ExosipTranslator::convertMCF2CtrlMsg(pCtrlMsg, msg);
@@ -1772,7 +1779,7 @@ BOOL CExosipStack::onSend_SIP_PRACK(PCTUniNetMsg uniMsg)
 		char* buf = NULL;
 		size_t len;
 		osip_message_to_str(msg, &buf, &len);
-		LOG4CXX_DEBUG(logger, "SIPPSA send RACK:\n"<<msg);
+		LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send RACK:\n"<<msg);
 		osip_free(buf);
 
 		eXosip_lock();
@@ -1780,14 +1787,14 @@ BOOL CExosipStack::onSend_SIP_PRACK(PCTUniNetMsg uniMsg)
 		eXosip_unlock();
 		if (OSIP_SUCCESS != ret)
 		{
-			LOG4CXX_ERROR(logger, "send RACK failed");
+			LOG4CXX_ERROR(mLogger.getLogger(), "send RACK failed");
 			return FALSE;
 		}
 
 		return TRUE;
 	}
 	else{
-		LOG4CXX_ERROR(logger, "UNKNOW Dialog for sending PRACK\n");
+		LOG4CXX_ERROR(mLogger.getLogger(), "UNKNOW Dialog for sending PRACK\n");
 		return FALSE;
 	}
 
@@ -1797,7 +1804,7 @@ BOOL CExosipStack::onSend_SIP_PRACK(PCTUniNetMsg uniMsg)
 
 BOOL CExosipStack::onSend_SIP_UPDATE(PCTUniNetMsg uniMsg)
 {
-	LOG4CXX_DEBUG(logger, "OnSend_SIP_UPDATE");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_UPDATE");
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
 	PTSipUpdate mcfMsg = (PTSipUpdate) uniMsg->msgBody;
@@ -1837,7 +1844,7 @@ BOOL CExosipStack::onSend_SIP_UPDATE(PCTUniNetMsg uniMsg)
 		char* buf = NULL;
 		size_t len;
 		osip_message_to_str(msg, &buf, &len);
-		LOG4CXX_DEBUG(logger, "SIPPSA send UPDATE:\n"<<buf);
+		LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send UPDATE:\n"<<buf);
 		osip_free(buf);
 
 		eXosip_lock();
@@ -1845,14 +1852,14 @@ BOOL CExosipStack::onSend_SIP_UPDATE(PCTUniNetMsg uniMsg)
 		eXosip_unlock();
 		if (OSIP_SUCCESS != ret)
 		{
-			LOG4CXX_ERROR(logger, "send UPDATE failed");
+			LOG4CXX_ERROR(mLogger.getLogger(), "send UPDATE failed");
 			return FALSE;
 		}
 
 		return TRUE;
 	}
 	else{
-		LOG4CXX_ERROR(logger, "UNKNOW Dialog for sending ACK\n");
+		LOG4CXX_ERROR(mLogger.getLogger(), "UNKNOW Dialog for sending ACK\n");
 		return FALSE;
 	}
 	
@@ -1868,7 +1875,7 @@ void CExosipStack::storeDid(RCTSipAddress from, RCTSipAddress to,
 
 	this->m_map_dialogid.put(uniqueDialogId, dialogId);
 
-	LOG4CXX_DEBUG(logger, "StoreDid: "<<uniqueDialogId<<" ["<<dialogId<<"]");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "StoreDid: "<<uniqueDialogId<<" ["<<dialogId<<"]");
 
 	delete[] uniqueDialogId;
 }
@@ -1882,7 +1889,7 @@ void CExosipStack::storeCid(RCTSipAddress from, RCTSipAddress to,
 	__generateUniqueCallId(uniqueCallId, 512, from, to, callId);
 	this->m_map_callid.put(uniqueCallId, cid);
 
-	LOG4CXX_DEBUG(logger, "StoreCid: "<<uniqueCallId<<" ["<<cid<<"]");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "StoreCid: "<<uniqueCallId<<" ["<<cid<<"]");
 
 	delete[] uniqueCallId;
 }
@@ -1895,7 +1902,7 @@ void CExosipStack::removeDid(RCTSipAddress from, RCTSipAddress to,
 
 	this->m_map_dialogid.remove(uniqueDialogId);
 
-	LOG4CXX_DEBUG(logger, "RmDid:"<<uniqueDialogId);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "RmDid:"<<uniqueDialogId);
 
 	delete[] uniqueDialogId;
 }
@@ -1907,7 +1914,7 @@ void CExosipStack::removeCid(RCTSipAddress from, RCTSipAddress to,
 	__generateUniqueCallId(uniqueCallId, 512, from, to, callId);
 	this->m_map_callid.remove(uniqueCallId);
 
-	LOG4CXX_DEBUG(logger, "RmCid: "<<uniqueCallId);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "RmCid: "<<uniqueCallId);
 
 	delete[] uniqueCallId;
 }

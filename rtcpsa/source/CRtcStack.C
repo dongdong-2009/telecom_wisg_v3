@@ -1,6 +1,6 @@
 #include "CRtcStack.h"
 
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("SgFileAppender"));
+static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
 
 //default PSAID
 INT CRtcStack::m_PSAID = 18;
@@ -30,7 +30,7 @@ CRtcStack::~CRtcStack(){
 	delete m_pSocket;
 	m_pSocket = NULL;
 
-	LOG4CXX_INFO(logger, "call CRtcStack distructure")
+	LOG4CXX_INFO(mLogger.getLogger(), "call CRtcStack distructure")
 
 }
 
@@ -130,11 +130,11 @@ BOOL CRtcStack::convertMsgToUniNetMsg(string strMsg, PTUniNetMsg pMsg){
 			pMsg->msgBody = pMsgBody;
 			pMsg->setMsgBody();
 		}else{
-			LOG4CXX_ERROR(logger, "unhandle roaptype:"<<roapType);
+			LOG4CXX_ERROR(mLogger.getLogger(), "unhandle roaptype:"<<roapType);
 			return false;
 		}
 	}catch(std::runtime_error & e){
-		LOG4CXX_ERROR(logger, "catch exception:"<<e.what());
+		LOG4CXX_ERROR(mLogger.getLogger(), "catch exception:"<<e.what());
 		return false;
 	}
 	return true;
@@ -230,7 +230,7 @@ BOOL CRtcStack::convertUniMsgToPlainMsg(PTUniNetMsg uniMsg, string& plainMsg){
 			break;
 		}
 		default:
-			LOG4CXX_ERROR(logger, "can not convertUniMsgToPlainMsg msgName:"<<uniMsg->msgName);
+			LOG4CXX_ERROR(mLogger.getLogger(), "can not convertUniMsgToPlainMsg msgName:"<<uniMsg->msgName);
 			return FALSE;
 		}
 
@@ -263,7 +263,7 @@ BOOL CRtcStack::convertUniMsgToPlainMsg(PTUniNetMsg uniMsg, string& plainMsg){
 			delete roapParser;
 			roapParser = NULL;
 		}
-		LOG4CXX_ERROR(logger, "catch exception:"<<e.what());
+		LOG4CXX_ERROR(mLogger.getLogger(), "catch exception:"<<e.what());
 		return false;
 	}
 	return TRUE;
@@ -282,7 +282,7 @@ void CRtcStack::doActive(){
 			return ;
 		}
 
-		LOG4CXX_INFO(logger, "doActive:: recvMsg "<<plainMsg<<"\nmsgType "<<pMsg->getMsgNameStr());
+		LOG4CXX_INFO(mLogger.getLogger(), "doActive:: recvMsg "<<plainMsg<<"\nmsgType "<<pMsg->getMsgNameStr());
 
 		TRtcCtrlMsg *pCtrl = (TRtcCtrlMsg *)pMsg->ctrlMsgHdr;
 		string offersessionId(pCtrl->offerSessionId.c_str());
@@ -316,11 +316,11 @@ BOOL CRtcStack::sendToWebRTCServer(const string& offersessionId, const string& p
 	int clientSocket;
 
 	if((clientSocket = m_pSocket->getwcsFd()) == -1){
-		LOG4CXX_ERROR(logger, "no wcs is connected");
+		LOG4CXX_ERROR(mLogger.getLogger(), "no wcs is connected");
 		return FALSE;
 	}
 	if(!m_pSocket->sendMsgToRtc(plainMsg, clientSocket)){
-		LOG4CXX_ERROR(logger, "send msg to "<<clientSocket<<" failed");
+		LOG4CXX_ERROR(mLogger.getLogger(), "send msg to "<<clientSocket<<" failed");
 		return FALSE;
 	}
 	return TRUE;

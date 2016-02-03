@@ -8,16 +8,14 @@
 #include "CRtcProtocolParser.h"
 #include "dbHandler.h"
 #include "rtc_msg_def.h"
-#include "stdio.h"
+#include <stdio.h>
+
+#include "MyLogger.h"
+
 #include <string>
 #include <vector>
 using namespace std;
 
-#include <log4cxx/logger.h>
-#include <log4cxx/basicconfigurator.h>
-#include <log4cxx/propertyconfigurator.h>
-#include <log4cxx/helpers/exception.h>
-#include <log4cxx/xml/domconfigurator.h>
 
 using namespace log4cxx::xml;
 using namespace log4cxx;

@@ -1,15 +1,9 @@
 #include "CBearModule.h"
-
-#include <log4cxx/logger.h>
-#include <log4cxx/basicconfigurator.h>
-#include <log4cxx/propertyconfigurator.h>
-#include <log4cxx/helpers/exception.h>
-#include <log4cxx/xml/domconfigurator.h>
-
+#include "MyLogger.h"
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-static log4cxx::LoggerPtr logger;
+MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
 
 CLONE_COMP( CBearModule)
 CREATE_COMP( CBearModule)
@@ -83,10 +77,6 @@ CBearModule::CBearModule(PCGFSM afsm) :
 	} else {
 		this->HOST_PORT = HOST_PORT;
 	}
-
-	log4cxx::xml::DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
-
-	logger = log4cxx::Logger::getLogger("SgFileAppender");
 }
 
 PTUACData CBearModule::createData() {
@@ -98,10 +88,10 @@ void CBearModule::initState() {
 }
 
 void CBearModule::procMsg(PTUniNetMsg msg) {
-	LOG4CXX_DEBUG(logger, "procMsg: current state: "
+	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg: current state: "
 			<< m_fsmContext.getState().getName() << ", recv msgName "
 			<< msg->getMsgNameStr());
-	LOG4CXX_DEBUG(logger, "procMsg: recv Msg:\n"
+	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg: recv Msg:\n"
 			<< CTUniNetMsgHelper::toString(msg));
 	switch (msg->msgName) {
 	case INTERNAL_REQUEST:
@@ -116,13 +106,13 @@ void CBearModule::procMsg(PTUniNetMsg msg) {
 		m_fsmContext.onBye(msg);
 		break;
 	default:
-		LOG4CXX_ERROR(logger, "procMsg:Unknown msgName: "
+		LOG4CXX_ERROR(mLogger.getLogger(), "procMsg:Unknown msgName: "
 				<< msg->getMsgNameStr())
 		;
 		break;
 	}
 
-	LOG4CXX_DEBUG(logger, "procMsg:After procMsg state: "
+	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg:After procMsg state: "
 			<< m_fsmContext.getState().getName());
 }
 
@@ -255,7 +245,7 @@ void CBearModule::sendMsgToDispatcher(TUniNetMsgName msgName,
 }
 
 void CBearModule::endTask() {
-	LOG4CXX_DEBUG(logger, "endTask: end BearModule");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "endTask: end BearModule");
 	sendMsgToDispatcher(SIP_RESPONSE, INT_TYPE, DIALOG_END,
 			m_IntCtrlMsg->clone(), NULL);
 
@@ -311,7 +301,7 @@ string CBearModule::checkRespCSeqMethod(TUniNetMsg * msg) {
 }
 
 void CBearModule::onTimeOut(TTimeMarkExt timerMark) {
-	LOG4CXX_DEBUG(logger,
+	LOG4CXX_DEBUG(mLogger.getLogger(),
 			"[CBearModule]DEBUG: The CSipCallModule task received a timeout event: "
 			<< timerMark.timerId);
 	m_fsmContext.onTimeOut(timerMark);

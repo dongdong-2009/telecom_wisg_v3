@@ -7,6 +7,8 @@
 #include "int_msg_def.h"
 #include "utils_inf.h"
 #include "CDialogController.h"
+#include "MyLogger.h"
+
 #include <stdio.h>
 _CLASSDEF(CMsgDispatcher)
 _DECLARE_CREATE_COMP(CMsgDispatcher);

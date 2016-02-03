@@ -37,6 +37,7 @@ CPsaSip::~CPsaSip()
 
 BOOL CPsaSip::init(void)
 {
+
 	// 初始化具体协议栈控制对象
 	s_sipStack = new CExosipStack(psaid);
 	// 设置端口

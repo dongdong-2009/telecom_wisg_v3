@@ -28,8 +28,7 @@
 
 
 #include "timerpoll.h"
-
-
+#include "MyLogger.h"
 
 
 #define BUFFER_SIZE 8192

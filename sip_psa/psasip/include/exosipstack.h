@@ -23,20 +23,13 @@
 #ifndef _EXOSIPSTACK_H
 #define _EXOSIPSTACK_H
 
-
-#include <log4cxx/logger.h>
-#include <log4cxx/basicconfigurator.h>
-#include <log4cxx/propertyconfigurator.h>
-#include <log4cxx/helpers/exception.h>
-#include <log4cxx/xml/domconfigurator.h>
-
-
 #include <eXosip2/eXosip.h>
 #include <osip2/osip_mt.h>
 #include <osipparser2/headers/osip_www_authenticate.h>
 #include <netinet/in.h>
 #include <map>
 #include <algorithm>
+
 
 #include "MD5Digest.h"
 #include "CPropertiesManager.h"
@@ -47,7 +40,7 @@
 #include "exosiptranslator.h"
 #include "timerpoll.h"
 
-
+//#include "MyLogger.h"
 
 typedef struct{
 	string username;

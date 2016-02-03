@@ -1,18 +1,12 @@
 #include "CMsgDispatcher.h"
 
-#include <log4cxx/logger.h>
-#include <log4cxx/basicconfigurator.h>
-#include <log4cxx/propertyconfigurator.h>
-#include <log4cxx/helpers/exception.h>
-#include <log4cxx/xml/domconfigurator.h>
-
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("SgFileAppender"));
-
 CLONE_COMP(CMsgDispatcher)
 CREATE_COMP(CMsgDispatcher)
+
+MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
 
 CMsgDispatcher::CMsgDispatcher(PCGFSM afsm) :
 	CUACTask(afsm), m_isrtcPsaAddrSet(FALSE), m_issipPsaAddrSet(FALSE) {
@@ -44,7 +38,7 @@ CMsgDispatcher::CMsgDispatcher(PCGFSM afsm) :
 
 //	DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
 //
-//	logger = log4cxx::Logger::getLogger("SgFileAppender");
+//	mLogger.getLogger() = log4cxx::mLogger.getLogger()::getLogger("SgFileAppender");
 }
 
 CMsgDispatcher::~CMsgDispatcher() {
@@ -52,14 +46,13 @@ CMsgDispatcher::~CMsgDispatcher() {
 		delete m_pDialogCtrl;
 		m_pDialogCtrl = NULL;
 	}
-	LOG4CXX_INFO(logger, "call CMsgDispatcher distructure")
+	LOG4CXX_INFO(mLogger.getLogger(), "call CMsgDispatcher distructure")
 
-	//logger = 0;
 }
 
 void CMsgDispatcher::procMsg(TUniNetMsg* msg) {
-	LOG4CXX_DEBUG(logger, "dispatcher get msg from "<<msg->oAddr.logAddr);
-	LOG4CXX_DEBUG(logger, "dispatcher recv msg\n "<<CTUniNetMsgHelper::toString(msg));
+	LOG4CXX_DEBUG(mLogger.getLogger(), "dispatcher get msg from "<<msg->oAddr.logAddr);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "dispatcher recv msg\n "<<CTUniNetMsgHelper::toString(msg));
 	if (msg->oAddr.logAddr == (UINT) LOGADDR_SIP_PSA) {
 		handleMsgFromSipPSA(msg);
 	} else if (msg->oAddr.logAddr == (UINT) LOGADDR_RTC_PSA) {
@@ -69,7 +62,7 @@ void CMsgDispatcher::procMsg(TUniNetMsg* msg) {
 	} else if (msg->oAddr.logAddr == (UINT) LOGADDR_BEAR_MOD) {
 		handleMsgFromBear(msg);
 	} else {
-		LOG4CXX_ERROR(logger, "###CMsgDispatcher: received an unexpected message from logaddr " << msg->oAddr.logAddr << ",This task will be ended.\n"
+		LOG4CXX_ERROR(mLogger.getLogger(), "###CMsgDispatcher: received an unexpected message from logaddr " << msg->oAddr.logAddr << ",This task will be ended.\n"
 		);
 		end();
 	}
@@ -105,7 +98,7 @@ void CMsgDispatcher::handleMsgFromBear(TUniNetMsg * msg) {
 
 	if (msg->dialogType == DIALOG_BEGIN) {
 		if (!m_pDialogCtrl->storeBear(uniqID, msg->oAddr)) {
-			LOG4CXX_ERROR(logger, "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
+			LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
 		}
 	}
 
@@ -122,12 +115,12 @@ void CMsgDispatcher::handleMsgFromBear(TUniNetMsg * msg) {
 		if (m_pDialogCtrl->getDialogAddr(uniqID, tAddr)) {
 			sendMsgtoInstance(msg, tAddr, DIALOG_CONTINUE);
 		} else {
-			LOG4CXX_ERROR(logger ,"handleMsgFromMSControl can not get addr by "<< uniqID);
+			LOG4CXX_ERROR(mLogger.getLogger() ,"handleMsgFromMSControl can not get addr by "<< uniqID);
 		}
 		break;
 	}
 	default:
-		LOG4CXX_ERROR(logger, "handleMsgFromMSControl: received unknown msgName "<<msg->getMsgName())
+		LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromMSControl: received unknown msgName "<<msg->getMsgName())
 		;
 		break;
 	}
@@ -151,7 +144,7 @@ void CMsgDispatcher::handleMsgFromSipPSA(TUniNetMsg* msg) {
 		break;
 	case SIP_INVITE:
 		if (m_pDialogCtrl->getDialogAddr(uniqID, tAddr)) {
-			LOG4CXX_DEBUG(logger, "CMsgDispatcher::handleMsgFromSipPSA this is a reinvite\n");
+			LOG4CXX_DEBUG(mLogger.getLogger(), "CMsgDispatcher::handleMsgFromSipPSA this is a reinvite\n");
 			sendMsgtoInstance(msg, tAddr, DIALOG_CONTINUE);
 		} else {
 			tAddr.logAddr = LOGADDR_RTC_SIP_CALL;
@@ -169,12 +162,12 @@ void CMsgDispatcher::handleMsgFromSipPSA(TUniNetMsg* msg) {
 		if (m_pDialogCtrl->getDialogAddr(uniqID, tAddr)) {
 			sendMsgtoInstance(msg, tAddr, DIALOG_CONTINUE);
 		} else {
-			LOG4CXX_ERROR(logger, "handleMsgFromSipPSA can not get addr by "<< uniqID);
+			LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipPSA can not get addr by "<< uniqID);
 		}
 		break;
 	}
 	default:
-		LOG4CXX_ERROR(logger, "received unknown msgName "<<msg->getMsgNameStr())
+		LOG4CXX_ERROR(mLogger.getLogger(), "received unknown msgName "<<msg->getMsgNameStr())
 		;
 		break;
 	}
@@ -182,7 +175,7 @@ void CMsgDispatcher::handleMsgFromSipPSA(TUniNetMsg* msg) {
 
 void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 	//call module调用endTask时发送过来，不用再转发
-	//LOG4CXX_DEBUG(logger, "handleMsgFromRtcSipCall recv Msg:\n"<<CTUniNetMsgHelper::toString(msg));
+	//LOG4CXX_DEBUG(mLogger.getLogger(), "handleMsgFromRtcSipCall recv Msg:\n"<<CTUniNetMsgHelper::toString(msg));
 	string uniqID;
 	switch (msg->msgType) {
 	case SIP_TYPE:
@@ -195,7 +188,7 @@ void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 		uniqID = generateIntUniqID(msg);
 		break;
 	default:
-		LOG4CXX_ERROR(logger, "received unknown msgType: "<<msg->msgType)
+		LOG4CXX_ERROR(mLogger.getLogger(), "received unknown msgType: "<<msg->msgType)
 		;
 		break;
 	}
@@ -203,7 +196,7 @@ void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 	if (msg->dialogType == DIALOG_BEGIN) {
 
 		if (!m_pDialogCtrl->storeDialog(uniqID, msg->oAddr)) {
-			LOG4CXX_ERROR(logger, "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
+			LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
 			return;
 		}
 	}
@@ -226,7 +219,7 @@ void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 			sendMsgtoInstance(msg, tAddr, DIALOG_BEGIN);
 			return;
 		} else {
-			LOG4CXX_ERROR(logger, "handleMsgFromSipCall can not get addr by " << uniqID);
+			LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipCall can not get addr by " << uniqID);
 			return;
 		}
 
@@ -248,8 +241,8 @@ void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 /* 判断是否有已经建立会话，无则记录，DIALOG—BEGIN，否则DIALOG_CONTINUE
  */
 void CMsgDispatcher::handleMsgFromRtcPSA(TUniNetMsg* msg) {
-	LOG4CXX_DEBUG(logger, "Msg from RTC Psa, roap Type is %s\n" <<msg->getMsgNameStr());
-	LOG4CXX_DEBUG(logger, "msg from RTC psa:\n"<<CTUniNetMsgHelper::toString(msg));
+	LOG4CXX_DEBUG(mLogger.getLogger(), "Msg from RTC Psa, roap Type is %s\n" <<msg->getMsgNameStr());
+	LOG4CXX_DEBUG(mLogger.getLogger(), "msg from RTC psa:\n"<<CTUniNetMsgHelper::toString(msg));
 
 	// 记录rtcpsa地址
 	if (!m_isrtcPsaAddrSet) {
@@ -262,7 +255,7 @@ void CMsgDispatcher::handleMsgFromRtcPSA(TUniNetMsg* msg) {
 	switch (msg->msgName) {
 	case RTC_OFFER:
 		if (m_pDialogCtrl->getDialogAddr(uniqID, tAddr)) {
-			LOG4CXX_DEBUG(logger, "CMsgDispatcher::handleMsgFromRtcPsa: this is a reoffer\n");
+			LOG4CXX_DEBUG(mLogger.getLogger(), "CMsgDispatcher::handleMsgFromRtcPsa: this is a reoffer\n");
 			sendMsgtoInstance(msg, tAddr, DIALOG_CONTINUE);
 		} else {
 			tAddr.logAddr = LOGADDR_RTC_SIP_CALL;
@@ -278,12 +271,12 @@ void CMsgDispatcher::handleMsgFromRtcPSA(TUniNetMsg* msg) {
 		if (m_pDialogCtrl->getDialogAddr(uniqID, tAddr)) {
 			sendMsgtoInstance(msg, tAddr, DIALOG_CONTINUE);
 		} else {
-			LOG4CXX_ERROR(logger, "handleMsgFromRtcPSA can not get addr by "<< uniqID);
+			LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromRtcPSA can not get addr by "<< uniqID);
 		}
 		break;
 	}
 	default:
-		LOG4CXX_ERROR(logger, "received unknown msgName "<<msg->getMsgNameStr())
+		LOG4CXX_ERROR(mLogger.getLogger(), "received unknown msgName "<<msg->getMsgNameStr())
 		;
 		break;
 	}
