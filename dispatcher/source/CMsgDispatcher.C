@@ -6,7 +6,7 @@ using namespace log4cxx;
 CLONE_COMP(CMsgDispatcher)
 CREATE_COMP(CMsgDispatcher)
 
-MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
+static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
 
 CMsgDispatcher::CMsgDispatcher(PCGFSM afsm) :
 	CUACTask(afsm), m_isrtcPsaAddrSet(FALSE), m_issipPsaAddrSet(FALSE) {

@@ -18,7 +18,6 @@ private:
 public:
 	static MyLogger& getInstance(const char * configPath, const char * appender);
 	~MyLogger(){
-		//LOG4CXX_INFO(logger, "destroy MyLogger!");
 	}
 
 	inline log4cxx::LoggerPtr getLogger()

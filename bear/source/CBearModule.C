@@ -3,7 +3,7 @@
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
+static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
 
 CLONE_COMP( CBearModule)
 CREATE_COMP( CBearModule)

@@ -46,7 +46,7 @@
 using namespace log4cxx;
 using namespace log4cxx::xml;
 
-static MyLogger mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
+static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
 
 //log4cxx::LoggerPtr mLogger.getLogger();
 
