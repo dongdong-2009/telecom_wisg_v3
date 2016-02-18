@@ -6,7 +6,8 @@ using namespace log4cxx;
 CLONE_COMP(CMsgDispatcher)
 CREATE_COMP(CMsgDispatcher)
 
-static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
+static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml",
+		"SgFileAppender");
 
 CMsgDispatcher::CMsgDispatcher(PCGFSM afsm) :
 	CUACTask(afsm), m_isrtcPsaAddrSet(FALSE), m_issipPsaAddrSet(FALSE) {
@@ -36,9 +37,9 @@ CMsgDispatcher::CMsgDispatcher(PCGFSM afsm) :
 	}
 	m_pDialogCtrl = new CDialogController();
 
-//	DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
-//
-//	mLogger.getLogger() = log4cxx::mLogger.getLogger()::getLogger("SgFileAppender");
+	//	DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
+	//
+	//	mLogger.getLogger() = log4cxx::mLogger.getLogger()::getLogger("SgFileAppender");
 }
 
 CMsgDispatcher::~CMsgDispatcher() {
@@ -93,13 +94,18 @@ void CMsgDispatcher::justPassRegister(TUniNetMsg* msg) {
 
 void CMsgDispatcher::handleMsgFromBear(TUniNetMsg * msg) {
 	// sip call module调用endTask时发送过来，不用再转发
-
-	string uniqID = generateIntUniqID(msg);
-
-	if (msg->dialogType == DIALOG_BEGIN) {
-		if (!m_pDialogCtrl->storeBear(uniqID, msg->oAddr)) {
-			LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
-		}
+	string uniqID;
+	switch (msg->msgType) {
+	case SIP_TYPE:
+		uniqID = generateSipUniqID(msg);
+		break;
+	case INT_TYPE:
+		uniqID = generateIntUniqID(msg);
+		break;
+	default:
+		LOG4CXX_ERROR(mLogger.getLogger(), "received unknown msgType: "<<msg->msgType)
+		;
+		break;
 	}
 
 	if (msg->dialogType == DIALOG_END) {
@@ -107,22 +113,42 @@ void CMsgDispatcher::handleMsgFromBear(TUniNetMsg * msg) {
 		m_pDialogCtrl->clearDialog(uniqID);
 		return;
 	}
-
-	switch (msg->msgName) {
-	case INT_CLOSE:
-	case INT_RESPONSE: {
-		TMsgAddress tAddr;
-		if (m_pDialogCtrl->getDialogAddr(uniqID, tAddr)) {
-			sendMsgtoInstance(msg, tAddr, DIALOG_CONTINUE);
-		} else {
-			LOG4CXX_ERROR(mLogger.getLogger() ,"handleMsgFromMSControl can not get addr by "<< uniqID);
+	if (msg->msgType == INT_TYPE) {
+		if (msg->dialogType == DIALOG_BEGIN) {
+			if (!m_pDialogCtrl->storeBear(uniqID, msg->oAddr)) {
+				LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
+			}
 		}
-		break;
+
+		switch (msg->msgName) {
+		case INT_CLOSE:
+		case INT_RESPONSE: {
+			TMsgAddress tAddr;
+			if (m_pDialogCtrl->getDialogAddr(uniqID, tAddr)) {
+				sendMsgtoInstance(msg, tAddr, DIALOG_CONTINUE);
+			} else {
+				LOG4CXX_ERROR(mLogger.getLogger() ,"handleMsgFromMSControl can not get addr by "<< uniqID);
+			}
+			break;
+		}
+		default:
+			LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromMSControl: received unknown msgName "<<msg->getMsgName())
+			;
+			break;
+		}
 	}
-	default:
-		LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromMSControl: received unknown msgName "<<msg->getMsgName())
-		;
-		break;
+
+	if (msg->msgType == SIP_TYPE) {
+		if (msg->dialogType == DIALOG_BEGIN) {//store addr, sip_psa can find bear
+			if (!m_pDialogCtrl->storeDialog(uniqID, msg->oAddr)) {
+				LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
+				return;
+			}
+		}
+
+		//发送给SIP-PSA
+		sendMsgtoInstance(msg, getSipPsaAddr(), DIALOG_CONTINUE);
+		return;
 	}
 }
 
@@ -194,7 +220,6 @@ void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 	}
 
 	if (msg->dialogType == DIALOG_BEGIN) {
-
 		if (!m_pDialogCtrl->storeDialog(uniqID, msg->oAddr)) {
 			LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
 			return;

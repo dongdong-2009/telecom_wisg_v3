@@ -241,7 +241,7 @@ void CBearModule::sendSdpAnswerToCall(TUniNetMsg * msg) {
 	pResp->body = ((PTSipResp) msg->msgBody)->body.content;
 
 	sendMsgToDispatcher(INT_RESPONSE, SIP_TYPE, DIALOG_BEGIN, pCtrlMsg,
-			pResp);
+			pResp);//tell dispatcher record bear addr
 }
 
 void CBearModule::sendErrorToCall(const int errorType) {
