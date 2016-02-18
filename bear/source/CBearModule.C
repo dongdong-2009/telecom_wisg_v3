@@ -240,7 +240,7 @@ void CBearModule::sendSdpAnswerToCall(TUniNetMsg * msg) {
 	PTIntResponse pResp = new TIntResponse();
 	pResp->body = ((PTSipResp) msg->msgBody)->body.content;
 
-	sendMsgToDispatcher(INT_RESPONSE, SIP_TYPE, DIALOG_BEGIN, pCtrlMsg,
+	sendMsgToDispatcher(INT_RESPONSE, INT_TYPE, DIALOG_BEGIN, pCtrlMsg,
 			pResp);//tell dispatcher record bear addr
 }
 
