@@ -1,4 +1,5 @@
 #include "CR2SCallModule.h"
+#include "MyLogger.h"
 
 CLONE_COMP(CR2SCallModule)
 CREATE_COMP(CR2SCallModule)
@@ -6,7 +7,7 @@ CREATE_COMP(CR2SCallModule)
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-static log4cxx::LoggerPtr logger;
+static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
 
 timers_poll * my_timers;
 timer * timer_rtc;
@@ -52,11 +53,6 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	} else {
 		this->m_accessMode = accessMode;
 	}
-
-	log4cxx::xml::DOMConfigurator::configureAndWatch("etc/log4cxx.xml", 5000);
-
-	logger = log4cxx::Logger::getLogger("SgFileAppender");
-
 	m_rtcCtrlMsg = new TRtcCtrlMsg();
 	m_intCtrlMsg_Rtc = NULL;
 	m_intCtrlMsg_Sip = NULL;
@@ -72,7 +68,7 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	 */
 	my_timers = new timers_poll(128);
 	if (pthread_create(&thread_id, NULL, thread_fun, (void *) my_timers) != 0) {
-		LOG4CXX_ERROR(logger, "Create timer thread failed");
+		LOG4CXX_ERROR(mLogger.getLogger(), "Create timer thread failed");
 		exit(-1);
 	}
 
@@ -114,7 +110,7 @@ CR2SCallModule::~CR2SCallModule() {
 	delete my_timers;
 	my_timers = NULL;
 
-	//logger = 0;
+	//mLogger.getLogger() = 0;
 
 }
 
@@ -143,10 +139,10 @@ bool CR2SCallModule::selectSipUser(string rtcname) {
 				rtcname.c_str(), m_sipName.c_str());
 		CDB::instance()->execSQL(pcSQLStatement);
 
-		LOG4CXX_INFO(logger, "selectSipUser: rtcname: "<<rtcname<<" map to sipname: "<<m_sipName);
+		LOG4CXX_INFO(mLogger.getLogger(), "selectSipUser: rtcname: "<<rtcname<<" map to sipname: "<<m_sipName);
 		return true;
 	} else {
-		LOG4CXX_ERROR(logger, "selectSipUser: No IMS sip code idle.");
+		LOG4CXX_ERROR(mLogger.getLogger(), "selectSipUser: No IMS sip code idle.");
 		return false;
 	}
 
@@ -176,7 +172,7 @@ void CR2SCallModule::sendToDispatcher(TUniNetMsgName msgName,
 }
 
 void CR2SCallModule::endTask_Rtc() {
-	LOG4CXX_DEBUG(logger, "endTask finished");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "endTask finished");
 	// 产生一条DIALOG——END消息，发给dispatcher，清除会话信息
 	sendToDispatcher(RTC_OK, RTC_TYPE, DIALOG_END, m_rtcCtrlMsg->clone(), NULL);
 	m_endFlag = m_endFlag | 0x2;
@@ -186,7 +182,7 @@ void CR2SCallModule::endTask_Rtc() {
 }
 
 void CR2SCallModule::endTask_Sip() {
-	LOG4CXX_DEBUG(logger, "endTask finished");
+	LOG4CXX_DEBUG(mLogger.getLogger(), "endTask finished");
 	if (m_accessMode == 1 || m_accessMode == 2) {
 		CUserMapHelper::resetCalling(m_sipName);
 	}
@@ -206,9 +202,9 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 		m_dispatcherAddr = msg->oAddr;
 		m_isDispatcherAddrSet = TRUE;
 	}
-	LOG4CXX_DEBUG(logger, "procMsg: RTC current state: "<< m_rtcContext.getState().getName() << ", recv msgName "<<msg->getMsgNameStr());
-	LOG4CXX_DEBUG(logger, "procMsg: SIP current state: "<< m_sipContext.getState().getName() << ", recv msgName "<<msg->getMsgNameStr());
-	LOG4CXX_DEBUG(logger, "procMsg: recv Msg:\n"<<CTUniNetMsgHelper::toString(msg));
+	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg: RTC current state: "<< m_rtcContext.getState().getName() << ", recv msgName "<<msg->getMsgNameStr());
+	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg: SIP current state: "<< m_sipContext.getState().getName() << ", recv msgName "<<msg->getMsgNameStr());
+	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg: recv Msg:\n"<<CTUniNetMsgHelper::toString(msg));
 	switch (msg->msgName) {
 	case RTC_OFFER: {
 		*m_rtcCtrlMsg = *((PTRtcCtrlMsg) msg->ctrlMsgHdr);
@@ -291,20 +287,20 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 		break;
 	}
 	default:
-		LOG4CXX_ERROR(logger, "procMsg:unknow msgName "<<msg->getMsgNameStr())
+		LOG4CXX_ERROR(mLogger.getLogger(), "procMsg:unknow msgName "<<msg->getMsgNameStr())
 		;
 		//收到非法消息,忽略.等待超时.
 		//endTask();
 		break;
 	}
-	LOG4CXX_DEBUG(logger, "after procMsg state: "<<m_rtcContext.getState().getName());
+	LOG4CXX_DEBUG(mLogger.getLogger(), "after procMsg state: "<<m_rtcContext.getState().getName());
 }
 
 //处理定时器超时,不是mcf
 void CR2SCallModule::timeOut(timer* ptimer) {
 	TimerType * myType = (TimerType *) ptimer->timer_get_userdata();
 	UINT timer_id = myType->timer_id;
-	LOG4CXX_INFO(logger, "The CR2SCallModule task received a timeout event:"<<myType->timer_id);
+	LOG4CXX_INFO(mLogger.getLogger(), "The CR2SCallModule task received a timeout event:"<<myType->timer_id);
 
 	TTimeMarkExt timerMark;
 	getTimeMarkExt(timer_id, timerMark);
@@ -324,7 +320,7 @@ void CR2SCallModule::timeOut(timer* ptimer) {
 		m_rtcContext.onTimeOut(timerMark);
 		break;
 	default:
-		LOG4CXX_ERROR(logger, "timeout, unknown Type")
+		LOG4CXX_ERROR(mLogger.getLogger(), "timeout, unknown Type")
 		;
 		break;
 	}
@@ -350,7 +346,7 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 		timer_rtc->timer_modify_internal(timerMark.timerDelay);
 		break;
 	default:
-		LOG4CXX_ERROR(logger, "timeout, unknown Type")
+		LOG4CXX_ERROR(mLogger.getLogger(), "timeout, unknown Type")
 		;
 		break;
 	}
@@ -365,7 +361,7 @@ void CR2SCallModule::stopTimer_Sip() {
 }
 
 void CR2SCallModule::onTimeOut(TTimeMarkExt timerMark) {
-	LOG4CXX_INFO(logger, "The CR2SCallModule can't handle mcf timeout event");
+	LOG4CXX_INFO(mLogger.getLogger(), "The CR2SCallModule can't handle mcf timeout event");
 }
 
 //

@@ -267,7 +267,7 @@ bool CPracticalSocket::init(string& wcsIp, int wcsPort) {
 
 
 
-	LOG4CXX_INFO(mLogger.getLogger(), "Socket initializes successfully")
+	LOG4CXX_INFO(mLogger.getLogger(), "Socket initializes successfully");
 	return true;
 }
 
