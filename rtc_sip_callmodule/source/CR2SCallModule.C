@@ -497,16 +497,19 @@ void CR2SCallModule::sendNoSdpInviteToIMS() {
 		m_sipCtrlMsg->sip_callId.number = str.c_str();
 
 		if (m_accessMode == 1 || m_accessMode == 2) {
-			m_sipCtrlMsg->from.displayname = getUserName(m_sipName);
-			printf("sipName: %s, host %s\n", m_sipName.c_str(), getHost(m_sipName));
-			if (getHost(m_sipName) != NULL) {
+
+			const char * userName = getUserName(m_sipName);
+			const char * host = getHost(m_sipName);
+			m_sipCtrlMsg->from.displayname = userName;
+			printf("sipName: %s, host %s\n", m_sipName.c_str(), host);
+
+			if ( host != NULL) {
 				printf("1\n");
 				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip",
-						getUserName(m_sipName), getHost(m_sipName), NULL);
+						userName, host, NULL);
 			} else {
-				printf("2\n");
 				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("tel",
-						getUserName(m_sipName), NULL, NULL);
+						userName, NULL, NULL);
 			}
 
 			printf("sipName: %s, host %s, %s\n", m_sipName.c_str(), getHost(m_sipName), m_sipCtrlMsg->from.url.host.c_str());

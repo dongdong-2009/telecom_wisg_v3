@@ -241,7 +241,7 @@ TSipURI CSipMsgHelper::createSipURI(const CHAR * scheme, const CHAR * userName,
 	if (userName) sipUri.username = userName;
 	if (host) sipUri.host = host;
 	if (port) sipUri.port = port;
-	printf("%s\n", host, sipUri.host.c_str());
+	printf("host %s, %s\n", host, sipUri.host.c_str());
 	return sipUri;
 }
 
