@@ -171,6 +171,17 @@ void CBearModule::sendAckToMS(TUniNetMsg * msg) {
 
 }
 
+
+void CBearModule::sendCancelToMS(){
+	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) m_MSSipCtrlMsg->clone();
+	pCtrlMsg->cseq_method = "CANCEL";
+	TSipReq * pSipReq = new TSipReq();
+	pSipReq->req_uri = pCtrlMsg->to.url;
+
+	sendMsgToDispatcher(SIP_CANCEL, SIP_TYPE, DIALOG_CONTINUE, pCtrlMsg, pSipReq);
+
+}
+
 void CBearModule::sendJoinToMS(TUniNetMsg * msg) {
 	string infoStr;
 
