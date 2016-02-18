@@ -11,10 +11,13 @@ CDialogController::~CDialogController(){
 }
 
 BOOL CDialogController::storeDialog(const string &uniqID, TMsgAddress addr){
-	pair<map<string, TMsgAddress>::iterator, bool> ret;
-	ret = m_mapDialog.insert(pair<string, TMsgAddress>(uniqID, addr));
+	m_mapDialog[uniqID] = addr;
+	return TRUE;
+
+	//pair<map<string, TMsgAddress>::iterator, bool> ret;
+	//ret = m_mapDialog.insert(pair<string, TMsgAddress>(uniqID, addr));
 	//DubugOut();
-	return ret.second;
+	//return ret.second;
 }
 
 BOOL CDialogController::getDialogAddr(const string &uniqID, TMsgAddress& addr){
@@ -34,7 +37,7 @@ BOOL CDialogController::clearDialog(const string &uniqID){
 
 
 BOOL CDialogController::storeBear(const string &uniqID, TMsgAddress addr){
-	pair<map<string, TMsgAddress>::iterator, bool> ret;
+	//pair<map<string, TMsgAddress>::iterator, bool> ret;
 	m_mapBear[uniqID] = addr;
 	return TRUE;
 	//ret = m_mapBear.insert(pair<string, TMsgAddress>(uniqID, addr));

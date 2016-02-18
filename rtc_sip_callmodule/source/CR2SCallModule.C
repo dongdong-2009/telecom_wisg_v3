@@ -410,9 +410,9 @@ void CR2SCallModule::sendAnswerToWeb(TUniNetMsg * msg) {
 	pAnswer->moreComing = false;
 	pAnswer->sdp = pResp->body;
 
-	sendToDispatcher(RTC_ANSWER, RTC_TYPE, DIALOG_CONTINUE,
+	//tell dispatcher record map of the addr
+	sendToDispatcher(RTC_ANSWER, RTC_TYPE, DIALOG_BEGIN,
 			m_rtcCtrlMsg->clone(), pAnswer);
-	//m_rtcCtrlMsg
 }
 
 void CR2SCallModule::sendErrorToWeb(int errorType) {
