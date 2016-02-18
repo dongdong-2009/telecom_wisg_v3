@@ -1275,7 +1275,7 @@ BOOL CExosipStack::onSend_SIP_ACK(PCTUniNetMsg uniMsg) {
 		ret = eXosip_call_build_ack(did, &ack);
 		if (ret != OSIP_SUCCESS) {
 			LOG4CXX_ERROR(mLogger.getLogger() ,"eXosip_call_build_ack failed: "<<ret<<
-				"\t(-6:OSIP_NOTFOUND -2:OSIP_BADPARAMETER\n");
+				"\t(-6:OSIP_NOTFOUND -2:OSIP_BADPARAMETER)\n");
 		} else {
 			// try to fix ack send failed
 			osip_via_t * via = (osip_via_t *) osip_list_get(&ack->vias, 0);
@@ -1927,10 +1927,11 @@ INT CExosipStack::getDid(RCTSipAddress from, RCTSipAddress to,
 	memset(uniqueDialogId, 0, 512);
 	__generateUniqueDialogId(uniqueDialogId, 512, from, to, callId);
 
-	//	printf("getDid %s size = %d\n", uniqueDialogId, m_map_dialogid.size());
+
 	if (FALSE == this->m_map_dialogid.get(uniqueDialogId, did)) {
 		did = -1;
 	}
+	printf("getDid %s %d\n", uniqueDialogId , did);
 
 	delete[] uniqueDialogId;
 
@@ -1958,6 +1959,11 @@ void MyMap::put(string key, INT val){
 }
 
 bool MyMap::get(string key, INT& val){
+	LOG4CXX_DEBUG(mLogger.getLogger(),"MyMap: values");
+	for(map<string, INT>::iterator it = _map.begin(); it!=_map.end(); ++it){
+		LOG4CXX_DEBUG(mLogger.getLogger(), it->first<<" => "<<it->second);
+	}
+
 	if(_map.find(key) != _map.end()){
 		val = _map[key];
 		return TRUE;

@@ -115,7 +115,6 @@ void CMsgDispatcher::handleMsgFromBear(TUniNetMsg * msg) {
 	}
 	if (msg->msgType == INT_TYPE) {
 		if (msg->dialogType == DIALOG_BEGIN) {
-			printf("unique Id %s", uniqID.c_str());
 			if (!m_pDialogCtrl->storeBear(uniqID, msg->oAddr)) {
 				LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
 			}
