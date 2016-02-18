@@ -191,10 +191,8 @@ CMessageXmlParse::~CMessageXmlParse() {
 
 bool CMessageXmlParse::getResult(string &result) {
 	map<string, string> attr;
-	printf("8\n");
 	if (this->queryNodeAttribute("result", attr)) {
 
-		printf("7\n");
 		if (attr.find("response") != attr.end()) {
 			result = attr["response"];
 			printf("result %s\n", result.c_str());

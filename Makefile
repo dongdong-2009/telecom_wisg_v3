@@ -194,8 +194,8 @@ compilebearsm:
 
 OBJS_BEAR = ./bear/source/CBearModule_sm.o \
 	./bear/source/CBearModule.o
-bear_module: $(OBJS_BEAR)
-	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/bear_module.so $(OBJS_BEAR) -L$(DEPLOY_DIR) $(LIBS) -lsipmsgdef 
+bear_module: $(OBJ_XML_PARSE) $(OBJS_BEAR)
+	$(CXX) -shared -fPIC -o $(OUTPUT_DIR)/bear_module.so $(OBJ_XML_PARSE) $(OBJS_BEAR) -L$(DEPLOY_DIR) $(LIBS) -lsipmsgdef 
 	@echo "**************Finsh making bear_module.so**********************"
 clean.bear_module:
 	rm -f $(OBJS_BEAR) $(OUTPUT_DIR)/bear_module.so
