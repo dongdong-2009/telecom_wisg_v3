@@ -204,7 +204,7 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 	}
 	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg: RTC current state: "<< m_rtcContext.getState().getName() << ", recv msgName "<<msg->getMsgNameStr());
 	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg: SIP current state: "<< m_sipContext.getState().getName() << ", recv msgName "<<msg->getMsgNameStr());
-	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg: recv Msg:\n"<<CTUniNetMsgHelper::toString(msg));
+	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg: recv Msg: \n"<<CTUniNetMsgHelper::toString(msg));
 	switch (msg->msgName) {
 	case RTC_OFFER: {
 		*m_rtcCtrlMsg = *((PTRtcCtrlMsg) msg->ctrlMsgHdr);
