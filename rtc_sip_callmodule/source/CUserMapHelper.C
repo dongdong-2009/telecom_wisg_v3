@@ -43,7 +43,7 @@ void CUserMapHelper::resetCalling(string& sipname)
 {
 	CHAR pcSQLStatement[512];
 	
-	sprintf(pcSQLStatement,"UPDATE user_map_table SET isCalling = 0 WHERE sipname = '%s'", sipname.c_str());
+	sprintf(pcSQLStatement,"UPDATE user_map_table SET isCalling = 0, lastUsedTime=NOW() WHERE sipname = '%s'", sipname.c_str());
 	//printf("#####RESET: %s", sipname.c_str());
 	CDB::instance()->execSQL(pcSQLStatement);
 	return;

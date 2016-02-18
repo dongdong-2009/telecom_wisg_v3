@@ -294,6 +294,7 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 		break;
 	}
 	LOG4CXX_DEBUG(mLogger.getLogger(), "after procMsg state: "<<m_rtcContext.getState().getName());
+	LOG4CXX_DEBUG(mLogger.getLogger(), "after procMsg state: "<< m_sipContext.getState().getName());
 }
 
 //处理定时器超时,不是mcf
@@ -497,6 +498,7 @@ void CR2SCallModule::sendNoSdpInviteToIMS() {
 
 		if (m_accessMode == 1 || m_accessMode == 2) {
 			m_sipCtrlMsg->from.displayname = getUserName(m_sipName);
+			printf("sipName: %s, host %s\n", m_sipName.c_str(), getHost(m_sipName));
 			if (getHost(m_sipName) != NULL) {
 				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip",
 						getUserName(m_sipName), getHost(m_sipName), NULL);
