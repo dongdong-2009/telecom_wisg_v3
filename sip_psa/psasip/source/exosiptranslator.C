@@ -99,7 +99,7 @@ osip_message_t* convertMCF2CtrlMsg(PCTSipCtrlMsg pCtrlMsg, osip_message_t *sip)
 
 	sip->from = from;
 //	sip->to = to;
-	printf("sip->from %s %s\n", sip->from->url->scheme, sip->from->url->username);
+//	printf("sip->from %s %s\n", sip->from->url->scheme, sip->from->url->username);
 
 	// TODO: via
 
@@ -184,7 +184,7 @@ RTSipReq convertOsipReq2MCF(osip_message_t *req, RTSipReq mcfReq)
 osip_message_t* convertMCF2OsipReq(RCTSipReq mcfReq, osip_message_t *req)
 {
 	//convertMCF2OsipUri(mcfReq.req_uri, req->req_uri);
-	printf("req->req_uri %s %s\n", req->req_uri->scheme, req->req_uri->username);
+//	printf("req->req_uri %s %s\n", req->req_uri->scheme, req->req_uri->username);
 	// body and content type
 	if (mcfReq.body.content_length > 0)
 	{
@@ -284,7 +284,6 @@ RTSipAddress convertOsipFrom2MCF(osip_from_t * osipFrom, RTSipAddress mcfFrom)
 {
 	osip_uri_t *fromurl = osip_from_get_url(osipFrom);
 	
-	printf("from \n");
 	// Process URI
 	convertOsipUri2MCF(fromurl, mcfFrom.url);
 
@@ -372,7 +371,7 @@ RTSipURI convertOsipUri2MCF(osip_uri_t *osipUri, RTSipURI mcfSipUri)
 	
 	}
 	else{
-		printf("ERR: no scheme!!!\n");
+		//printf("ERR: no scheme!!!\n");
 
 	}
 
@@ -383,7 +382,7 @@ osip_uri_t* convertMCF2OsipUri(RCTSipURI mcfSipUri, osip_uri_t *osipUri)
 {
 	osip_free(osipUri->scheme);
 
-	printf("osipUri %s %s\n", mcfSipUri.scheme.c_str(), mcfSipUri.username.c_str());
+	//printf("osipUri %s %s\n", mcfSipUri.scheme.c_str(), mcfSipUri.username.c_str());
 	osip_uri_set_scheme(osipUri, NULL);
 	if (mcfSipUri.scheme.length() > 0)
 		{ osip_uri_set_scheme(osipUri, osip_strdup(mcfSipUri.scheme.c_str())); }
@@ -408,7 +407,7 @@ osip_uri_t* convertMCF2OsipUri(RCTSipURI mcfSipUri, osip_uri_t *osipUri)
 	if (mcfSipUri.port.length() > 0)
 		{ osip_uri_set_port(osipUri, osip_strdup(mcfSipUri.port.c_str())); }
 	
-	printf("osipUri %s %s\n", osipUri->scheme, osipUri->username);
+	//printf("osipUri %s %s\n", osipUri->scheme, osipUri->username);
 	return osipUri;
 }
 
@@ -497,7 +496,7 @@ RTSipBody convertOsipBody2MCF(osip_body_t *sipBody, RTSipBody mcfBody)
 
 	// content
 	mcfBody.content = sipBody->body;
-	printf("sip-body: %s\n", sipBody->body);
+//	printf("sip-body: %s\n", sipBody->body);
 
 	return mcfBody;
 }

@@ -810,6 +810,7 @@ void CR2SCallModule::handleUnexpectedMsg(TUniNetMsg * msg) {
 }
 
 bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
+	m_isSdpConfirmed = true;
 	//set ims rtc body
 	return true;
 }

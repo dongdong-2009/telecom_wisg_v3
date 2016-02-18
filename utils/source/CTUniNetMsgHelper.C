@@ -35,7 +35,7 @@ void CTUniNetMsgHelper::print(TUniNetMsg * msg){
 	ostrstream st;
 	msg->print(st);
 
-	printf("%s\n",st.str());
+	//printf("%s\n",st.str());
 	//print("%s",st.str());
 	//term("%s",st.str());
 	st.freeze(0);
