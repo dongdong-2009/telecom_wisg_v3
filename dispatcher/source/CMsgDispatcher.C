@@ -175,7 +175,7 @@ void CMsgDispatcher::handleMsgFromSipPSA(TUniNetMsg* msg) {
 
 void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 	//call module调用endTask时发送过来，不用再转发
-	//LOG4CXX_DEBUG(mLogger.getLogger(), "handleMsgFromRtcSipCall recv Msg:\n"<<CTUniNetMsgHelper::toString(msg));
+	LOG4CXX_DEBUG(mLogger.getLogger(), "handleMsgFromRtcSipCall\n");
 	string uniqID;
 	switch (msg->msgType) {
 	case SIP_TYPE:
@@ -206,6 +206,7 @@ void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 		return;
 	}
 
+	printf("1\n");
 	if (msg->msgType == INT_TYPE) {
 		TMsgAddress tAddr;
 		if (m_pDialogCtrl->getBearAddr(uniqID, tAddr)) {
@@ -216,6 +217,7 @@ void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 			tAddr.logAddr = LOGADDR_BEAR_MOD;
 			tAddr.phyAddr = 0;
 			tAddr.taskInstID = 0;
+			printf("2\n");
 			sendMsgtoInstance(msg, tAddr, DIALOG_BEGIN);
 			return;
 		} else {
