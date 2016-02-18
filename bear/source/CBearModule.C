@@ -110,7 +110,7 @@ void CBearModule::procMsg(PTUniNetMsg msg) {
 	LOG4CXX_DEBUG(mLogger.getLogger(), "procMsg: recv Msg:\n"
 			<< CTUniNetMsgHelper::toString(msg));
 	switch (msg->msgName) {
-	case INTERNAL_REQUEST:
+	case INT_REQUEST:
 		*m_IntCtrlMsg = *((PTIntCtrlMsg) msg->ctrlMsgHdr);
 		swap(m_IntCtrlMsg->from, m_IntCtrlMsg->to);
 		m_fsmContext.onSdpRequest(msg);
