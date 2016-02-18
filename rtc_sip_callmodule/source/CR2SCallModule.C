@@ -97,6 +97,16 @@ CR2SCallModule::~CR2SCallModule() {
 		m_rtcCtrlMsg = NULL;
 	}
 
+	if(m_intCtrlMsg_Rtc){
+		delete m_intCtrlMsg_Rtc;
+		m_intCtrlMsg_Rtc = NULL;
+	}
+
+	if(m_intCtrlMsg_Sip){
+		delete m_intCtrlMsg_Sip;
+		m_intCtrlMsg_Sip = NULL;
+	}
+
 	my_timers->timers_poll_deactive();//终止定时器
 
 	delete timerType_rtc;
@@ -644,6 +654,7 @@ void CR2SCallModule::sendByeToIMS() {
 //void sendCloseToBear_Sip();
 void CR2SCallModule::sendReqToBear_Sip() {
 	if (m_intCtrlMsg_Sip == NULL) {
+		m_intCtrlMsg_Sip = new TIntCtrlMsg();
 		m_intCtrlMsg_Sip->from = "sip_call";
 		m_intCtrlMsg_Sip->to = "bear";
 		CHAR buf[33];
