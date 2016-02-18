@@ -218,7 +218,7 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 		str += buf;
 		m_rtcCtrlMsg->answerSessionId = str.c_str();
 		swap(m_rtcCtrlMsg->from, m_rtcCtrlMsg->to);
-
+		LOG4CXX_DEBUG(mLogger.getLogger(),"rtcContext onOffer");
 		m_rtcContext.onOffer(msg);
 		break;
 	}
