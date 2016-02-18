@@ -33,17 +33,17 @@ private:
 
 
 	void sendMsgtoInstance(TUniNetMsg* msg, TMsgAddress instAddr, TDialogType dialogtype);
-	inline char* generateSipUniqID(TUniNetMsg* msg)
+	inline string generateSipUniqID(TUniNetMsg* msg)
 	{
 		TSipCtrlMsg* pSipCtrl = (TSipCtrlMsg*) (msg->ctrlMsgHdr);
 		return pSipCtrl->sip_callId.number.c_str();
 	}
-	inline char* generateRtcUniqID(TUniNetMsg* msg){
+	inline string generateRtcUniqID(TUniNetMsg* msg){
 		PTRtcCtrlMsg pCtrl = (PTRtcCtrlMsg) msg->ctrlMsgHdr;
 		return pCtrl->offerSessionId.c_str();
 	}
 
-	inline char* generateIntUniqID(TUniNetMsg* msg){
+	inline string generateIntUniqID(TUniNetMsg* msg){
 		PTIntCtrlMsg pCtrl = (PTIntCtrlMsg) msg->ctrlMsgHdr;
 		return pCtrl->sessionId.c_str();
 	}
