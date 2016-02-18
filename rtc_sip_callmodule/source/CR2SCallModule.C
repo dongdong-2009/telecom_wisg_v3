@@ -276,6 +276,7 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 	}
 
 	case SIP_RESPONSE: {
+		m_sipCtrlMsg->via = ((PTSipCtrlMsg) msg->ctrlMsgHdr)->via;
 		m_sipContext.onResponse(msg);
 		break;
 	}
