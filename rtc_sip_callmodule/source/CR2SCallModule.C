@@ -500,12 +500,16 @@ void CR2SCallModule::sendNoSdpInviteToIMS() {
 			m_sipCtrlMsg->from.displayname = getUserName(m_sipName);
 			printf("sipName: %s, host %s\n", m_sipName.c_str(), getHost(m_sipName));
 			if (getHost(m_sipName) != NULL) {
+				printf("1\n");
 				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip",
 						getUserName(m_sipName), getHost(m_sipName), NULL);
 			} else {
+				printf("2\n");
 				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("tel",
 						getUserName(m_sipName), NULL, NULL);
 			}
+
+			printf("sipName: %s, host %s, %s\n", m_sipName.c_str(), getHost(m_sipName), m_sipCtrlMsg->from.url.host.c_str());
 		} else {
 			string from = m_rtcCtrlMsg->to.c_str();
 			m_sipCtrlMsg->from.displayname = getUserName(from);
