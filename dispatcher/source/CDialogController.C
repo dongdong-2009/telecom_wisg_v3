@@ -44,6 +44,7 @@ BOOL CDialogController::getBearAddr(const string &uniqID, TMsgAddress& addr){
 	//DubugOut();
 	map<string, TMsgAddress>::iterator it = m_mapDialog.find(uniqID);
 	if(it != m_mapBear.end()){
+		printf("4\n");
 		addr = it->second;
 		return TRUE;
 	}

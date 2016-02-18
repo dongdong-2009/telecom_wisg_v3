@@ -1533,7 +1533,7 @@ BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
 	size_t len;
 	osip_message_to_str(invite, &buf, &len);
 
-	LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send invite: \n%s"<<buf);
+	LOG4CXX_DEBUG(mLogger.getLogger(), "SIPPSA send invite: \n"<<buf);
 	osip_free(buf);
 
 	eXosip_lock();

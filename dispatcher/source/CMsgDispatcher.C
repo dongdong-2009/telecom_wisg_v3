@@ -208,8 +208,10 @@ void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 
 	printf("1\n");
 	if (msg->msgType == INT_TYPE) {
+		printf("3\n");
 		TMsgAddress tAddr;
 		if (m_pDialogCtrl->getBearAddr(uniqID, tAddr)) {
+			printf("5\n");
 			sendMsgtoInstance(msg, tAddr, DIALOG_CONTINUE);
 		} else if (msg->msgName == INT_REQUEST) {
 			//发送给BEAR模块
