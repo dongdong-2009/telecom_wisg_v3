@@ -971,15 +971,13 @@ void CExosipStack::doActive(void) {
 				this->m_map_branch_tid.put(pCtrlMsg->via.branch.c_str(), event->tid);
 			}
 
-			this->storeDid(pCtrlMsg->from, pCtrlMsg->to,
-						pCtrlMsg->sip_callId, event->did);
+			//100 trying event did = 0
+			if ( 100< event->response->status_code && 199
+					>= event->response->status_code) {
 
-//			if (100 <= event->response->status_code && 199
-//					>= event->response->status_code) {
-//				// keep did
-//
-//				this->storeDid(pCtrlMsg->from, pCtrlMsg->to,
-//						pCtrlMsg->sip_callId, event->did);
+				this->storeDid(pCtrlMsg->from, pCtrlMsg->to,
+						pCtrlMsg->sip_callId, event->did);
+			}
 				//osip_header_t * requireHd/*, * supportedHd*/;
 				/*	if(osip_message_get_supported(event->response, 0, &supportedHd) >= 0){
 				 string supportedStr = supportedHd->hvalue;
@@ -1955,7 +1953,8 @@ INT CExosipStack::getCid(RCTSipAddress from, RCTSipAddress to,
 }
 
 void MyMap::put(string key, INT val){
-	_map.insert(pair<string, INT>(key, val));
+	_map[key] = val;
+	//_map.insert(pair<string, INT>(key, val));
 }
 
 bool MyMap::get(string key, INT& val){

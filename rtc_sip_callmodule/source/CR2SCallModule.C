@@ -812,7 +812,16 @@ void CR2SCallModule::handleUnexpectedMsg(TUniNetMsg * msg) {
 
 bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 	m_isSdpConfirmed = true;
-	//set ims rtc body
+	if(msg->msgName == SIP_RESPONSE){
+		PTSipResp pResp = (PTSipResp)msg->msgBody;
+		m_imsSdp = pResp->body.content.c_str();
+	}
+	else if(msg->msgName == SIP_UPDATE){
+		PTSipUpdate pUpdate = (PTSipUpdate) msg->msgBody;
+		m_imsSdp = pUpdate->body.content.c_str();
+	}
+
+	//compare with m_webBody
 	return true;
 }
 bool CR2SCallModule::compSdpWithOld(TUniNetMsg * msg) {
