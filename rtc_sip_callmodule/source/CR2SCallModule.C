@@ -457,6 +457,7 @@ bool CR2SCallModule::isSdpConfirmed() {
 
 void CR2SCallModule::sendReqToBear_Rtc() {
 	if (m_intCtrlMsg_Rtc == NULL) {
+		m_intCtrlMsg_Rtc = new TIntCtrlMsg();
 		m_intCtrlMsg_Rtc->from = "rtc_call";
 		m_intCtrlMsg_Rtc->to = "bear";
 		CHAR buf[33];
