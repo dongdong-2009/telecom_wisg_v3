@@ -81,6 +81,20 @@ CBearModule::CBearModule(PCGFSM afsm) :
 	}
 }
 
+
+CBearModule::~CBearModule(){
+	if(m_IntCtrlMsg){
+		delete m_IntCtrlMsg;
+		m_IntCtrlMsg = NULL;
+	}
+	if(m_MSSipCtrlMsg){
+		delete m_MSSipCtrlMsg;
+		m_MSSipCtrlMsg = NULL;
+	}
+
+}
+
+
 PTUACData CBearModule::createData() {
 	return new TUACData();
 }
