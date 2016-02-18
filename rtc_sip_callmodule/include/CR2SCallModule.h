@@ -168,8 +168,8 @@ public:
 	bool compSdpWithOld(TUniNetMsg * msg);
 	string checkRespCseqMothod(TUniNetMsg * msg);
 
-	const char * getUserName(const string& user);
-	const char * getHost(const string& user);
+	string getUserName(const string& user);
+	string getHost(const string& user);
 
 	inline void setUACTag(TUniNetMsg * msg){
 		m_sipCtrlMsg->to.tag = ((PTSipCtrlMsg) msg->ctrlMsgHdr)->to.tag;

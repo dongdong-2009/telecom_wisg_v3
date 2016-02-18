@@ -26,7 +26,8 @@
 #define MSGHELPER_SIP_H_
 
 #include "psa_sip_inf.h"
-
+#include <string>
+using namespace std;
 _CLASSDEF(CSipMsgHelper);
 class CSipMsgHelper
 {
@@ -35,8 +36,8 @@ public:
 	static UINT generateRandomNumberUINT();
 	static void generateRandomNumberStr(CHAR buf[33]);
 
-	static TSipURI createSipURI(const CHAR *  scheme, const CHAR *  userName,
-			const CHAR *  host, const CHAR *  port);
+	static TSipURI createSipURI(const string &  scheme, const string &  userName,
+			const string & host, const string &  port);
 	static TSipContentType createSipContentType(const CHAR* type, const CHAR* subtype);
 
 	static TSipBody createSipBody(CVarChar content);

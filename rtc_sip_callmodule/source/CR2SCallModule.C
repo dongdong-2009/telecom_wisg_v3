@@ -472,28 +472,26 @@ void CR2SCallModule::sendCloseToBear_Rtc() {
 	}
 }
 
-const char * CR2SCallModule::getUserName(const string& user) {
+string CR2SCallModule::getUserName(const string& user) {
 
 	int i = user.find('@');
 	if (i != -1){
 		//return user.substr(0, i).c_str();
-		string tmp = user.substr(0,i);
-		return tmp.c_str();
-
+		return user.substr(0,i);
+		//return tmp.c_str();
 	}
 	else
 		return user.c_str();
 }
 
-const char * CR2SCallModule::getHost(const string& user) {
+string CR2SCallModule::getHost(const string& user) {
 	int i = user.find('@');
 	if (i != -1){
 		//return user.substr(i + 1).c_str();
-		string tmp = user.substr(i+1);
-		return tmp.c_str();
+		return user.substr(i+1);
 	}
 	else
-		return NULL;
+		return "";
 }
 
 void CR2SCallModule::sendNoSdpInviteToIMS() {
@@ -504,35 +502,33 @@ void CR2SCallModule::sendNoSdpInviteToIMS() {
 		m_sipCtrlMsg->sip_callId.number = str.c_str();
 
 		if (m_accessMode == 1 || m_accessMode == 2) {
-			const char * userName = getUserName(m_sipName);
-			const char * host = getHost(m_sipName);
-			m_sipCtrlMsg->from.displayname = userName;
-			printf("userName: %s, host %s\n", userName, host);
+			string userName = getUserName(m_sipName);
+			string host = getHost(m_sipName);
+			m_sipCtrlMsg->from.displayname = userName.c_str();
+			//printf("userName: %s, host %s\n", userName, host);
 
-			if ( host != NULL) {
-				printf("1\n");
+			if (!host.empty()) {
 				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip",
-						userName, host, NULL);
+						userName, host, string(""));
 			} else {
-				printf("2\n");
 				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("tel",
-						userName, NULL, NULL);
+						userName, string(""), string(""));
 			}
 
 			//printf("sipName: %s, host %s, %s\n", m_sipName.c_str(), getHost(m_sipName), m_sipCtrlMsg->from.url.host.c_str());
 		} else {
 			string from = m_rtcCtrlMsg->to.c_str();
-			m_sipCtrlMsg->from.displayname = getUserName(from);
+			m_sipCtrlMsg->from.displayname = getUserName(from).c_str();
 			m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip",
-					getUserName(from), getHost(from), NULL);
+					getUserName(from), getHost(from), string(""));
 		}
 
 		m_sipCtrlMsg->from.tag = m_rtcCtrlMsg->offerSessionId;
 
 		string toStr = m_rtcCtrlMsg->from.c_str();
-		m_sipCtrlMsg->to.displayname = getUserName(toStr);
+		m_sipCtrlMsg->to.displayname = getUserName(toStr).c_str();
 		m_sipCtrlMsg->to.url = CSipMsgHelper::createSipURI("tel", getUserName(
-				toStr), NULL, NULL);//tel后不能有域名
+				toStr), string(""), string(""));//tel后不能有域名
 	}
 
 	//协议栈自动添加
