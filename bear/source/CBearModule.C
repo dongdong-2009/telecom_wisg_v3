@@ -240,7 +240,7 @@ void CBearModule::sendSdpAnswerToCall(TUniNetMsg * msg) {
 	PTIntResponse pResp = new TIntResponse();
 	pResp->body = ((PTSipResp) msg->msgBody)->body.content;
 
-	sendMsgToDispatcher(INTERNAL_RESPONSE, SIP_TYPE, DIALOG_BEGIN, pCtrlMsg,
+	sendMsgToDispatcher(INT_RESPONSE, SIP_TYPE, DIALOG_BEGIN, pCtrlMsg,
 			pResp);
 }
 
@@ -249,14 +249,14 @@ void CBearModule::sendErrorToCall(const int errorType) {
 	PTIntError pError = new TIntError();
 	pError->errorType = errorType;
 
-	sendMsgToDispatcher(INTERNAL_ERROR, INT_TYPE, DIALOG_CONTINUE, pCtrlMsg,
+	sendMsgToDispatcher(INT_ERROR, INT_TYPE, DIALOG_CONTINUE, pCtrlMsg,
 			pError);
 }
 
 void CBearModule::sendCloseToCall() {
 	PTIntCtrlMsg pCtrlMsg = (PTIntCtrlMsg) m_IntCtrlMsg->clone();
 
-	sendMsgToDispatcher(INTERNAL_CLOSE, INT_TYPE, DIALOG_CONTINUE, pCtrlMsg,
+	sendMsgToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_CONTINUE, pCtrlMsg,
 			NULL);
 }
 
