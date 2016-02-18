@@ -1,12 +1,14 @@
 #include "CBearModule.h"
 #include "MyLogger.h"
+
+
+CLONE_COMP( CBearModule)
+CREATE_COMP( CBearModule)
+
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
 static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
-
-CLONE_COMP( CBearModule)
-CREATE_COMP( CBearModule)
 
 CBearModule::CBearModule(PCGFSM afsm) :
 	CUACSTask(afsm), m_fsmContext(*this) {

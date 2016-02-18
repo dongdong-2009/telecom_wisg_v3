@@ -216,7 +216,6 @@ void CMsgDispatcher::handleMsgFromRtcSipCall(TUniNetMsg* msg) {
 			tAddr.logAddr = LOGADDR_BEAR_MOD;
 			tAddr.phyAddr = 0;
 			tAddr.taskInstID = 0;
-			printf("2\n");
 			sendMsgtoInstance(msg, tAddr, DIALOG_BEGIN);
 			return;
 		} else {

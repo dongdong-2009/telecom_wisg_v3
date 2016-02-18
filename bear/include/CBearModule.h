@@ -15,7 +15,6 @@ _DECLARE_CREATE_COMP(CBearModule)
 //注意下面仅仅是定时器ID，不是超时时间 在timer.cfg配置其具体信息:名字,时延,重发次数等
 const int BEAR_200OK_TIMEOUT = 40;
 
-
 class CBearModule: public CUACSTask {
 public:
 	CBearModule(PCGFSM afsm);
