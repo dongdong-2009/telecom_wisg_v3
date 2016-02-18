@@ -561,11 +561,11 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onSdpAnswer(CSipTermCallContext& cont
         ctxt.stopTimer_Sip();
         ctxt.sendPrackToIMS(msg);
         ctxt.setTimer(SIP_200OK_TIMEOUT);
-        context.setState(CSipTermCallState::BEAR_CONFIRMED);
+        context.setState(CSipTermCallState::BEAR_CONFIRMING);
     }
     catch (...)
     {
-        context.setState(CSipTermCallState::BEAR_CONFIRMED);
+        context.setState(CSipTermCallState::BEAR_CONFIRMING);
         throw;
     }
     (context.getState()).Entry(context);

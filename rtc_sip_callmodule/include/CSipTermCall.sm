@@ -137,7 +137,7 @@ CALLPROC
 BEAR_GATEWAY_READY
 {
 	onSdpAnswer(msg:TUniNetMsg*)   	
-	BEAR_CONFIRMED
+	BEAR_CONFIRMING
 	{//收到来自bear的SDP
 		stopTimer_Sip();
 		sendPrackToIMS(msg);
