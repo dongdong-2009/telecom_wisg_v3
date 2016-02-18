@@ -475,16 +475,23 @@ void CR2SCallModule::sendCloseToBear_Rtc() {
 const char * CR2SCallModule::getUserName(const string& user) {
 
 	int i = user.find('@');
-	if (i != -1)
-		return user.substr(0, i).c_str();
+	if (i != -1){
+		//return user.substr(0, i).c_str();
+		string tmp = user.substr(0,i);
+		return tmp.c_str();
+
+	}
 	else
 		return user.c_str();
 }
 
 const char * CR2SCallModule::getHost(const string& user) {
 	int i = user.find('@');
-	if (i != -1)
-		return user.substr(i + 1).c_str();
+	if (i != -1){
+		//return user.substr(i + 1).c_str();
+		string tmp = user.substr(i+1);
+		return tmp.c_str();
+	}
 	else
 		return NULL;
 }
@@ -498,20 +505,21 @@ void CR2SCallModule::sendNoSdpInviteToIMS() {
 
 		if (m_accessMode == 1 || m_accessMode == 2) {
 			const char * userName = getUserName(m_sipName);
-			m_sipCtrlMsg->from.displayname = userName;
 			const char * host = getHost(m_sipName);
-			printf("sipName: %s, userName %s, host %s\n", m_sipName.c_str(), userName, host);
+			m_sipCtrlMsg->from.displayname = userName;
+			printf("userName: %s, host %s\n", userName, host);
 
 			if ( host != NULL) {
 				printf("1\n");
 				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("sip",
 						userName, host, NULL);
 			} else {
+				printf("2\n");
 				m_sipCtrlMsg->from.url = CSipMsgHelper::createSipURI("tel",
 						userName, NULL, NULL);
 			}
 
-			printf("sipName: %s, host %s, %s\n", m_sipName.c_str(), getHost(m_sipName), m_sipCtrlMsg->from.url.host.c_str());
+			//printf("sipName: %s, host %s, %s\n", m_sipName.c_str(), getHost(m_sipName), m_sipCtrlMsg->from.url.host.c_str());
 		} else {
 			string from = m_rtcCtrlMsg->to.c_str();
 			m_sipCtrlMsg->from.displayname = getUserName(from);
