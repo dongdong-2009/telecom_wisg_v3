@@ -218,9 +218,9 @@ void CBearModule::sendJoinToMS(TUniNetMsg * msg) {
 
 	string infoStr;
 
-	string connId1 = ((PTIntJoin) msg->msgBody)->connId1;
+	string connId1 = ((PTIntJoin) msg->msgBody)->connId1.c_str();
 	//string
-	string connId2 = ((PTIntJoin) msg->msgBody)->connId2;
+	string connId2 = ((PTIntJoin) msg->msgBody)->connId2.c_str();
 	LOG4CXX_DEBUG(mLogger.getLogger(), "sendJoinToMS:: connId1="<<connId1<<" connId2="<<connId2);
 
 	m_parser = new CMessageXmlParse();

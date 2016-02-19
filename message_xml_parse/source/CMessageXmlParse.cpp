@@ -435,7 +435,7 @@ string CMessageXmlParse::createConfJoinXml(string& connId, string& confId) {
 //		return ret;
 }
 
-string CMessageXmlParse::createConfModifyXml(string& confId, int partiesNum) {
+string CMessageXmlParse::createConfModifyXml(string confId, int partiesNum) {
 
 	string str;
 	if (partiesNum == 3) {
@@ -453,7 +453,7 @@ string CMessageXmlParse::createConfModifyXml(string& confId, int partiesNum) {
 
 }
 
-string CMessageXmlParse::create3PartiesXml(string& confId) {
+string CMessageXmlParse::create3PartiesXml(string confId) {
 	TiXmlDocument* tDoc = new TiXmlDocument;
 	if (NULL == tDoc) {
 		exit(1);

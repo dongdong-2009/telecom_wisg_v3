@@ -55,7 +55,7 @@ public:
 
 	std::string createMessageXml(std::string targetId, std::string type, std::string src);
 	std::string createConfCreateXml();
-	std::string createConfJoinXml(std::string connId, std::string confId);
+	std::string createConfJoinXml(std::string& connId, std::string& confId);
 	std::string createConfModifyXml(std::string confId, int partiesNum);
 
 	std::string createFastUpdateXml();
