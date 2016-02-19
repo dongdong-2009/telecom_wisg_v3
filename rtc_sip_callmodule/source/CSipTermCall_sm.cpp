@@ -559,6 +559,7 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onSdpAnswer(CSipTermCallContext& cont
     try
     {
         ctxt.stopTimer_Sip();
+        ctxt.setIMSConnId(msg);
         ctxt.sendPrackToIMS(msg);
         ctxt.setTimer(SIP_200OK_TIMEOUT);
         context.setState(CSipTermCallState::BEAR_CONFIRMING);
@@ -1036,6 +1037,7 @@ void CSipTermCallState_BEAR_CLIENT_READY::onSdpAnswer(CSipTermCallContext& conte
     try
     {
         ctxt.stopTimer_Sip();
+
         ctxt.sendAckToIMS(msg);
         context.setState(CSipTermCallState::ACTIVE);
     }

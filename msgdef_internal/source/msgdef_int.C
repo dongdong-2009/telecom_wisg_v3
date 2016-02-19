@@ -192,17 +192,89 @@ void TIntRequest::print(ostrstream& st)
 }
 
 /////////////////////////////////////////////
+//           for class TIntJoin
+/////////////////////////////////////////////
+PTMsgBody TIntJoin::clone()
+{
+	PTIntJoin amsg = new TIntJoin();
+	amsg->connId1                       = connId1;
+	amsg->connId2                       = connId2;
+	return amsg;
+}
+TIntJoin& TIntJoin::operator=(const TIntJoin &r)
+{
+	connId1                       = r.connId1;
+	connId2                       = r.connId2;
+	return *this;
+}
+
+BOOL TIntJoin::operator == (TMsgPara& msg)
+{
+	COMPARE_MSG_BEGIN(TIntJoin,msg)
+
+	COMPARE_FORCE_VCHAR(TIntJoin,connId1)
+	COMPARE_FORCE_VCHAR(TIntJoin,connId2)
+
+	COMPARE_END
+}
+
+INT TIntJoin::size()
+{
+	INT tmpSize = 0;
+
+	tmpSize += connId1.size();
+	tmpSize += connId2.size();
+
+	return tmpSize;
+}
+
+INT TIntJoin::encode(CHAR* &buf)
+{
+	connId1.encode(buf);
+	connId2.encode(buf);
+
+	return size();
+}
+
+INT TIntJoin::decode(CHAR* &buf)
+{
+	connId1.decode(buf);
+	connId2.decode(buf);
+
+	return size();
+}
+
+BOOL TIntJoin::decodeFromXML(TiXmlHandle& xmlParser,PCGFSM fsm)
+{
+	FILL_FIELD_BEGIN
+
+	FILL_FORCE_VCHAR(TIntJoin,connId1)
+	FILL_FORCE_VCHAR(TIntJoin,connId2)
+
+	FILL_FIELD_END
+}
+
+void TIntJoin::print(ostrstream& st)
+{
+	st<<"==| TIntJoin =="<<endl;
+	st<<"$connId1                         = "<<connId1.GetVarCharContentPoint()<<endl;
+	st<<"$connId2                         = "<<connId2.GetVarCharContentPoint()<<endl;
+}
+
+/////////////////////////////////////////////
 //           for class TIntResponse
 /////////////////////////////////////////////
 PTMsgBody TIntResponse::clone()
 {
 	PTIntResponse amsg = new TIntResponse();
 	amsg->body                       = body;
+	amsg->connId                       = connId;
 	return amsg;
 }
 TIntResponse& TIntResponse::operator=(const TIntResponse &r)
 {
 	body                       = r.body;
+	connId                       = r.connId;
 	return *this;
 }
 
@@ -211,6 +283,7 @@ BOOL TIntResponse::operator == (TMsgPara& msg)
 	COMPARE_MSG_BEGIN(TIntResponse,msg)
 
 	COMPARE_FORCE_VCHAR(TIntResponse,body)
+	COMPARE_FORCE_VCHAR(TIntResponse,connId)
 
 	COMPARE_END
 }
@@ -220,6 +293,7 @@ INT TIntResponse::size()
 	INT tmpSize = 0;
 
 	tmpSize += body.size();
+	tmpSize += connId.size();
 
 	return tmpSize;
 }
@@ -227,6 +301,8 @@ INT TIntResponse::size()
 INT TIntResponse::encode(CHAR* &buf)
 {
 	body.encode(buf);
+	connId.encode(buf);
+
 
 	return size();
 }
@@ -234,7 +310,7 @@ INT TIntResponse::encode(CHAR* &buf)
 INT TIntResponse::decode(CHAR* &buf)
 {
 	body.decode(buf);
-
+	connId.decode(buf);
 	return size();
 }
 
@@ -243,6 +319,8 @@ BOOL TIntResponse::decodeFromXML(TiXmlHandle& xmlParser,PCGFSM fsm)
 	FILL_FIELD_BEGIN
 
 	FILL_FORCE_VCHAR(TIntResponse,body)
+	FILL_FORCE_VCHAR(TIntResponse,connId)
+
 
 	FILL_FIELD_END
 }
@@ -250,6 +328,7 @@ BOOL TIntResponse::decodeFromXML(TiXmlHandle& xmlParser,PCGFSM fsm)
 void TIntResponse::print(ostrstream& st)
 {
 	st<<"==| TIntResponse =="<<endl;
+	st<<"$connId                         = "<<connId.GetVarCharContentPoint()<<endl;
 	st<<"$body                         = "<<body.GetVarCharContentPoint()<<endl;
 
 }

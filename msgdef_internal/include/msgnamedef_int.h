@@ -12,5 +12,7 @@ const TUniNetMsgName INT_ERROR = 1073;
 
 const TUniNetMsgName INT_CLOSE = 1074;
 
+const TUniNetMsgName INT_JOIN = 1075;
+
 
 #endif

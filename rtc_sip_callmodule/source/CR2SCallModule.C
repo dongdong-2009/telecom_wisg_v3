@@ -61,7 +61,9 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	m_sipCtrlMsg = NULL;
 	m_sdpModifyFlag = 0;
 
+	m_joinFlag = 0;
 	m_endFlag = 0;
+	m_joinSend = false;
 
 	/**
 	 * 设置定时器，因为MCF一个task只支持一个定时器，下面采用第三方的定时器，自定义
@@ -484,6 +486,16 @@ void CR2SCallModule::sendCloseToBear_Rtc() {
 	}
 }
 
+
+void CR2SCallModule::sendJoinToBear_Rtc(){
+	if (m_intCtrlMsg_Rtc != NULL) {
+		PTIntJoin pJoin = new TIntJoin();
+		pJoin->connId1 = m_imsConnId;
+		pJoin->connId2 = m_webConnId;
+		sendToDispatcher(INT_JOIN, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Rtc->clone(), pJoin);
+	}
+}
+
 string CR2SCallModule::getUserName(const string& user) {
 
 	int i = user.find('@');
@@ -828,7 +840,6 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 bool CR2SCallModule::compSdpWithOld(TUniNetMsg * msg) {
 	//set ims rtc body
 
-
 	return true;
 }
 
@@ -838,3 +849,24 @@ string CR2SCallModule::checkRespCseqMothod(TUniNetMsg * msg) {
 	return ctrlMsg->cseq_method.c_str();
 }
 
+void CR2SCallModule::setIMSConnId(TUniNetMsg * msg){
+	PTIntResponse pResp = (PTIntResponse) msg->msgBody;
+	m_imsConnId = pResp->connId;
+	m_joinFlag = m_joinFlag | 0x02;
+
+	if(!m_joinSend && (m_joinFlag & 0x03 == 0x03)){
+		sendJoinToBear_Rtc();
+		m_joinSend = true;
+	}
+}
+
+void CR2SCallModule::setWebConnId(TUniNetMsg * msg){
+	PTIntResponse pResp = (PTIntResponse) msg->msgBody;
+	m_webConnId = pResp->connId;
+	m_joinFlag = m_joinFlag | 0x01;
+
+	if(!m_joinSend && (m_joinFlag & 0x03 == 0x03)){
+		sendJoinToBear_Rtc();
+		m_joinSend = true;
+	}
+}

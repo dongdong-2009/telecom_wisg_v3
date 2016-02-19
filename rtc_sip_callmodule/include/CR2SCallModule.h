@@ -94,10 +94,16 @@ private:
 	TMsgAddress m_dispatcherAddr;
 	BOOL m_isDispatcherAddrSet;
 
+	CVarChar m_webConnId;
+	CVarChar m_imsConnId;
+
+
+
 	string m_webSdp;
 	string m_imsSdp;
 
 	string m_sipName;
+
 
 
 	TIntCtrlMsg* m_intCtrlMsg_Rtc;
@@ -119,6 +125,10 @@ private:
 
 	UINT m_endFlag;
 
+	UINT m_joinFlag;
+
+	bool m_joinSend;
+
 	bool selectSipUser(string rtcname);
 public:
 	// map rtc message to sip message
@@ -137,8 +147,11 @@ public:
 	void sendShutdownToWeb();
 	void sendNotifyToWeb(TUniNetMsg *msg);
 	bool isSdpConfirmed();
+
 	void sendReqToBear_Rtc();
 	void sendCloseToBear_Rtc();
+	void sendJoinToBear_Rtc();//just send once JOIN to bear_rtc or bear_sip is OK
+	void setWebConnId(TUniNetMsg *msg);
 
 
 	void sendNoSdpInviteToIMS();
@@ -158,6 +171,7 @@ public:
 
 	void sendReqToBear_Sip();
 	void sendCloseToBear_Sip();
+	void setIMSConnId(TUniNetMsg *msg);
 
 	bool isWithSDP(TUniNetMsg * msg);
 	bool isResp1xx(TUniNetMsg * msg);

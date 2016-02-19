@@ -74,10 +74,36 @@ class TIntRequest:public TMsgBody
 		void           print(ostrstream& st);
 };
 
+
+_CLASSDEF(TIntJoin)
+class TIntJoin:public TMsgBody
+{
+	public:
+
+		CVarChar       connId1;
+		CVarChar	   connId2;
+
+
+		inline         TIntJoin();
+
+		CHAR*          getMsgName(){ return "TIntJoin";};
+		TIntJoin       &operator=(const TIntJoin &r);
+		PTMsgBody      clone();
+		BOOL           operator == (TMsgPara&);
+
+		INT            size();
+		INT            encode(CHAR* &buf);
+		INT            decode(CHAR* &buf);
+		BOOL           decodeFromXML(TiXmlHandle& xmlParser,PCGFSM fsm);
+
+		void           print(ostrstream& st);
+};
+
 _CLASSDEF(TIntResponse)
 class TIntResponse:public TMsgBody
 {
 	public:
+		CVarChar	   connId;
 		CVarChar       body;
 
 		inline         TIntResponse();
@@ -146,6 +172,10 @@ inline TIntCtrlMsg::TIntCtrlMsg()
 
 inline TIntRequest::TIntRequest()
 {
+}
+
+inline TIntJoin::TIntJoin(){
+
 }
 
 inline TIntResponse::TIntResponse()

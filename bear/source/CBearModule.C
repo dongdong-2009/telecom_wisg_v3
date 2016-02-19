@@ -118,6 +118,9 @@ void CBearModule::procMsg(PTUniNetMsg msg) {
 	case INT_CLOSE:
 		m_fsmContext.onClose(msg);
 		break;
+	case INT_JOIN:
+		m_fsmContext.onJoin(msg);
+		break;
 	case SIP_RESPONSE:
 		m_fsmContext.onResponse(msg);
 		break;
@@ -241,6 +244,7 @@ void CBearModule::sendSdpAnswerToCall(TUniNetMsg * msg) {
 	PTIntCtrlMsg pCtrlMsg = (PTIntCtrlMsg) m_IntCtrlMsg->clone();
 
 	PTIntResponse pResp = new TIntResponse();
+	pResp->connId = m_MSConnId.c_str();
 	pResp->body = ((PTSipResp) msg->msgBody)->body.content;
 
 	sendMsgToDispatcher(INT_RESPONSE, INT_TYPE, DIALOG_BEGIN, pCtrlMsg,
