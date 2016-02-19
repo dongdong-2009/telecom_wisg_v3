@@ -46,7 +46,8 @@
 using namespace log4cxx;
 using namespace log4cxx::xml;
 
-static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
+static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml",
+		"SgFileAppender");
 
 //log4cxx::LoggerPtr mLogger.getLogger();
 
@@ -84,13 +85,12 @@ CExosipStack::CExosipStack(INT psaid) :
 
 }
 
-CExosipStack::~CExosipStack(){
+CExosipStack::~CExosipStack() {
 
 	//LOG4CXX_INFO(mLogger.getLogger(), "call CExosipStack distructure")
 
 	delete ptimer_poll;
 }
-
 
 BOOL CExosipStack::init(USHORT port) {
 
@@ -104,7 +104,7 @@ BOOL CExosipStack::init(USHORT port) {
 	eXosip_set_option(EXOSIP_OPT_DONT_SEND_101, &i);
 	// 打开监听端口
 	if (eXosip_listen_addr(IPPROTO_UDP, NULL, port, AF_INET, FALSE) != 0) {
-		LOG4CXX_ERROR(mLogger.getLogger(),  "eXosip listen on port "<<port<<" failed");
+		LOG4CXX_ERROR(mLogger.getLogger(), "eXosip listen on port "<<port<<" failed");
 		eXosip_quit();
 		return FALSE;
 	}
@@ -139,7 +139,7 @@ BOOL CExosipStack::init(USHORT port) {
 
 		if (pthread_create(&thread_id, NULL, thread_fun, (void *) ptimer_poll)
 				!= 0) {
-			LOG4CXX_ERROR(mLogger.getLogger(),  "Create timer thread failed");
+			LOG4CXX_ERROR(mLogger.getLogger(), "Create timer thread failed");
 			return FALSE;
 		}
 	}
@@ -166,7 +166,6 @@ BOOL CExosipStack::init(USHORT port) {
 
 	return TRUE;
 }
-
 
 void * CExosipStack::thread_fun(void *data) {
 	timers_poll *my_timers = (timers_poll *) data;
@@ -335,13 +334,13 @@ void CExosipStack::register_process_401(eXosip_event_t * je) {
 
 	osip_www_authenticate_t * www_header;
 	osip_message_get_www_authenticate(je->response, 0, &www_header);
-	
+
 	char * opaque64 = osip_www_authenticate_get_opaque(www_header);
 	char * nonce64 = osip_www_authenticate_get_nonce(www_header);
 	char * nonce64_no_quotes = remove_quotes(nonce64);
 
 	string nonce = nonce64_no_quotes;
-	
+
 	string username;
 	username.append(osip_from_get_url(je->response->from)->username);
 	username.append("@");
@@ -361,14 +360,13 @@ void CExosipStack::register_process_401(eXosip_event_t * je) {
 	}
 	string algorithm = alg;
 
-
 	MD5Digest md5Digest(password, username, realm, nonce, cnonce, noncecount,
 			algorithm);
 	string response = md5Digest.calcResponse();
 
 	LOG4CXX_DEBUG(mLogger.getLogger(), "password:"<<password<<", username:"<<username<<", realm:"<<realm<<",\n"
-				<<"nonce:"<<nonce<<", cnonce: "<<cnonce<<", noncecount:"<<noncecount<<
-				",\nalgorithm:"<<algorithm<<", response:"<<response);
+			<<"nonce:"<<nonce<<", cnonce: "<<cnonce<<", noncecount:"<<noncecount<<
+			",\nalgorithm:"<<algorithm<<", response:"<<response);
 
 	osip_message_t * reg2 = NULL;
 	int expires = 100;
@@ -505,8 +503,6 @@ char * CExosipStack::add_quotes(string text) {
 	return res;
 }
 
-
-
 void CExosipStack::doActive(void) {
 	BOOL parsed = FALSE; // 标记消息是否被处理
 
@@ -526,15 +522,14 @@ void CExosipStack::doActive(void) {
 	}
 	char * buf = NULL;
 	size_t len;
-	if(event->request != NULL){
+	if (event->request != NULL) {
 		osip_message_to_str(event->request, &buf, &len);
 		LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip request:\n"<<buf);
 		osip_free(buf);
 		buf = NULL;
 	}
 
-
-	if(event->response != NULL){
+	if (event->response != NULL) {
 		osip_message_to_str(event->response, &buf, &len);
 		LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip response:\n"<<buf);
 		osip_free(buf);
@@ -577,8 +572,7 @@ void CExosipStack::doActive(void) {
 				if (OSIP_SUCCESS != ret) {
 					LOG4CXX_ERROR(mLogger.getLogger(), "error send answer for register!!!\n");
 				}
-			}
-			eXosip_unlock();
+			}eXosip_unlock();
 			delete pMsg;
 
 			eXosip_event_free(event);
@@ -767,12 +761,12 @@ void CExosipStack::doActive(void) {
 						pCtrlMsg->sip_callId, event->did);
 
 				break;
-			} else if(!strcmp(event->request->sip_method, "UPDATE")){
+			} else if (!strcmp(event->request->sip_method, "UPDATE")) {
 				parsed = TRUE;
 				osip_message_t * update = event->request;
 				PTSipUpdate mcfUpdate = new TSipUpdate();
 				ExosipTranslator::convertOsipUpdate2MCF(update, *mcfUpdate);
-				
+
 				pMsg->msgName = SIP_UPDATE;
 				pMsg->msgBody = mcfUpdate;
 
@@ -929,8 +923,16 @@ void CExosipStack::doActive(void) {
 	if (!parsed) {
 		if (event->response && MSG_IS_RESPONSE(event->response)) {
 			parsed = TRUE;
+			delete pMsg;
+			pMsg = NULL;
+			delete pCtrlMsg;
+			pCtrlMsg = NULL;
 
 			if (0 == strcmp(event->response->cseq->method, "REGISTER")) {
+				delete pMsg;
+				pMsg = NULL;
+				delete pCtrlMsg;
+				pCtrlMsg = NULL;
 				if (2 == accessMode) {
 					if (200 == event->response->status_code) {
 						// REGISTER response 200OK, clear rid map
@@ -947,9 +949,20 @@ void CExosipStack::doActive(void) {
 					return;
 				}
 			}
-	//		if (0 == strcmp(event->response->cseq->method, "PRACK")) {
-	//			return;
-	//		}
+
+			if (0 == strcmp(event->response->cseq->method, "BYE")) {
+				delete pMsg;
+				pMsg = NULL;
+				delete pCtrlMsg;
+
+				pCtrlMsg = NULL;
+				LOG4CXX_DEBUG(mLogger.getLogger(), "Receive 200 OK for BYE");
+				return;
+
+			}
+			//		if (0 == strcmp(event->response->cseq->method, "PRACK")) {
+			//			return;
+			//		}
 
 			osip_message_t *resp = event->response;
 
@@ -967,44 +980,48 @@ void CExosipStack::doActive(void) {
 				// keep cid here
 				this->storeCid(pCtrlMsg->from, pCtrlMsg->to,
 						pCtrlMsg->sip_callId, event->cid);
-			
-				this->m_map_branch_tid.put(pCtrlMsg->via.branch.c_str(), event->tid);
+
+				this->m_map_branch_tid.put(pCtrlMsg->via.branch.c_str(),
+						event->tid);
 			}
 
 			//100 trying event did = 0
-			if ( 100< event->response->status_code && 199
+			if (100 < event->response->status_code && 199
 					>= event->response->status_code) {
 
 				this->storeDid(pCtrlMsg->from, pCtrlMsg->to,
 						pCtrlMsg->sip_callId, event->did);
 			}
-				//osip_header_t * requireHd/*, * supportedHd*/;
-				/*	if(osip_message_get_supported(event->response, 0, &supportedHd) >= 0){
-				 string supportedStr = supportedHd->hvalue;
-				 printf("supportedStr %s\n", supportedStr.c_str());
-				 if(supportedStr.find("100rel") != string::npos){
-				 osip_message_t *prack;
-				 eXosip_call_build_prack(event->tid, &prack);
-				 eXosip_call_send_prack(event->tid, prack);
-				 }
-				 }
-				 else*/
-				//  if (osip_message_get_require(event->response, 0, &requireHd)
-				// 		>= 0) {
-				// 	string requireStr = requireHd->hvalue;
-				// 	if (requireStr.find("100rel") != string::npos) {
-				// 		osip_message_t *prack;
-				// 		eXosip_call_build_prack(event->tid, &prack);
-				// 		eXosip_call_send_prack(event->tid, prack);
+			//osip_header_t * requireHd/*, * supportedHd*/;
+			/*	if(osip_message_get_supported(event->response, 0, &supportedHd) >= 0){
+			 string supportedStr = supportedHd->hvalue;
+			 printf("supportedStr %s\n", supportedStr.c_str());
+			 if(supportedStr.find("100rel") != string::npos){
+			 osip_message_t *prack;
+			 eXosip_call_build_prack(event->tid, &prack);
+			 eXosip_call_send_prack(event->tid, prack);
+			 }
+			 }
+			 else*/
+			//  if (osip_message_get_require(event->response, 0, &requireHd)
+			// 		>= 0) {
+			// 	string requireStr = requireHd->hvalue;
+			// 	if (requireStr.find("100rel") != string::npos) {
+			// 		osip_message_t *prack;
+			// 		eXosip_call_build_prack(event->tid, &prack);
+			// 		eXosip_call_send_prack(event->tid, prack);
 
-				// 	}
-				// }
+			// 	}
+			// }
 			//}
 		}
 	} // if not parsed
 
 	if (!parsed) {
 		delete pMsg;
+		pMsg = NULL;
+		delete pCtrlMsg;
+		pCtrlMsg = NULL;
 		LOG4CXX_DEBUG(mLogger.getLogger(), "Unkown sip message type");
 
 		eXosip_event_free(event);
@@ -1058,15 +1075,15 @@ BOOL CExosipStack::doSendMsg(PTMsg msg) {
 		flag = this->onSend_SIP_REGISTER(uniMsg);
 		break;
 	}
-	case SIP_INFO:{
+	case SIP_INFO: {
 		flag = this->onSend_SIP_INFO(uniMsg);
 		break;
 	}
-	case SIP_PRACK:{
+	case SIP_PRACK: {
 		flag = this->onSend_SIP_PRACK(uniMsg);
 		break;
 	}
-	case SIP_UPDATE:{
+	case SIP_UPDATE: {
 		flag = this->onSend_SIP_UPDATE(uniMsg);
 		break;
 	}
@@ -1084,7 +1101,8 @@ BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
 
 	LOG4CXX_DEBUG(mLogger.getLogger(), "Send out SIP RESPONSE: status ="<<mcfRes->statusCode);
 
-	if (!strcmp(pCtrlMsg->cseq_method.c_str(), "INVITE") || !strcmp(pCtrlMsg->cseq_method.c_str(), "UPDATE")) {
+	if (!strcmp(pCtrlMsg->cseq_method.c_str(), "INVITE") || !strcmp(
+			pCtrlMsg->cseq_method.c_str(), "UPDATE")) {
 		if (100 == mcfRes->statusCode) {
 			// 100 trying is sent by eXosip automatically
 			return TRUE;
@@ -1108,7 +1126,8 @@ BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
 				ExosipTranslator::convertMCF2OsipResp(*mcfRes, ans);
 
 				string toStr = CSipMsgHelper::toString(pCtrlMsg->to).c_str();
-				string fromStr = CSipMsgHelper::toString(pCtrlMsg->from).c_str();
+				string fromStr =
+						CSipMsgHelper::toString(pCtrlMsg->from).c_str();
 				if (toStr.find("msml") != string::npos || fromStr.find("msml")
 						!= string::npos) {
 				} else if (accessMode == 0) {
@@ -1207,13 +1226,12 @@ BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
 				} else {
 					LOG4CXX_DEBUG(mLogger.getLogger(), "eXosip_call_send_answer success");
 				}
-			}
-			eXosip_unlock();
+			}eXosip_unlock();
 
 			this->m_map_branch_tid.remove(pCtrlMsg->via.branch.c_str());
 		} else {
 			LOG4CXX_ERROR(mLogger.getLogger(), "UNKNOW Transaction: "<<
-								pCtrlMsg->via.branch.c_str());
+					pCtrlMsg->via.branch.c_str());
 		}
 	} // RESPONSE for REGISTER/MESSAGE
 	else if (!strcmp(pCtrlMsg->cseq_method.c_str(), "BYE")) {
@@ -1243,8 +1261,7 @@ BOOL CExosipStack::onSend_SIP_RESPONSE(PCTUniNetMsg uniMsg) {
 				if (OSIP_SUCCESS != ret) {
 					LOG4CXX_ERROR(mLogger.getLogger(), "eXosip_call_send_answer "<<mcfRes->statusCode<<" failed: "<<ret);
 				}
-			}
-			eXosip_unlock();
+			}eXosip_unlock();
 			this->m_map_branch_tid.remove(pCtrlMsg->via.branch.c_str());
 		}
 	} else {
@@ -1273,7 +1290,7 @@ BOOL CExosipStack::onSend_SIP_ACK(PCTUniNetMsg uniMsg) {
 		ret = eXosip_call_build_ack(did, &ack);
 		if (ret != OSIP_SUCCESS) {
 			LOG4CXX_ERROR(mLogger.getLogger() ,"eXosip_call_build_ack failed: "<<ret<<
-				"\t(-6:OSIP_NOTFOUND -2:OSIP_BADPARAMETER)\n");
+					"\t(-6:OSIP_NOTFOUND -2:OSIP_BADPARAMETER)\n");
 		} else {
 			// try to fix ack send failed
 			osip_via_t * via = (osip_via_t *) osip_list_get(&ack->vias, 0);
@@ -1298,10 +1315,10 @@ BOOL CExosipStack::onSend_SIP_ACK(PCTUniNetMsg uniMsg) {
 			if (toStr.find("msml") != string::npos || fromStr.find("msml")
 					!= string::npos) {
 			} else if (accessMode == 0) {
-//				osip_route_t *rt;
-//				osip_route_init(&rt);
-//				string icscfAddr = (string) "<" + icscf + ";lr>";
-//				osip_message_set_route(ack, icscfAddr.c_str());
+				//				osip_route_t *rt;
+				//				osip_route_init(&rt);
+				//				string icscfAddr = (string) "<" + icscf + ";lr>";
+				//				osip_message_set_route(ack, icscfAddr.c_str());
 			} else {
 				osip_route_t *rt;
 				osip_route_init(&rt);
@@ -1321,10 +1338,9 @@ BOOL CExosipStack::onSend_SIP_ACK(PCTUniNetMsg uniMsg) {
 			osip_free(buf);
 			if (ret != OSIP_SUCCESS) {
 				LOG4CXX_ERROR(mLogger.getLogger(), "eXosip_call_send_ack failed: "<<ret<<
-					"\t(-6:OSIP_NOTFOUND -2:OSIP_BADPARAMETER\n");
+						"\t(-6:OSIP_NOTFOUND -2:OSIP_BADPARAMETER\n");
 			}
-		}
-		eXosip_unlock();
+		}eXosip_unlock();
 		return TRUE;
 	} else {
 		LOG4CXX_ERROR(mLogger.getLogger(), "UNKNOW Dialog for sending ACK\n");
@@ -1342,7 +1358,6 @@ BOOL CExosipStack::onSend_SIP_BYE(PCTUniNetMsg uniMsg) {
 
 	did = this->getDid(pCtrlMsg->from, pCtrlMsg->to, pCtrlMsg->sip_callId);
 	cid = this->getCid(pCtrlMsg->from, pCtrlMsg->to, pCtrlMsg->sip_callId);
-
 
 	if (-1 == cid) {
 		// revert from to
@@ -1375,9 +1390,9 @@ BOOL CExosipStack::onSend_SIP_BYE(PCTUniNetMsg uniMsg) {
 				!= string::npos) {
 			status = eXosip_call_terminate(cid, did, NULL, fromTag, toTag);
 		} else if (accessMode == 0) {
-//			string icscfAddr = (string) "<" + icscf + ";lr>";
-//			const char * nexthop = icscfAddr.c_str();
-//			status = eXosip_call_terminate(cid, did, nexthop, fromTag, toTag);
+			//			string icscfAddr = (string) "<" + icscf + ";lr>";
+			//			const char * nexthop = icscfAddr.c_str();
+			//			status = eXosip_call_terminate(cid, did, nexthop, fromTag, toTag);
 			status = eXosip_call_terminate(cid, did, NULL, fromTag, toTag);
 		} else {
 			string proxyAddr = (string) "<" + proxy + ";lr>";
@@ -1437,20 +1452,18 @@ BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
 
 	int did = this->getDid(pCtrlMsg->from, pCtrlMsg->to, pCtrlMsg->sip_callId);
 	osip_message_t * invite;
-	if (did != -1)
-	{
+	if (did != -1) {
 		LOG4CXX_DEBUG(mLogger.getLogger(), "SipPsa build re-invite");
 		int ret = eXosip_call_build_request(did, "INVITE", &invite);
 		if (OSIP_SUCCESS != ret) {
 			printf("eXosip_call_build_initial_invite failed!\n");
 			return FALSE;
 		}
-	}
-	else{
+	} else {
 		//	pCtrlMsg->to.url.scheme = "tel";
 		string toStr = CSipMsgHelper::toString(pCtrlMsg->to).c_str();
 		string fromStr = CSipMsgHelper::toString(pCtrlMsg->from).c_str();
-	
+
 		int ret = eXosip_call_build_initial_invite(&invite, toStr.c_str(),
 				CSipMsgHelper::toString(pCtrlMsg->from).c_str(), NULL, NULL);
 		if (OSIP_SUCCESS != ret) {
@@ -1514,7 +1527,7 @@ BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
 			osip_message_set_route(invite, icscfAddr.c_str());
 		}
 	}
-	
+
 	//char * buf1 = NULL;
 	//size_t len1;
 	//osip_message_to_str(invite, &buf1, &len1);
@@ -1586,7 +1599,7 @@ BOOL CExosipStack::onSend_SIP_MESSAGE(PCTUniNetMsg uniMsg) {
 
 	if (pCtrlMsg->route.url.host.length() > 0) {
 		//DEBUGV(m_psaid, "OUTGOING SIP MSG route before convert: %s\n",
-			//	pCtrlMsg->route.url.host.c_str());
+		//	pCtrlMsg->route.url.host.c_str());
 
 		routeStr = CSipMsgHelper::toStringRoute(pCtrlMsg->route);
 
@@ -1608,8 +1621,7 @@ BOOL CExosipStack::onSend_SIP_MESSAGE(PCTUniNetMsg uniMsg) {
 	if (toStr.find("msml") != string::npos || fromStr.find("msml")
 			!= string::npos) {
 		//printf("send to XMS");
-	}
-	else if (1 == accessMode) {
+	} else if (1 == accessMode) {
 		osip_route_t *rt;
 		osip_route_init(&rt);
 		char * response = new char[128];
@@ -1682,43 +1694,39 @@ BOOL CExosipStack::onSend_SIP_MESSAGE(PCTUniNetMsg uniMsg) {
 	return TRUE;
 }
 
-
-BOOL CExosipStack::onSend_SIP_INFO(PCTUniNetMsg uniMsg)
-{
+BOOL CExosipStack::onSend_SIP_INFO(PCTUniNetMsg uniMsg) {
 	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_INFO");
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
 	PTSipInfo mcfMsg = (PTSipInfo) uniMsg->msgBody;
 	int did = this->getDid(pCtrlMsg->from, pCtrlMsg->to, pCtrlMsg->sip_callId);
-	if (did != -1)
-	{
+	if (did != -1) {
 		osip_message_t *msg = NULL;
 
-//		CVarChar routeStr;
-//
-//		if (pCtrlMsg->route.url.host.length() > 0)
-//		{
-//			DEBUGV(m_psaid, "OUTGOING SIP MSG route before convert: %s\n",
-//					pCtrlMsg->route.url.host.c_str());
-//
-//			//routeStr = CSipMsgHelper::toStringRoute(pCtrlMsg->route);
-//			routeStr = toOsipRoute(pCtrlMsg->route);
-//
-//			printf("OUTGOING SIP MSG route after convert: %s\n", routeStr.c_str());
-//		}
+		//		CVarChar routeStr;
+		//
+		//		if (pCtrlMsg->route.url.host.length() > 0)
+		//		{
+		//			DEBUGV(m_psaid, "OUTGOING SIP MSG route before convert: %s\n",
+		//					pCtrlMsg->route.url.host.c_str());
+		//
+		//			//routeStr = CSipMsgHelper::toStringRoute(pCtrlMsg->route);
+		//			routeStr = toOsipRoute(pCtrlMsg->route);
+		//
+		//			printf("OUTGOING SIP MSG route after convert: %s\n", routeStr.c_str());
+		//		}
 
 		int ret = eXosip_call_build_info(did, &msg);
 
-		if (OSIP_SUCCESS != ret)
-		{
+		if (OSIP_SUCCESS != ret) {
 			psaPrint(m_psaid, "eXosip_message_build_request failed!\n");
 			return FALSE;
 		}
-	//	ExosipTranslator::convertMCF2CtrlMsg(pCtrlMsg, msg);
+		//	ExosipTranslator::convertMCF2CtrlMsg(pCtrlMsg, msg);
 
 		ExosipTranslator::convertMCF2OsipInfo(*mcfMsg, msg);
 
-	//	ExosipTranslator::convertMCF2OsipUri(pCtrlMsg->to.url, msg->req_uri);
+		//	ExosipTranslator::convertMCF2OsipUri(pCtrlMsg->to.url, msg->req_uri);
 
 
 		//add by liling 2010-7 to add ROUTE to out-going SIP MESSAGE
@@ -1731,26 +1739,20 @@ BOOL CExosipStack::onSend_SIP_INFO(PCTUniNetMsg uniMsg)
 		eXosip_lock();
 		ret = eXosip_message_send_request(msg);
 		eXosip_unlock();
-		if (OSIP_SUCCESS != ret)
-		{
+		if (OSIP_SUCCESS != ret) {
 			psaPrint(m_psaid, "Send MESSAGE failed!!!\n");
 			return FALSE;
 		}
 
 		return TRUE;
-	}
-	else{
+	} else {
 		psaPrint(m_psaid, "UNKNOW Dialog for sending ACK\n");
 		return FALSE;
 	}
 
 }
 
-
-
-
-BOOL CExosipStack::onSend_SIP_PRACK(PCTUniNetMsg uniMsg)
-{
+BOOL CExosipStack::onSend_SIP_PRACK(PCTUniNetMsg uniMsg) {
 	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_PRACK");
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
@@ -1761,18 +1763,17 @@ BOOL CExosipStack::onSend_SIP_PRACK(PCTUniNetMsg uniMsg)
 		eXosip_lock();
 		ret = eXosip_call_build_prack(tid, &msg);
 
-		if (OSIP_SUCCESS != ret)
-		{
+		if (OSIP_SUCCESS != ret) {
 			LOG4CXX_ERROR(mLogger.getLogger(), "eXosip_prack_build_request failed!\n");
 			return FALSE;
 		}
-	//	ExosipTranslator::convertMCF2CtrlMsg(pCtrlMsg, msg);
+		//	ExosipTranslator::convertMCF2CtrlMsg(pCtrlMsg, msg);
 
 
 		PTSipPrack mcfMsg = (PTSipPrack) uniMsg->msgBody;
 		ExosipTranslator::convertMCF2OsipPrack(*mcfMsg, msg);
 
-	//	ExosipTranslator::convertMCF2OsipUri(pCtrlMsg->to.url, msg->req_uri);
+		//	ExosipTranslator::convertMCF2OsipUri(pCtrlMsg->to.url, msg->req_uri);
 
 		char* buf = NULL;
 		size_t len;
@@ -1783,59 +1784,52 @@ BOOL CExosipStack::onSend_SIP_PRACK(PCTUniNetMsg uniMsg)
 		eXosip_lock();
 		ret = eXosip_message_send_request(msg);
 		eXosip_unlock();
-		if (OSIP_SUCCESS != ret)
-		{
+		if (OSIP_SUCCESS != ret) {
 			LOG4CXX_ERROR(mLogger.getLogger(), "send RACK failed");
 			return FALSE;
 		}
 
 		return TRUE;
-	}
-	else{
+	} else {
 		LOG4CXX_ERROR(mLogger.getLogger(), "UNKNOW Dialog for sending PRACK\n");
 		return FALSE;
 	}
 
 }
 
-
-
-BOOL CExosipStack::onSend_SIP_UPDATE(PCTUniNetMsg uniMsg)
-{
+BOOL CExosipStack::onSend_SIP_UPDATE(PCTUniNetMsg uniMsg) {
 	LOG4CXX_DEBUG(mLogger.getLogger(), "OnSend_SIP_UPDATE");
 	PTSipCtrlMsg pCtrlMsg = (PTSipCtrlMsg) uniMsg->ctrlMsgHdr;
 
 	PTSipUpdate mcfMsg = (PTSipUpdate) uniMsg->msgBody;
 	int did = this->getDid(pCtrlMsg->from, pCtrlMsg->to, pCtrlMsg->sip_callId);
-	if (did != -1)
-	{
+	if (did != -1) {
 		osip_message_t *msg = NULL;
 
-//		CVarChar routeStr;
-//
-//		if (pCtrlMsg->route.url.host.length() > 0)
-//		{
-//			DEBUGV(m_psaid, "OUTGOING SIP MSG route before convert: %s\n",
-//					pCtrlMsg->route.url.host.c_str());
-//
-//			//routeStr = CSipMsgHelper::toStringRoute(pCtrlMsg->route);
-//			routeStr = toOsipRoute(pCtrlMsg->route);
-//
-//			printf("OUTGOING SIP MSG route after convert: %s\n", routeStr.c_str());
-//		}
+		//		CVarChar routeStr;
+		//
+		//		if (pCtrlMsg->route.url.host.length() > 0)
+		//		{
+		//			DEBUGV(m_psaid, "OUTGOING SIP MSG route before convert: %s\n",
+		//					pCtrlMsg->route.url.host.c_str());
+		//
+		//			//routeStr = CSipMsgHelper::toStringRoute(pCtrlMsg->route);
+		//			routeStr = toOsipRoute(pCtrlMsg->route);
+		//
+		//			printf("OUTGOING SIP MSG route after convert: %s\n", routeStr.c_str());
+		//		}
 
 		int ret = eXosip_call_build_update(did, &msg);
 
-		if (OSIP_SUCCESS != ret)
-		{
+		if (OSIP_SUCCESS != ret) {
 			psaPrint(m_psaid, "eXosip_message_build_request failed!\n");
 			return FALSE;
 		}
-	//	ExosipTranslator::convertMCF2CtrlMsg(pCtrlMsg, msg);
+		//	ExosipTranslator::convertMCF2CtrlMsg(pCtrlMsg, msg);
 
 		ExosipTranslator::convertMCF2OsipUpdate(*mcfMsg, msg);
 
-	//	ExosipTranslator::convertMCF2OsipUri(pCtrlMsg->to.url, msg->req_uri);
+		//	ExosipTranslator::convertMCF2OsipUri(pCtrlMsg->to.url, msg->req_uri);
 
 
 		//add by liling 2010-7 to add ROUTE to out-going SIP MESSAGE
@@ -1848,22 +1842,18 @@ BOOL CExosipStack::onSend_SIP_UPDATE(PCTUniNetMsg uniMsg)
 		eXosip_lock();
 		ret = eXosip_message_send_request(msg);
 		eXosip_unlock();
-		if (OSIP_SUCCESS != ret)
-		{
+		if (OSIP_SUCCESS != ret) {
 			LOG4CXX_ERROR(mLogger.getLogger(), "send UPDATE failed");
 			return FALSE;
 		}
 
 		return TRUE;
-	}
-	else{
+	} else {
 		LOG4CXX_ERROR(mLogger.getLogger(), "UNKNOW Dialog for sending ACK\n");
 		return FALSE;
 	}
-	
+
 }
-
-
 
 void CExosipStack::storeDid(RCTSipAddress from, RCTSipAddress to,
 		RCTSipCallId callId, INT dialogId) {
@@ -1877,8 +1867,6 @@ void CExosipStack::storeDid(RCTSipAddress from, RCTSipAddress to,
 
 	delete[] uniqueDialogId;
 }
-
-
 
 void CExosipStack::storeCid(RCTSipAddress from, RCTSipAddress to,
 		RCTSipCallId callId, INT cid) {
@@ -1925,11 +1913,10 @@ INT CExosipStack::getDid(RCTSipAddress from, RCTSipAddress to,
 	memset(uniqueDialogId, 0, 512);
 	__generateUniqueDialogId(uniqueDialogId, 512, from, to, callId);
 
-
 	if (FALSE == this->m_map_dialogid.get(uniqueDialogId, did)) {
 		did = -1;
 	}
-	printf("getDid %s %d\n", uniqueDialogId , did);
+	printf("getDid %s %d\n", uniqueDialogId, did);
 
 	delete[] uniqueDialogId;
 
@@ -1952,26 +1939,26 @@ INT CExosipStack::getCid(RCTSipAddress from, RCTSipAddress to,
 	return cid;
 }
 
-void MyMap::put(string key, INT val){
+void MyMap::put(string key, INT val) {
 	_map[key] = val;
 	//_map.insert(pair<string, INT>(key, val));
 }
 
-bool MyMap::get(string key, INT& val){
+bool MyMap::get(string key, INT& val) {
 	LOG4CXX_DEBUG(mLogger.getLogger(),"MyMap: values");
-	for(map<string, INT>::iterator it = _map.begin(); it!=_map.end(); ++it){
+	for (map<string, INT>::iterator it = _map.begin(); it != _map.end(); ++it) {
 		LOG4CXX_DEBUG(mLogger.getLogger(), it->first<<" => "<<it->second);
 	}
 
-	if(_map.find(key) != _map.end()){
+	if (_map.find(key) != _map.end()) {
 		val = _map[key];
 		return TRUE;
 	}
 	return FALSE;
 }
 
-void MyMap::remove(string key){
-	if(_map.find(key) != _map.end()){
+void MyMap::remove(string key) {
+	if (_map.find(key) != _map.end()) {
 		_map.erase(key);
 	}
 }
