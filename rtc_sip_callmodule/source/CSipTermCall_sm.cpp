@@ -1037,7 +1037,7 @@ void CSipTermCallState_BEAR_CLIENT_READY::onSdpAnswer(CSipTermCallContext& conte
     try
     {
         ctxt.stopTimer_Sip();
-
+        ctxt.setIMSConnId(msg);
         ctxt.sendAckToIMS(msg);
         context.setState(CSipTermCallState::ACTIVE);
     }
@@ -1179,6 +1179,7 @@ void CSipTermCallState_BEAR_MODYFYING::onSdpAnswer(CSipTermCallContext& context,
     try
     {
         ctxt.stopTimer_Sip();
+        ctxt.setIMSConnId(msg);
         ctxt.send200OKForUpdateToIMS(msg);
         context.setState(CSipTermCallState::BEAR_CONFIRMED);
     }
@@ -1500,6 +1501,7 @@ void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onSdpAnswer(CSipTermCallConte
         {
             ctxt.resetFlag();
             ctxt.stopTimer_Sip();
+            ctxt.setIMSConnId(msg);
             ctxt.send200OKForUpdateToIMS(msg);
             context.setState(CSipTermCallState::ACTIVE);
         }
@@ -1519,6 +1521,7 @@ void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onSdpAnswer(CSipTermCallConte
         {
             ctxt.resetFlag();
             ctxt.stopTimer_Sip();
+            ctxt.setIMSConnId(msg);
             ctxt.send200OKForInviteToIMS(msg);
             ctxt.setTimer(SIP_ACK_TIMEOUT);
             context.setState(CSipTermCallState::ACTIVE_WAIT_ACK);

@@ -525,6 +525,7 @@ void CRtcOrigCallState_BEAR_CONFIRMING::onSdpAnswer(CRtcOrigCallContext& context
     try
     {
         ctxt.stopTimer_Rtc();
+        ctxt.setWebConnId(msg);
         ctxt.sendAnswerToWeb(msg);
         ctxt.setTimer(RTC_CONNECTION_TIMEOUT);
         context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
@@ -881,6 +882,7 @@ void CRtcOrigCallState_ACTIVE_WAIT1::onSdpAnswer(CRtcOrigCallContext& context, T
     context.clearState();
     try
     {
+    	ctxt.setWebConnId(msg);
         ctxt.stopTimer_Rtc();
         ctxt.sendAnswerToWeb(msg);
         ctxt.setTimer(RTC_CONNECTION_TIMEOUT);

@@ -853,7 +853,7 @@ void CR2SCallModule::setIMSConnId(TUniNetMsg * msg){
 	PTIntResponse pResp = (PTIntResponse) msg->msgBody;
 	m_imsConnId = pResp->connId;
 	m_joinFlag = m_joinFlag | 0x02;
-
+	LOG4CXX_DEBUG(mLogger.getLogger(), "setIMSConnId: m_joinFlag="<<m_joinFlag);
 	if(!m_joinSend && ((m_joinFlag & 0x03) == 0x03)){
 		sendJoinToBear_Rtc();
 		m_joinSend = true;
@@ -864,7 +864,7 @@ void CR2SCallModule::setWebConnId(TUniNetMsg * msg){
 	PTIntResponse pResp = (PTIntResponse) msg->msgBody;
 	m_webConnId = pResp->connId;
 	m_joinFlag = m_joinFlag | 0x01;
-
+	LOG4CXX_DEBUG(mLogger.getLogger(), "setWebConnId: m_joinFlag="<<m_joinFlag);
 	if(!m_joinSend && ((m_joinFlag & 0x03) == 0x03)){
 		sendJoinToBear_Rtc();
 		m_joinSend = true;
