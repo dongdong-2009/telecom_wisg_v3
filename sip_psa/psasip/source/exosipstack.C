@@ -923,11 +923,6 @@ void CExosipStack::doActive(void) {
 	if (!parsed) {
 		if (event->response && MSG_IS_RESPONSE(event->response)) {
 			parsed = TRUE;
-			delete pMsg;
-			pMsg = NULL;
-			delete pCtrlMsg;
-			pCtrlMsg = NULL;
-
 			if (0 == strcmp(event->response->cseq->method, "REGISTER")) {
 				delete pMsg;
 				pMsg = NULL;
