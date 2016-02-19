@@ -115,6 +115,9 @@ void CBearModule::procMsg(PTUniNetMsg msg) {
 		swap(m_IntCtrlMsg->from, m_IntCtrlMsg->to);
 		m_fsmContext.onSdpRequest(msg);
 		break;
+	case INT_CLOSE:
+		m_fsmContext.onClose(msg);
+		break;
 	case SIP_RESPONSE:
 		m_fsmContext.onResponse(msg);
 		break;
