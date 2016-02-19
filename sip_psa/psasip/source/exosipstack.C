@@ -926,8 +926,6 @@ void CExosipStack::doActive(void) {
 			if (0 == strcmp(event->response->cseq->method, "REGISTER")) {
 				delete pMsg;
 				pMsg = NULL;
-				delete pCtrlMsg;
-				pCtrlMsg = NULL;
 				if (2 == accessMode) {
 					if (200 == event->response->status_code) {
 						// REGISTER response 200OK, clear rid map
@@ -948,9 +946,6 @@ void CExosipStack::doActive(void) {
 			if (0 == strcmp(event->response->cseq->method, "BYE")) {
 				delete pMsg;
 				pMsg = NULL;
-				delete pCtrlMsg;
-
-				pCtrlMsg = NULL;
 				LOG4CXX_DEBUG(mLogger.getLogger(), "Receive 200 OK for BYE");
 				return;
 
@@ -1015,8 +1010,6 @@ void CExosipStack::doActive(void) {
 	if (!parsed) {
 		delete pMsg;
 		pMsg = NULL;
-		delete pCtrlMsg;
-		pCtrlMsg = NULL;
 		LOG4CXX_DEBUG(mLogger.getLogger(), "Unkown sip message type");
 
 		eXosip_event_free(event);
