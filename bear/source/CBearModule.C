@@ -215,12 +215,16 @@ void CBearModule::sendByeToMS(){
 }
 
 void CBearModule::sendJoinToMS(TUniNetMsg * msg) {
+
 	string infoStr;
 
-	string anotherConnId = ((PTIntRequest) msg->msgBody)->body.c_str();
+	string connId1 = ((PTIntJoin) msg->msgBody)->connId1;
+	//string
+	string connId2 = ((PTIntJoin) msg->msgBody)->connId2;
+	LOG4CXX_DEBUG(mLogger.getLogger(), "sendJoinToMS:: connId1="<<connId1<<" connId2="<<connId2);
 
 	m_parser = new CMessageXmlParse();
-	infoStr = m_parser->createConfJoinXml(m_MSConnId, anotherConnId);
+	infoStr = m_parser->createConfJoinXml(connId1, connId2);
 	delete m_parser;
 	m_parser = NULL;
 

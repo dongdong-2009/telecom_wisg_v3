@@ -370,7 +370,7 @@ string CMessageXmlParse::createConfCreateXml() {
 	return ret;
 }
 
-string CMessageXmlParse::createConfJoinXml(string connId, string confId) {
+string CMessageXmlParse::createConfJoinXml(string& connId, string& confId) {
 	string res = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><msml version=\"1.1\"><join id1=\"";
 	res += connId;
 	res += "\" id2=\"";
@@ -435,7 +435,7 @@ string CMessageXmlParse::createConfJoinXml(string connId, string confId) {
 //		return ret;
 }
 
-string CMessageXmlParse::createConfModifyXml(string confId, int partiesNum) {
+string CMessageXmlParse::createConfModifyXml(string& confId, int partiesNum) {
 
 	string str;
 	if (partiesNum == 3) {
@@ -453,7 +453,7 @@ string CMessageXmlParse::createConfModifyXml(string confId, int partiesNum) {
 
 }
 
-string CMessageXmlParse::create3PartiesXml(string confId) {
+string CMessageXmlParse::create3PartiesXml(string& confId) {
 	TiXmlDocument* tDoc = new TiXmlDocument;
 	if (NULL == tDoc) {
 		exit(1);
