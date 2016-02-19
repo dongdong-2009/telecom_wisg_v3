@@ -854,7 +854,7 @@ void CR2SCallModule::setIMSConnId(TUniNetMsg * msg){
 	m_imsConnId = pResp->connId;
 	m_joinFlag = m_joinFlag | 0x02;
 
-	if(!m_joinSend && (m_joinFlag & 0x03 == 0x03)){
+	if(!m_joinSend && ((m_joinFlag & 0x03) == 0x03)){
 		sendJoinToBear_Rtc();
 		m_joinSend = true;
 	}
@@ -865,7 +865,7 @@ void CR2SCallModule::setWebConnId(TUniNetMsg * msg){
 	m_webConnId = pResp->connId;
 	m_joinFlag = m_joinFlag | 0x01;
 
-	if(!m_joinSend && (m_joinFlag & 0x03 == 0x03)){
+	if(!m_joinSend && ((m_joinFlag & 0x03) == 0x03)){
 		sendJoinToBear_Rtc();
 		m_joinSend = true;
 	}
