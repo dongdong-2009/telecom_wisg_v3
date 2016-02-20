@@ -434,8 +434,7 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
         }
         (context.getState()).Entry(context);
     }
-    else if (true == ctxt.isResp2xx(msg) && true == ctxt.isWithSDP(msg))
-
+    else if (true == ctxt.isResp2xx(msg) && true == ctxt.isWithSDP(msg) && true == ctxt.compAndModifySdpWithRtc(msg))
     {
         (context.getState()).Exit(context);
         context.clearState();
@@ -454,6 +453,25 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
             throw;
         }
         (context.getState()).Entry(context);
+    }
+    else if(true == ctxt.isResp2xx(msg) && true == ctxt.isWithSDP(msg) && false == ctxt.compAndModifySdpWithRtc(msg))
+    {
+    	(context.getState()).Exit(context);
+		context.clearState();
+		try
+		{
+			ctxt.stopTimer_Sip();
+			ctxt.setUACTag(msg);
+			ctxt.notifyRtcOrigCallClose();
+			context.setState(CSipTermCallState::CLOSED);
+		}
+		catch (...)
+		{
+			context.setState(CSipTermCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+
     }
     else if (true == ctxt.isResp2xx(msg) && false == ctxt.isWithSDP(msg))
 
