@@ -317,7 +317,7 @@ void CR2SCallModule::timeOut(timer* ptimer) {
 	LOG4CXX_INFO(mLogger.getLogger(), "The CR2SCallModule task received a timeout event:"<<myType->timer_id);
 
 	TTimeMarkExt timerMark;
-	getTimeMarkExt(timer_id, timerMark);
+	//getTimeMarkExt(timer_id, timerMark);
 	switch (timer_id) {
 //	case SIP_200OK_TIMEOUT:
 //	case SIP_ACK_TIMEOUT:
