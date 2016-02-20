@@ -443,8 +443,8 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
         {
             ctxt.stopTimer_Sip();
             ctxt.setUACTag(msg);
-            ctxt.sendReqToBear_Sip();
             ctxt.notifyRtcOrigCallSdp();
+            ctxt.sendReqToBear_Sip();
             ctxt.setTimer(SIP_WAITBEAR_TIMEOUT);
             context.setState(CSipTermCallState::BEAR_CLIENT_READY);
         }
@@ -957,7 +957,6 @@ void CSipTermCallState_BEAR_CONFIRMED::onUpdate(CSipTermCallContext& context, TU
         (context.getState()).Entry(context);
     }
     else if (false == ctxt.compAndModifySdpWithRtc(msg))
-
     {
         (context.getState()).Exit(context);
         context.clearState();

@@ -767,6 +767,7 @@ void CR2SCallModule::notifySipTermCallClose() {
 //void notifyRtcOrigCallError(const int errorType);
 
 void CR2SCallModule::notifyRtcOrigCallSdp() {
+	LOG4CXX_DEBUG(mLogger.getLogger(), "notifyRtcOrigCallSdp");
 	m_rtcContext.onNotify(NULL);
 }
 
