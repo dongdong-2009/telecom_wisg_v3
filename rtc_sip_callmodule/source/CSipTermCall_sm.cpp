@@ -892,9 +892,13 @@ void CSipTermCallState_BEAR_CONFIRMED::onResponse(CSipTermCallContext& context, 
         context.clearState();
         try
         {
+        	printf("1\n");
             ctxt.stopTimer_Sip();
+        	printf("2\n");
             ctxt.sendCloseToBear_Sip();
+            printf("3\n");
             ctxt.notifyRtcOrigCallClose();
+            printf("4\n");
             context.setState(CSipTermCallState::CLOSED);
         }
         catch (...)
