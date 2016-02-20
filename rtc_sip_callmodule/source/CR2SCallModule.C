@@ -75,13 +75,13 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	}
 
 	timerType_rtc = new TimerType();
-	timerType_rtc->timer_id = 0;
+	timerType_rtc->timer_id = 1;
 	timerType_rtc->currMod = this;
 	timer_rtc = new timer(0, timeout_callback, timerType_rtc, 0);
 	my_timers->timers_poll_add_timer(timer_rtc);
 
 	timerType_sip = new TimerType();
-	timerType_sip->timer_id = 0;
+	timerType_sip->timer_id = 2;
 	timerType_sip->currMod = this;
 	timer_sip = new timer(0, timeout_callback, timerType_sip, 0);
 	my_timers->timers_poll_add_timer(timer_sip);
@@ -319,18 +319,20 @@ void CR2SCallModule::timeOut(timer* ptimer) {
 	TTimeMarkExt timerMark;
 	getTimeMarkExt(timer_id, timerMark);
 	switch (timer_id) {
-	case SIP_200OK_TIMEOUT:
-	case SIP_ACK_TIMEOUT:
-	case SIP_ACTIVE_TIMEOUT:
-	case SIP_CONNECTING_TIMEOUT:
-	case SIP_WAITBEAR_TIMEOUT:
-	case SIP_RING_TIMEOUT:
+//	case SIP_200OK_TIMEOUT:
+//	case SIP_ACK_TIMEOUT:
+//	case SIP_ACTIVE_TIMEOUT:
+//	case SIP_CONNECTING_TIMEOUT:
+//	case SIP_WAITBEAR_TIMEOUT:
+//	case SIP_RING_TIMEOUT:
+	case 2:
 		m_sipContext.onTimeOut(timerMark);
 		break;
-	case RTC_CONNECTION_TIMEOUT:
-	case RTC_SHUTDOWN_TIMEOUT:
-	case RTC_WAITSIP_TIMEOUT:
-	case RTC_WAITBEAR_TIMEOUT:
+//	case RTC_CONNECTION_TIMEOUT:
+//	case RTC_SHUTDOWN_TIMEOUT:
+//	case RTC_WAITSIP_TIMEOUT:
+//	case RTC_WAITBEAR_TIMEOUT:
+	case 1:
 		m_rtcContext.onTimeOut(timerMark);
 		break;
 	default:
@@ -352,9 +354,9 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 	case SIP_WAITBEAR_TIMEOUT:
 	case SIP_RING_TIMEOUT:
 	{
-		printf("setTimer:: %d\n", timerMark.timerDelay);
-		TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
-		myType->timer_id = timer_id;
+		//printf("setTimer:: %d\n", timerMark.timerDelay);
+		//TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
+		//myType->timer_id = timer_id;
 		timer_sip->timer_modify_internal(timerMark.timerDelay);
 
 	}
@@ -364,8 +366,8 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 	case RTC_WAITSIP_TIMEOUT:
 	case RTC_WAITBEAR_TIMEOUT:
 	{
-		TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
-		myType->timer_id = timer_id;
+		//TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
+		//myType->timer_id = timer_id;
 		timer_rtc->timer_modify_internal(timerMark.timerDelay);
 
 	}
