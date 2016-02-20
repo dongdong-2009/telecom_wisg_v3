@@ -356,8 +356,9 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 		TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
 		myType->timer_id = timer_id;
 		timer_sip->timer_modify_internal(timerMark.timerDelay);
-		break;
+
 	}
+	break;
 	case RTC_CONNECTION_TIMEOUT:
 	case RTC_SHUTDOWN_TIMEOUT:
 	case RTC_WAITSIP_TIMEOUT:
@@ -366,8 +367,9 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 		TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
 		myType->timer_id = timer_id;
 		timer_rtc->timer_modify_internal(timerMark.timerDelay);
-		break;
+
 	}
+	break;
 	default:
 		LOG4CXX_ERROR(mLogger.getLogger(), "setTimer: unknown Type "<<timer_id)
 		;
