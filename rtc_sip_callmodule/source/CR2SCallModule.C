@@ -334,7 +334,7 @@ void CR2SCallModule::timeOut(timer* ptimer) {
 		m_rtcContext.onTimeOut(timerMark);
 		break;
 	default:
-		LOG4CXX_ERROR(mLogger.getLogger(), "timeout, unknown Type")
+		LOG4CXX_ERROR(mLogger.getLogger(), "Timeout: unknown Type")
 		;
 		break;
 	}
@@ -351,17 +351,25 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 	case SIP_CONNECTING_TIMEOUT:
 	case SIP_WAITBEAR_TIMEOUT:
 	case SIP_RING_TIMEOUT:
+	{
 		printf("setTimer:: %d\n", timerMark.timerDelay);
+		TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
+		myType->timer_id = timer_id;
 		timer_sip->timer_modify_internal(timerMark.timerDelay);
 		break;
+	}
 	case RTC_CONNECTION_TIMEOUT:
 	case RTC_SHUTDOWN_TIMEOUT:
 	case RTC_WAITSIP_TIMEOUT:
 	case RTC_WAITBEAR_TIMEOUT:
+	{
+		TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
+		myType->timer_id = timer_id;
 		timer_rtc->timer_modify_internal(timerMark.timerDelay);
 		break;
+	}
 	default:
-		LOG4CXX_ERROR(mLogger.getLogger(), "timeout, unknown Type")
+		LOG4CXX_ERROR(mLogger.getLogger(), "setTimer: unknown Type "<<timer_id)
 		;
 		break;
 	}
