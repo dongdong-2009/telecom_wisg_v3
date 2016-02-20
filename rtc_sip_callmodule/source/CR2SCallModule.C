@@ -354,7 +354,7 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 	case SIP_WAITBEAR_TIMEOUT:
 	case SIP_RING_TIMEOUT:
 	{
-		printf("setTimer_sip:: %d\n", timerMark.timerDelay);
+		//printf("setTimer_sip:: %d\n", timerMark.timerDelay);
 		//TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
 		//myType->timer_id = timer_id;
 		timer_sip->timer_modify_internal(timerMark.timerDelay);
@@ -366,7 +366,7 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 	case RTC_WAITSIP_TIMEOUT:
 	case RTC_WAITBEAR_TIMEOUT:
 	{
-		printf("setTimer_rtc:: %d\n", timerMark.timerDelay);
+		//printf("setTimer_rtc:: %d\n", timerMark.timerDelay);
 		//TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
 		//myType->timer_id = timer_id;
 		timer_rtc->timer_modify_internal(timerMark.timerDelay);
