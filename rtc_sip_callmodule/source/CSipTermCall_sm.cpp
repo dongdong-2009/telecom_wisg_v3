@@ -696,6 +696,7 @@ void CSipTermCallState_BEAR_CONFIRMING::onResponse(CSipTermCallContext& context,
         {
             ctxt.stopTimer_Sip();
             ctxt.setTimer(SIP_RING_TIMEOUT);
+            printf("set ring timeout\n");
             context.setState(CSipTermCallState::BEAR_CONFIRMED);
         }
         catch (...)
@@ -886,19 +887,14 @@ void CSipTermCallState_BEAR_CONFIRMED::onResponse(CSipTermCallContext& context, 
         (context.getState()).Entry(context);
     }
     else if (true == ctxt.isResp3xx_6xx(msg))
-
-    {	printf("BEAR_CONFIRMED: onResponse: is3xx_6xx\n");
+    {
         (context.getState()).Exit(context);
         context.clearState();
         try
         {
-        	printf("1\n");
             ctxt.stopTimer_Sip();
-        	printf("2\n");
             ctxt.sendCloseToBear_Sip();
-            printf("3\n");
             ctxt.notifyRtcOrigCallClose();
-            printf("4\n");
             context.setState(CSipTermCallState::CLOSED);
         }
         catch (...)
@@ -923,6 +919,8 @@ void CSipTermCallState_BEAR_CONFIRMED::onTimeOut(CSipTermCallContext& context, T
     context.clearState();
     try
     {
+
+    	printf("BEAR_CONFIRMED::onTimeOut\n");
         ctxt.stopTimer_Sip();
         ctxt.sendCancelToIMS();
         ctxt.sendCloseToBear_Sip();
