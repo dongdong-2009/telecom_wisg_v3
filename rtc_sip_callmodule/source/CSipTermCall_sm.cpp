@@ -444,6 +444,7 @@ void CSipTermCallState_CALLPROC::onResponse(CSipTermCallContext& context, TUniNe
             ctxt.stopTimer_Sip();
             ctxt.setUACTag(msg);
             ctxt.sendReqToBear_Sip();
+            ctxt.notifyRtcOrigCallSdp();
             ctxt.setTimer(SIP_WAITBEAR_TIMEOUT);
             context.setState(CSipTermCallState::BEAR_CLIENT_READY);
         }

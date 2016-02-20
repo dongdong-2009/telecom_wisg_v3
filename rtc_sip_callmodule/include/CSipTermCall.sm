@@ -100,6 +100,7 @@ CALLPROC
 	{
 		stopTimer_Sip();
 		setUACTag(msg);
+		notifyRtcOrigCallSdp();
 		sendReqToBear_Sip();	//返回SDP给CALL模块
 		setTimer(SIP_WAITBEAR_TIMEOUT);		
 	}
