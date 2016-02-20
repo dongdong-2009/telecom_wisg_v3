@@ -807,6 +807,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onClose(CSipTermCallContext& context, TUn
 void CSipTermCallState_BEAR_CONFIRMED::onResponse(CSipTermCallContext& context, TUniNetMsg* msg)
 {
     CR2SCallModule& ctxt(context.getOwner());
+    printf("BEAR_CONFIRMED: onResponse\n");
 
     if ("INVITE" != ctxt.checkRespCseqMothod(msg))
     {
@@ -886,7 +887,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onResponse(CSipTermCallContext& context, 
     }
     else if (true == ctxt.isResp3xx_6xx(msg))
 
-    {
+    {	printf("BEAR_CONFIRMED: onResponse: is3xx_6xx\n");
         (context.getState()).Exit(context);
         context.clearState();
         try
