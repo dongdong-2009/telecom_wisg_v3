@@ -351,6 +351,7 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 	case SIP_CONNECTING_TIMEOUT:
 	case SIP_WAITBEAR_TIMEOUT:
 	case SIP_RING_TIMEOUT:
+		printf("setTimer:: %d\n", timerMark.timerDelay);
 		timer_sip->timer_modify_internal(timerMark.timerDelay);
 		break;
 	case RTC_CONNECTION_TIMEOUT:
