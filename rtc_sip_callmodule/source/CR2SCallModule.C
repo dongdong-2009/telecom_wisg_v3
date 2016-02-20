@@ -381,11 +381,11 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 }
 
 void CR2SCallModule::stopTimer_Rtc() {
-	timer_sip->timer_modify_internal(0);
+	timer_rtc->timer_modify_internal(0);
 }
 
 void CR2SCallModule::stopTimer_Sip() {
-	timer_rtc->timer_modify_internal(0);
+	timer_sip->timer_modify_internal(0);
 }
 
 void CR2SCallModule::onTimeOut(TTimeMarkExt timerMark) {
