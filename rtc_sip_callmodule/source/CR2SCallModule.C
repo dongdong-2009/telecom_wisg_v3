@@ -802,7 +802,7 @@ void CR2SCallModule::notifyRtcOrigCallError(TUniNetMsg * msg) {
 }
 
 void CR2SCallModule::notifyRtcOrigCallClose() {
-	m_sipContext.onClose(NULL);
+	m_rtcContext.onClose(NULL);
 }
 
 void CR2SCallModule::notifyRtcOrigCallError(const int errorType) {
