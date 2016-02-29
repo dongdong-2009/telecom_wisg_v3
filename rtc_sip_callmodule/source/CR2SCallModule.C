@@ -849,6 +849,48 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 		m_imsSdp = pUpdate->body.content.c_str();
 	}
 
+	//fsdp_description_t * imsDsc = fsdp_description_new();
+	fsdp_description_t * webDsc = fsdp_description_new();
+
+//	if(fsdp_parse(m_imsSdp, imsDsc) != FSDPE_OK)
+//	{
+//		LOG4CXX_ERROR(mLogger, "IMS return sdp is invalid");
+//		fsdp_description_delete(imsDsc);
+//		fsdp_description_delete(webDsc);
+//		m_isSdpConfirmed = false;
+//		return false;
+//	}
+//	else
+	if(fsdp_parse(m_webSdp.c_str(), webDsc) != FSDPE_OK)
+	{
+		LOG4CXX_ERROR(mLogger.getLogger(), "web return sdp is invalid");
+		fsdp_description_delete(webDsc);
+		//fsdp_description_delete(webDsc);
+		m_isSdpConfirmed = false;
+		return false;
+	}
+	else
+	{
+		//int imsMediaCount = fsdp_get_media_count(imsDsc);
+		int webMediaCount = fsdp_get_media_count(webDsc);
+
+		for(int i = 0; i<webMediaCount; i++){
+			const fsdp_media_description_t * webMedia = fsdp_get_media(webDsc, i);
+			fsdp_media_t mediaType =  fsdp_get_media_type(webMedia);
+			if(mediaType == FSDP_MEDIA_VIDEO){
+				fsdp_set_media_invalid(webDsc, i);
+				break;
+			}
+		}
+
+		fsdp_description_delete(webDsc);
+	}
+
+
+
+
+
+
 	//compare with m_webBody
 	return true;
 }
