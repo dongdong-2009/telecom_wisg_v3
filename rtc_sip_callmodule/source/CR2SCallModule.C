@@ -850,7 +850,7 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 	}
 
 	//fsdp_description_t * imsDsc = fsdp_description_new();
-	fsdp_description_t * webDsc = fsdp_description_new();
+	//fsdp_description_t * webDsc = fsdp_description_new();
 
 //	if(fsdp_parse(m_imsSdp, imsDsc) != FSDPE_OK)
 //	{
@@ -863,35 +863,35 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 //	else
 
 	LOG4CXX_ERROR(mLogger.getLogger(), m_webSdp);
-	fsdp_error_t error = fsdp_parse(m_webSdp.c_str(), webDsc);
-	printf("error %d\n", error == FSDPE_UNKNOWN_MEDIA_TRANSPORT);
-	if(error != FSDPE_OK)
-	{
-		LOG4CXX_ERROR(mLogger.getLogger(), "web return sdp is invalid");
-		fsdp_description_delete(webDsc);
-		//fsdp_description_delete(webDsc);
-		m_isSdpConfirmed = false;
-		return false;
+	string str = m_webSdp;
+	size_t pos = str.find("m=", 0);
+	pos += 2;
+
+	size_t pos2 = str.find(" ", pos);
+	string tmp = str.substr(pos, pos2-pos);
+	LOG4CXX_ERROR(mLogger.getLogger(), "media_type1"<<tmp);
+	if(tmp != "video"){
+
+		pos = str.find("m=", pos);
+		pos +=2;
+		pos2 = str.find(" ", pos);
+
+		tmp = str.substr(pos, pos2-pos);
+		LOG4CXX_ERROR(mLogger.getLogger(), "media_type2"<<tmp);
+
+		pos = str.find(" ", pos2+1);
+		string port = str.substr(pos2+1, pos-pos2);
+		str.erase(pos2+1, pos-pos2);
+		str.insert(pos2+1, "0");
 	}
-	else
-	{
-		//int imsMediaCount = fsdp_get_media_count(imsDsc);
-		int webMediaCount = fsdp_get_media_count(webDsc);
-
-		for(int i = 0; i<webMediaCount; i++){
-			const fsdp_media_description_t * webMedia = fsdp_get_media(webDsc, i);
-			fsdp_media_t mediaType =  fsdp_get_media_type(webMedia);
-			if(mediaType == FSDP_MEDIA_VIDEO){
-				fsdp_set_media_invalid(webDsc, i);
-				break;
-			}
-		}
-
-		fsdp_description_delete(webDsc);
+	else{
+		pos = str.find(" ", pos2+1);
+		string port = str.substr(pos2+1, pos-pos2);
+		str.erase(pos2+1, pos-pos2);
+		str.insert(pos2+1, "0");
 	}
 
-
-
+	m_webSdp = str;
 
 
 

@@ -13,7 +13,7 @@
 #include <db.h>
 #include <msgdef_uninet.h>
 
-#include <freesdp/freesdp.h>
+//#include <freesdp/freesdp.h>
 
 #include "rtc_msg_def.h"
 #include "int_msg_def.h"
