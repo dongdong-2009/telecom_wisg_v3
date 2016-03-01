@@ -882,13 +882,13 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 		pos = str.find(" ", pos2+1);
 		string port = str.substr(pos2+1, pos-pos2);
 		str.erase(pos2+1, pos-pos2);
-		str.insert(pos2+1, "0");
+		str.insert(pos2+1, "0 ");
 	}
 	else{
 		pos = str.find(" ", pos2+1);
 		string port = str.substr(pos2+1, pos-pos2);
 		str.erase(pos2+1, pos-pos2);
-		str.insert(pos2+1, "0");
+		str.insert(pos2+1, "0 ");
 	}
 
 	m_webSdp = str;
