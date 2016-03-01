@@ -331,48 +331,48 @@ bool CPracticalSocket::handleMsgFromWebrtc(const string& strMsg, int sockfd) {
 	try {
 		if (roapParser.getType() == ROAP_CANDIDATE) {
 			//last candidate
-			if (roapParser.getSdp().length() != 0) {
-				if (m_mapOfferOrAnswer.find(offerSessionId)
-						!= m_mapOfferOrAnswer.end()) {
-					LOG4CXX_DEBUG(mLogger.getLogger(), "receive candidate, send offer with one candidate");
-					string offerOrAnswer = m_mapOfferOrAnswer[offerSessionId];
-		
-					CRtcProtocolParser rtcParser2(offerOrAnswer);
-					CRoapParser roapParser2 = rtcParser2.getRoapParser();
-					string sdp = roapParser2.getSdp();
-
-					string candidateSdp = roapParser.getSdp();
-					if(candidateSdp.find("a=") == string::npos)
-					{
-						sdp += "a=" + candidateSdp + "\r\n";
-					}
-					else{
-						sdp += candidateSdp;
-					}
-					roapParser2.setSdp(sdp);
-
-					rtcParser2.setRoap(roapParser2.getRoapJson());
-
-					string newOfferOrAnswer = rtcParser2.toPlainString();
-					m_mapOfferOrAnswer.erase(offerSessionId);
-
-					msgBuffer.storeMsg(sockfd, newOfferOrAnswer);
-
-					return true;
-				} else {
-					return false;
-				}
-			}
+//			if (roapParser.getSdp().length() != 0) {
+//				if (m_mapOfferOrAnswer.find(offerSessionId)
+//						!= m_mapOfferOrAnswer.end()) {
+//					LOG4CXX_DEBUG(mLogger.getLogger(), "receive candidate, send offer with one candidate");
+//					string offerOrAnswer = m_mapOfferOrAnswer[offerSessionId];
+//
+//					CRtcProtocolParser rtcParser2(offerOrAnswer);
+//					CRoapParser roapParser2 = rtcParser2.getRoapParser();
+//					string sdp = roapParser2.getSdp();
+//
+//					string candidateSdp = roapParser.getSdp();
+//					if(candidateSdp.find("a=") == string::npos)
+//					{
+//						sdp += "a=" + candidateSdp + "\r\n";
+//					}
+//					else{
+//						sdp += candidateSdp;
+//					}
+//					roapParser2.setSdp(sdp);
+//
+//					rtcParser2.setRoap(roapParser2.getRoapJson());
+//
+//					string newOfferOrAnswer = rtcParser2.toPlainString();
+//					m_mapOfferOrAnswer.erase(offerSessionId);
+//
+//					msgBuffer.storeMsg(sockfd, newOfferOrAnswer);
+//
+//					return true;
+//				} else {
+//					return false;
+//				}
+			//}
 		} else if (ROAP_OFFER == roapParser.getType() || ROAP_ANSWER
 				== roapParser.getType()) {
-			m_mapOfferOrAnswer[offerSessionId] = strMsg;
+			//m_mapOfferOrAnswer[offerSessionId] = strMsg;
 
-			if (roapParser.getSdp().find("a=candidate") != string::npos) {
+			//if (roapParser.getSdp().find("a=candidate") != string::npos) {
 				m_mapOfferOrAnswer.erase(offerSessionId);
 
 				msgBuffer.storeMsg(sockfd, strMsg);
 				return true;
-			}
+			//}
 		} else {
 			//other type message
 			msgBuffer.storeMsg(sockfd, strMsg);
