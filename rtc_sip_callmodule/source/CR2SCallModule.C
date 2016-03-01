@@ -861,6 +861,8 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 //		return false;
 //	}
 //	else
+
+	LOG4CXX_ERROR(mLogger.getLogger(), m_webSdp);
 	if(fsdp_parse(m_webSdp.c_str(), webDsc) != FSDPE_OK)
 	{
 		LOG4CXX_ERROR(mLogger.getLogger(), "web return sdp is invalid");
