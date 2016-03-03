@@ -849,49 +849,37 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 		m_imsSdp = pUpdate->body.content.c_str();
 	}
 
-	//fsdp_description_t * imsDsc = fsdp_description_new();
-	//fsdp_description_t * webDsc = fsdp_description_new();
 
-//	if(fsdp_parse(m_imsSdp, imsDsc) != FSDPE_OK)
-//	{
-//		LOG4CXX_ERROR(mLogger, "IMS return sdp is invalid");
-//		fsdp_description_delete(imsDsc);
-//		fsdp_description_delete(webDsc);
-//		m_isSdpConfirmed = false;
-//		return false;
+//	LOG4CXX_ERROR(mLogger.getLogger(), m_webSdp);
+//	string str = m_webSdp;
+//	size_t pos = str.find("m=", 0);
+//	pos += 2;
+//
+//	size_t pos2 = str.find(" ", pos);
+//	string tmp = str.substr(pos, pos2-pos);
+//	LOG4CXX_ERROR(mLogger.getLogger(), "media_type1"<<tmp);
+//	if(tmp != "video"){
+//
+//		pos = str.find("m=", pos);
+//		pos +=2;
+//		pos2 = str.find(" ", pos);
+//
+//		tmp = str.substr(pos, pos2-pos);
+//		LOG4CXX_ERROR(mLogger.getLogger(), "media_type2"<<tmp);
+//
+//		pos = str.find(" ", pos2+1);
+//		string port = str.substr(pos2+1, pos-pos2);
+//		str.erase(pos2+1, pos-pos2);
+//		str.insert(pos2+1, "0 ");
 //	}
-//	else
+//	else{
+//		pos = str.find(" ", pos2+1);
+//		string port = str.substr(pos2+1, pos-pos2);
+//		str.erase(pos2+1, pos-pos2);
+//		str.insert(pos2+1, "0 ");
+//	}
 
-	LOG4CXX_ERROR(mLogger.getLogger(), m_webSdp);
-	string str = m_webSdp;
-	size_t pos = str.find("m=", 0);
-	pos += 2;
-
-	size_t pos2 = str.find(" ", pos);
-	string tmp = str.substr(pos, pos2-pos);
-	LOG4CXX_ERROR(mLogger.getLogger(), "media_type1"<<tmp);
-	if(tmp != "video"){
-
-		pos = str.find("m=", pos);
-		pos +=2;
-		pos2 = str.find(" ", pos);
-
-		tmp = str.substr(pos, pos2-pos);
-		LOG4CXX_ERROR(mLogger.getLogger(), "media_type2"<<tmp);
-
-		pos = str.find(" ", pos2+1);
-		string port = str.substr(pos2+1, pos-pos2);
-		str.erase(pos2+1, pos-pos2);
-		str.insert(pos2+1, "0 ");
-	}
-	else{
-		pos = str.find(" ", pos2+1);
-		string port = str.substr(pos2+1, pos-pos2);
-		str.erase(pos2+1, pos-pos2);
-		str.insert(pos2+1, "0 ");
-	}
-
-	m_webSdp = str;
+	//m_webSdp = str;
 
 
 
