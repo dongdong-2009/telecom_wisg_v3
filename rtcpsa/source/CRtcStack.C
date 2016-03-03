@@ -64,7 +64,7 @@ BOOL CRtcStack::convertMsgToUniNetMsg(string strMsg, PTUniNetMsg pMsg){
 		string toStr = rtcParser.getTo().c_str();
 //		if((toStr[0] != '0' && toStr.length() == 11) || toStr.length() == 12){
 //			//为手机号
-//		//	toStr = "+86"+toStr;
+//			toStr = "+86"+toStr;
 //		}
 
 		pCtrlMsg->from = fromStr.c_str();
@@ -247,9 +247,9 @@ BOOL CRtcStack::convertUniMsgToPlainMsg(PTUniNetMsg uniMsg, string& plainMsg){
 		}
 
 		string fromStr = pCtrlMsg->from.c_str();
-		if(fromStr[0] == '+'){
-			fromStr = fromStr.substr(0, 3);
-		}
+//		if(fromStr[0] == '+'){
+//			fromStr = fromStr.substr(0, 3);
+//		}
 
 		CRtcProtocolParser rtcParser(pCtrlMsg->rtcType,
 				fromStr.c_str(),
