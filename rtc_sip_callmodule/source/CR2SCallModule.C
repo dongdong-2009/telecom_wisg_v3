@@ -850,36 +850,36 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 	}
 
 
-	LOG4CXX_ERROR(mLogger.getLogger(), m_webSdp);
-	string str = m_imsSdp;
-	size_t pos = str.find("m=", 0);
-	pos += 2;
-
-	size_t pos2 = str.find(" ", pos);
-	string tmp = str.substr(pos, pos2-pos);
-	LOG4CXX_ERROR(mLogger.getLogger(), "media_type1"<<tmp);
-	if(tmp != "video"){
-
-		pos = str.find("m=", pos);
-		pos +=2;
-		pos2 = str.find(" ", pos);
-
-		tmp = str.substr(pos, pos2-pos);
-		LOG4CXX_ERROR(mLogger.getLogger(), "media_type2"<<tmp);
-
-		pos = str.find(" ", pos2+1);
-		string port = str.substr(pos2+1, pos-pos2);
-		str.erase(pos2+1, pos-pos2);
-		str.insert(pos2+1, "0 ");
-	}
-	else{
-		pos = str.find(" ", pos2+1);
-		string port = str.substr(pos2+1, pos-pos2);
-		str.erase(pos2+1, pos-pos2);
-		str.insert(pos2+1, "0 ");
-	}
-
-	m_imsSdp = str;
+//	LOG4CXX_ERROR(mLogger.getLogger(), m_webSdp);
+//	string str = m_imsSdp;
+//	size_t pos = str.find("m=", 0);
+//	pos += 2;
+//
+//	size_t pos2 = str.find(" ", pos);
+//	string tmp = str.substr(pos, pos2-pos);
+//	LOG4CXX_ERROR(mLogger.getLogger(), "media_type1"<<tmp);
+//	if(tmp != "video"){
+//
+//		pos = str.find("m=", pos);
+//		pos +=2;
+//		pos2 = str.find(" ", pos);
+//
+//		tmp = str.substr(pos, pos2-pos);
+//		LOG4CXX_ERROR(mLogger.getLogger(), "media_type2"<<tmp);
+//
+//		pos = str.find(" ", pos2+1);
+//		string port = str.substr(pos2+1, pos-pos2);
+//		str.erase(pos2+1, pos-pos2);
+//		str.insert(pos2+1, "0 ");
+//	}
+//	else{
+//		pos = str.find(" ", pos2+1);
+//		string port = str.substr(pos2+1, pos-pos2);
+//		str.erase(pos2+1, pos-pos2);
+//		str.insert(pos2+1, "0 ");
+//	}
+//
+//	m_imsSdp = str;
 
 
 
