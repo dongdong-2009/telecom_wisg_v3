@@ -846,7 +846,7 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 	}
 
 
-	unsigned int pos = 0;
+	unsigned int pos = 0, pos2 = 0;
 //	while ((pos = m_imsSdp.find("m=", pos)) != string::npos) {
 //		unsigned int pos2 = m_imsSdp.find(" ", pos);
 //		pos += 2;
@@ -869,6 +869,7 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 
 
 	pos = 0;
+	pos2 = 0;
 
 	if((pos = m_webSdp.find("m=video", 0)) != string::npos && (pos2 = m_imsSdp.find("m=video")) == string::npos ){
 		LOG4CXX_INFO(mLogger.getLogger(), "IMS Do Not Support Video, set PORT 0 in WebRTC SDP");
