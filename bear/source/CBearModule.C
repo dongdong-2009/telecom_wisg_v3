@@ -267,8 +267,9 @@ void CBearModule::sendErrorToCall(const int errorType) {
 void CBearModule::sendCloseToCall() {
 	PTIntCtrlMsg pCtrlMsg = (PTIntCtrlMsg) m_IntCtrlMsg->clone();
 
+	PTIntClose pClose = new TIntClose();
 	sendMsgToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_CONTINUE, pCtrlMsg,
-			NULL);
+			pClose);
 }
 
 void CBearModule::sendMsgToDispatcher(TUniNetMsgName msgName,
