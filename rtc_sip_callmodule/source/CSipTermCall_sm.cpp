@@ -485,8 +485,6 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onResponse(
 		CSipTermCallContext& context, TUniNetMsg* msg) {
 	CR2SCallModule& ctxt(context.getOwner());
 
-	(context.getState()).Exit(context);
-	context.clearState();
 	if (true == ctxt.isResp3xx_6xx(msg)) {
 		//IMS return error. Example: timeout
 		(context.getState()).Exit(context);
