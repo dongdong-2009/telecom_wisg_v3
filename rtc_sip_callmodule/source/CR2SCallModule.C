@@ -881,7 +881,7 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 //		m_webSdp.insert(pos, "a=group:BUNDLE audio");
 
 		pos += 8;
-		unsigned int pos2 = m_imsSdp.find(" ", pos);
+		unsigned int pos2 = m_webSdp.find(" ", pos);
 		m_webSdp.erase(pos, pos2 - pos);
 		m_webSdp.insert(pos, "0");
 	}
