@@ -927,11 +927,15 @@ void CSipTermCallState_BEAR_CLIENT_READY::onTimeOut(
 
 	(context.getState()).Exit(context);
 	context.clearState();
-	try {
+	try {//ToDO xms is shutdown, sg break
+		printf("1\n");
 		ctxt.stopTimer_Sip();
+		printf("2\n");
 		ctxt.notifyRtcOrigCallError(ERROR_TIMEOUT);
+		printf("3\n");
 		ctxt.sendCancelToIMS();
-		ctxt.notifyRtcOrigCallClose();
+		printf("4\n");
+		//ctxt.notifyRtcOrigCallClose();
 		context.setState(CSipTermCallState::CLOSED);
 	} catch (...) {
 		context.setState(CSipTermCallState::CLOSED);

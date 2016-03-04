@@ -845,46 +845,60 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 		m_imsSdp = pUpdate->body.content.c_str();
 	}
 
+
 	unsigned int pos = 0;
-	while ((pos = m_imsSdp.find("m=", pos)) != string::npos) {
+//	while ((pos = m_imsSdp.find("m=", pos)) != string::npos) {
+//		unsigned int pos2 = m_imsSdp.find(" ", pos);
+//		pos += 2;
+//		string mediaType = m_imsSdp.substr(pos, pos2 - pos);
+//		if (m_webSdp.find("m=" + mediaType) == string::npos) {
+//
+//			pos = pos2 + 1;
+//			pos2 = m_imsSdp.find(" ", pos);
+//			m_imsSdp.erase(pos, pos2 - pos);
+//			m_imsSdp.insert(pos, "0");
+//		}
+//	}
+	if((pos = m_imsSdp.find("m=video", 0)) != string::npos && (pos2 = m_webSdp.find("m=video")) == string::npos ){
+		LOG4CXX_INFO(mLogger.getLogger(), "WebRTC Do Not Support Video, set PORT 0 in IMS SDP");
+		pos += 8;
 		unsigned int pos2 = m_imsSdp.find(" ", pos);
-		pos += 2;
-		string mediaType = m_imsSdp.substr(pos, pos2 - pos);
-		if (m_webSdp.find("m=" + mediaType) == string::npos) {
-			LOG4CXX_INFO(mLogger.getLogger(), "WebRTC Do Not Support "<<mediaType<<", set PORT 0 in IMS SDP");
-			pos = pos2 + 1;
-			pos2 = m_imsSdp.find(" ", pos);
-			m_imsSdp.erase(pos, pos2 - pos);
-			m_imsSdp.insert(pos, "0");
-		}
+		m_imsSdp.erase(pos, pos2 - pos);
+		m_imsSdp.insert(pos, "0");
 	}
 
+
 	pos = 0;
-	while ((pos = m_webSdp.find("m=", pos)) != string::npos) {
-		unsigned pos2 = m_webSdp.find(" ", pos);
-		pos += 2;
-		string mediaType = m_webSdp.substr(pos, pos2 - pos);
-		if (m_imsSdp.find("m=" + mediaType) == string::npos) {
-			LOG4CXX_INFO(mLogger.getLogger(), "IMS Do Not Support "<<mediaType<<", set PORT 0 in WebRTC SDP");
-			pos = pos2 + 1;
-			pos2 = m_webSdp.find(" ", pos);
-			m_webSdp.erase(pos, pos2 - pos);
-			m_webSdp.insert(pos, "0");
-		}
+
+	if((pos = m_webSdp.find("m=video", 0)) != string::npos && (pos2 = m_imsSdp.find("m=video")) == string::npos ){
+		LOG4CXX_INFO(mLogger.getLogger(), "IMS Do Not Support Video, set PORT 0 in WebRTC SDP");
+		m_webSdp = m_webSdp.substr(0, pos);
 	}
+//	while ((pos = m_webSdp.find("m=", pos)) != string::npos) {
+//		unsigned pos2 = m_webSdp.find(" ", pos);
+//		pos += 2;
+//		string mediaType = m_webSdp.substr(pos, pos2 - pos);
+//		if (m_imsSdp.find("m=" + mediaType) == string::npos) {
+//			LOG4CXX_INFO(mLogger.getLogger(), "IMS Do Not Support "<<mediaType<<", set PORT 0 in WebRTC SDP");
+//			pos = pos2 + 1;
+//			pos2 = m_webSdp.find(" ", pos);
+//			m_webSdp.erase(pos, pos2 - pos);
+//			m_webSdp.insert(pos, "0");
+//		}
+//	}
 
 	return true;
 }
 bool CR2SCallModule::compSdpWithOld(TUniNetMsg * msg) {
 	//set ims rtc body
-	string imsBody;
-	if (msg->msgName == SIP_INVITE) {
-		PTSipInvite pInvite = (PTSipInvite) msg->msgBody;
-		imsBody = pInvite->body.content.c_str();
-	} else if (msg->msgName == SIP_UPDATE) {
-		PTSipUpdate pUpdate = (PTSipUpdate) msg->msgBody;
-		imsBody = pUpdate->body.content.c_str();
-	}
+//	string imsBody;
+//	if (msg->msgName == SIP_INVITE) {
+//		PTSipInvite pInvite = (PTSipInvite) msg->msgBody;
+//		imsBody = pInvite->body.content.c_str();
+//	} else if (msg->msgName == SIP_UPDATE) {
+//		PTSipUpdate pUpdate = (PTSipUpdate) msg->msgBody;
+//		imsBody = pUpdate->body.content.c_str();
+//	}
 
 	return true;
 }
