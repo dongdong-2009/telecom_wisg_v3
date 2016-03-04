@@ -120,7 +120,6 @@ private:
 	UINT m_endFlag;
 
 	UINT m_joinFlag;
-
 	bool m_joinSend;
 	bool m_isSdpConfirmed;
 	bool m_switchFlag;

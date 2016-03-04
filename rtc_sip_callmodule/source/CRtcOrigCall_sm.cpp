@@ -757,7 +757,7 @@ void CRtcOrigCallState_ACTIVE::onNotify(CRtcOrigCallContext& context, TUniNetMsg
     context.clearState();
     try
     {
-        ctxt.resetSwitchFlag();
+       // ctxt.resetSwitchFlag();
         ctxt.sendNotifyToWeb(msg);
         context.setState(endState);
     }

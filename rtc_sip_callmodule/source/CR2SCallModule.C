@@ -877,16 +877,16 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 }
 bool CR2SCallModule::compSdpWithOld(TUniNetMsg * msg) {
 	//set ims rtc body
-//	string imsBody;
-//	if (msg->msgName == SIP_INVITE) {
-//		PTSipInvite pInvite = (PTSipInvite) msg->msgBody;
-//		imsBody = pInvite->body.content.c_str();
-//	} else if (msg->msgName == SIP_UPDATE) {
-//		PTSipUpdate pUpdate = (PTSipUpdate) msg->msgBody;
-//		imsBody = pUpdate->body.content.c_str();
-//	}
+	string imsBody;
+	if (msg->msgName == SIP_INVITE) {
+		PTSipInvite pInvite = (PTSipInvite) msg->msgBody;
+		imsBody = pInvite->body.content.c_str();
+	} else if (msg->msgName == SIP_UPDATE) {
+		PTSipUpdate pUpdate = (PTSipUpdate) msg->msgBody;
+		imsBody = pUpdate->body.content.c_str();
+	}
 
-	return true;
+
 }
 
 string CR2SCallModule::checkRespCseqMothod(TUniNetMsg * msg) {
