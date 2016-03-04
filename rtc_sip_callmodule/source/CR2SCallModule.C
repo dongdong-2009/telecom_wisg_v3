@@ -886,7 +886,7 @@ bool CR2SCallModule::compSdpWithOld(TUniNetMsg * msg) {
 		imsBody = pUpdate->body.content.c_str();
 	}
 
-
+	return true;
 }
 
 string CR2SCallModule::checkRespCseqMothod(TUniNetMsg * msg) {
