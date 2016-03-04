@@ -31,7 +31,7 @@ CFLAGS = -Wall -g $(INC_DIR) -D_DEBUG  -Wno-deprecated -Wno-write-strings
 #CFLAGS = -Wall -g $(INC_DIR)  -Wno-deprecated -Wno-write-strings
 
 LIBS = -L. -L$(LIB_DIR) -lsipmsgdef -ljsoncpp -lmcf -llog4cxx -lutils -lmysqlclient -lrtcmsg -lrtcdb  -lintmsg\
-		-losip2 -losipparser2 -leXosip2 -lpthread -lfreesdp
+		-losip2 -losipparser2 -leXosip2 -lpthread
 
 %.o: %.C
 	$(CC) -c -o $@ $(CFLAGS) $<

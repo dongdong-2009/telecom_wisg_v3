@@ -95,18 +95,12 @@ private:
 	INT LOGADDR_DISPATCHER;	// 231
 
 	TMsgAddress m_dispatcherAddr;
-	BOOL m_isDispatcherAddrSet;
-
 	CVarChar m_webConnId;
 	CVarChar m_imsConnId;
 
-
-
 	string m_webSdp;
 	string m_imsSdp;
-
 	string m_sipName;
-
 
 
 	TIntCtrlMsg* m_intCtrlMsg_Rtc;
@@ -120,17 +114,17 @@ private:
 	UINT m_seq;
 	int m_accessMode;
 
-	bool m_isSdpConfirmed;
 
 	UINT m_sdpModifyFlag;
-
-	bool m_switchFlag;
 
 	UINT m_endFlag;
 
 	UINT m_joinFlag;
 
 	bool m_joinSend;
+	bool m_isSdpConfirmed;
+	bool m_switchFlag;
+	BOOL m_isDispatcherAddrSet;
 
 	bool selectSipUser(string rtcname);
 public:

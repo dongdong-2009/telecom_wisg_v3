@@ -7,7 +7,8 @@ CREATE_COMP(CR2SCallModule)
 using namespace log4cxx::xml;
 using namespace log4cxx;
 
-static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml", "SgFileAppender");
+static MyLogger& mLogger = MyLogger::getInstance("etc/log4cxx.xml",
+		"SgFileAppender");
 
 timers_poll * my_timers;
 timer * timer_rtc;
@@ -99,12 +100,12 @@ CR2SCallModule::~CR2SCallModule() {
 		m_rtcCtrlMsg = NULL;
 	}
 
-	if(m_intCtrlMsg_Rtc){
+	if (m_intCtrlMsg_Rtc) {
 		delete m_intCtrlMsg_Rtc;
 		m_intCtrlMsg_Rtc = NULL;
 	}
 
-	if(m_intCtrlMsg_Sip){
+	if (m_intCtrlMsg_Sip) {
 		delete m_intCtrlMsg_Sip;
 		m_intCtrlMsg_Sip = NULL;
 	}
@@ -112,7 +113,7 @@ CR2SCallModule::~CR2SCallModule() {
 	my_timers->timers_poll_deactive();//终止定时器
 
 	delete timerType_rtc;
-	delete	timer_rtc;
+	delete timer_rtc;
 	timer_rtc = NULL;
 
 	delete timerType_sip;
@@ -319,19 +320,19 @@ void CR2SCallModule::timeOut(timer* ptimer) {
 	TTimeMarkExt timerMark;
 	//getTimeMarkExt(timer_id, timerMark);
 	switch (timer_id) {
-//	case SIP_200OK_TIMEOUT:
-//	case SIP_ACK_TIMEOUT:
-//	case SIP_ACTIVE_TIMEOUT:
-//	case SIP_CONNECTING_TIMEOUT:
-//	case SIP_WAITBEAR_TIMEOUT:
-//	case SIP_RING_TIMEOUT:
+	//	case SIP_200OK_TIMEOUT:
+	//	case SIP_ACK_TIMEOUT:
+	//	case SIP_ACTIVE_TIMEOUT:
+	//	case SIP_CONNECTING_TIMEOUT:
+	//	case SIP_WAITBEAR_TIMEOUT:
+	//	case SIP_RING_TIMEOUT:
 	case 2:
 		m_sipContext.onTimeOut(timerMark);
 		break;
-//	case RTC_CONNECTION_TIMEOUT:
-//	case RTC_SHUTDOWN_TIMEOUT:
-//	case RTC_WAITSIP_TIMEOUT:
-//	case RTC_WAITBEAR_TIMEOUT:
+		//	case RTC_CONNECTION_TIMEOUT:
+		//	case RTC_SHUTDOWN_TIMEOUT:
+		//	case RTC_WAITSIP_TIMEOUT:
+		//	case RTC_WAITBEAR_TIMEOUT:
 	case 1:
 		m_rtcContext.onTimeOut(timerMark);
 		break;
@@ -352,27 +353,25 @@ void CR2SCallModule::setTimer(UINT timer_id) {
 	case SIP_ACTIVE_TIMEOUT:
 	case SIP_CONNECTING_TIMEOUT:
 	case SIP_WAITBEAR_TIMEOUT:
-	case SIP_RING_TIMEOUT:
-	{
+	case SIP_RING_TIMEOUT: {
 		//printf("setTimer_sip:: %d\n", timerMark.timerDelay);
 		//TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
 		//myType->timer_id = timer_id;
 		timer_sip->timer_modify_internal(timerMark.timerDelay);
 
 	}
-	break;
+		break;
 	case RTC_CONNECTION_TIMEOUT:
 	case RTC_SHUTDOWN_TIMEOUT:
 	case RTC_WAITSIP_TIMEOUT:
-	case RTC_WAITBEAR_TIMEOUT:
-	{
+	case RTC_WAITBEAR_TIMEOUT: {
 		//printf("setTimer_rtc:: %d\n", timerMark.timerDelay);
 		//TimerType* myType = (TimerType *) timer_sip->timer_get_userdata();
 		//myType->timer_id = timer_id;
 		timer_rtc->timer_modify_internal(timerMark.timerDelay);
 
 	}
-	break;
+		break;
 	default:
 		LOG4CXX_ERROR(mLogger.getLogger(), "setTimer: unknown Type "<<timer_id)
 		;
@@ -427,8 +426,8 @@ void CR2SCallModule::sendAnswerToWeb(TUniNetMsg * msg) {
 	pAnswer->sdp = pResp->body;
 
 	//tell dispatcher record map of the addr
-	sendToDispatcher(RTC_ANSWER, RTC_TYPE, DIALOG_BEGIN,
-			m_rtcCtrlMsg->clone(), pAnswer);
+	sendToDispatcher(RTC_ANSWER, RTC_TYPE, DIALOG_BEGIN, m_rtcCtrlMsg->clone(),
+			pAnswer);
 }
 
 void CR2SCallModule::sendErrorToWeb(int errorType) {
@@ -500,35 +499,33 @@ void CR2SCallModule::sendCloseToBear_Rtc() {
 	}
 }
 
-
-void CR2SCallModule::sendJoinToBear_Rtc(){
+void CR2SCallModule::sendJoinToBear_Rtc() {
 	if (m_intCtrlMsg_Rtc != NULL) {
 		PTIntJoin pJoin = new TIntJoin();
 		pJoin->connId1 = m_imsConnId;
 		pJoin->connId2 = m_webConnId;
-		sendToDispatcher(INT_JOIN, INT_TYPE, DIALOG_CONTINUE, m_intCtrlMsg_Rtc->clone(), pJoin);
+		sendToDispatcher(INT_JOIN, INT_TYPE, DIALOG_CONTINUE,
+				m_intCtrlMsg_Rtc->clone(), pJoin);
 	}
 }
 
 string CR2SCallModule::getUserName(const string& user) {
 
 	int i = user.find('@');
-	if (i != -1){
+	if (i != -1) {
 		//return user.substr(0, i).c_str();
-		return user.substr(0,i);
+		return user.substr(0, i);
 		//return tmp.c_str();
-	}
-	else
+	} else
 		return user.c_str();
 }
 
 string CR2SCallModule::getHost(const string& user) {
 	int i = user.find('@');
-	if (i != -1){
+	if (i != -1) {
 		//return user.substr(i + 1).c_str();
-		return user.substr(i+1);
-	}
-	else
+		return user.substr(i + 1);
+	} else
 		return "";
 }
 
@@ -840,54 +837,54 @@ void CR2SCallModule::handleUnexpectedMsg(TUniNetMsg * msg) {
 
 bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 	m_isSdpConfirmed = true;
-	if(msg->msgName == SIP_RESPONSE){
-		PTSipResp pResp = (PTSipResp)msg->msgBody;
+	if (msg->msgName == SIP_RESPONSE) {
+		PTSipResp pResp = (PTSipResp) msg->msgBody;
 		m_imsSdp = pResp->body.content.c_str();
-	}
-	else if(msg->msgName == SIP_UPDATE){
+	} else if (msg->msgName == SIP_UPDATE) {
 		PTSipUpdate pUpdate = (PTSipUpdate) msg->msgBody;
 		m_imsSdp = pUpdate->body.content.c_str();
 	}
 
+	unsigned int pos = 0;
+	while ((pos = m_imsSdp.find("m=", pos)) != string::npos) {
+		unsigned int pos2 = m_imsSdp.find(" ", pos);
+		pos += 2;
+		string mediaType = m_imsSdp.substr(pos, pos2 - pos);
+		if (m_webSdp.find("m=" + mediaType) == string::npos) {
+			LOG4CXX_INFO(mLogger.getLogger(), "WebRTC Do Not Support "<<mediaType<<", set PORT 0 in IMS SDP");
+			pos = pos2 + 1;
+			pos2 = m_imsSdp.find(" ", pos);
+			m_imsSdp.erase(pos, pos2 - pos);
+			m_imsSdp.insert(pos, "0");
+		}
+	}
 
-//	LOG4CXX_ERROR(mLogger.getLogger(), m_webSdp);
-//	string str = m_imsSdp;
-//	size_t pos = str.find("m=", 0);
-//	pos += 2;
-//
-//	size_t pos2 = str.find(" ", pos);
-//	string tmp = str.substr(pos, pos2-pos);
-//	LOG4CXX_ERROR(mLogger.getLogger(), "media_type1"<<tmp);
-//	if(tmp != "video"){
-//
-//		pos = str.find("m=", pos);
-//		pos +=2;
-//		pos2 = str.find(" ", pos);
-//
-//		tmp = str.substr(pos, pos2-pos);
-//		LOG4CXX_ERROR(mLogger.getLogger(), "media_type2"<<tmp);
-//
-//		pos = str.find(" ", pos2+1);
-//		string port = str.substr(pos2+1, pos-pos2);
-//		str.erase(pos2+1, pos-pos2);
-//		str.insert(pos2+1, "0 ");
-//	}
-//	else{
-//		pos = str.find(" ", pos2+1);
-//		string port = str.substr(pos2+1, pos-pos2);
-//		str.erase(pos2+1, pos-pos2);
-//		str.insert(pos2+1, "0 ");
-//	}
-//
-//	m_imsSdp = str;
+	pos = 0;
+	while ((pos = m_webSdp.find("m=", pos)) != string::npos) {
+		unsigned pos2 = m_webSdp.find(" ", pos);
+		pos += 2;
+		string mediaType = m_webSdp.substr(pos, pos2 - pos);
+		if (m_imsSdp.find("m=" + mediaType) == string::npos) {
+			LOG4CXX_INFO(mLogger.getLogger(), "IMS Do Not Support "<<mediaType<<", set PORT 0 in WebRTC SDP");
+			pos = pos2 + 1;
+			pos2 = m_webSdp.find(" ", pos);
+			m_webSdp.erase(pos, pos2 - pos);
+			m_webSdp.insert(pos, "0");
+		}
+	}
 
-
-
-	//compare with m_webBody
 	return true;
 }
 bool CR2SCallModule::compSdpWithOld(TUniNetMsg * msg) {
 	//set ims rtc body
+//	string imsBody;
+//	if (msg->msgName == SIP_INVITE) {
+//		PTSipInvite pInvite = (PTSipInvite) msg->msgBody;
+//		imsBody = pInvite->body.content.c_str();
+//	} else if (msg->msgName == SIP_UPDATE) {
+//		PTSipUpdate pUpdate = (PTSipUpdate) msg->msgBody;
+//		imsBody = pUpdate->body.content.c_str();
+//	}
 
 	return true;
 }
@@ -898,23 +895,23 @@ string CR2SCallModule::checkRespCseqMothod(TUniNetMsg * msg) {
 	return ctrlMsg->cseq_method.c_str();
 }
 
-void CR2SCallModule::setIMSConnId(TUniNetMsg * msg){
+void CR2SCallModule::setIMSConnId(TUniNetMsg * msg) {
 	PTIntResponse pResp = (PTIntResponse) msg->msgBody;
 	m_imsConnId = pResp->connId;
 	m_joinFlag = m_joinFlag | 0x02;
 	LOG4CXX_DEBUG(mLogger.getLogger(), "setIMSConnId: m_joinFlag="<<m_joinFlag);
-	if(!m_joinSend && ((m_joinFlag & 0x03) == 0x03)){
+	if (!m_joinSend && ((m_joinFlag & 0x03) == 0x03)) {
 		sendJoinToBear_Rtc();
 		m_joinSend = true;
 	}
 }
 
-void CR2SCallModule::setWebConnId(TUniNetMsg * msg){
+void CR2SCallModule::setWebConnId(TUniNetMsg * msg) {
 	PTIntResponse pResp = (PTIntResponse) msg->msgBody;
 	m_webConnId = pResp->connId;
 	m_joinFlag = m_joinFlag | 0x01;
 	LOG4CXX_DEBUG(mLogger.getLogger(), "setWebConnId: m_joinFlag="<<m_joinFlag);
-	if(!m_joinSend && ((m_joinFlag & 0x03) == 0x03)){
+	if (!m_joinSend && ((m_joinFlag & 0x03) == 0x03)) {
 		sendJoinToBear_Rtc();
 		m_joinSend = true;
 	}
