@@ -97,11 +97,6 @@ void CR2SCallModuleState_Sip::onSdpAnswer(CSipTermCallContext& context,
 	return;
 }
 
-void CR2SCallModuleState_Sip::onTimeOut(CSipTermCallContext& context,
-		TUniNetMsg* msg) {
-	Default(context);
-	return;
-}
 
 void CR2SCallModuleState_Sip::onTimeOut(CSipTermCallContext& context,
 		TTimeMarkExt timerMark) {
@@ -486,6 +481,30 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onClose(
 	return;
 }
 
+void CSipTermCallState_BEAR_GATEWAY_READY::onResponse(
+		CSipTermCallContext& context, TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
+
+	(context.getState()).Exit(context);
+	context.clearState();
+	if (true == ctxt.isResp3xx_6xx(msg)) {
+		//IMS return error. Example: timeout
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Sip();
+			ctxt.notifyRtcOrigCallError(msg);
+			ctxt.sendCloseToBear_Sip();
+			context.setState(CSipTermCallState::CLOSED);
+		} catch (...) {
+			context.setState(CSipTermCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+
+	}
+}
+
 void CSipTermCallState_BEAR_GATEWAY_READY::onError(
 		CSipTermCallContext& context, TUniNetMsg* msg) {
 	CR2SCallModule& ctxt(context.getOwner());
@@ -527,8 +546,7 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onSdpAnswer(
 	return;
 }
 
-void CSipTermCallState_BEAR_GATEWAY_READY::onTimeOut(
-		CSipTermCallContext& context, TUniNetMsg* msg) {
+void CSipTermCallState_BEAR_GATEWAY_READY::onTimeOut(CSipTermCallContext& context, TTimeMarkExt timerMark){
 	CR2SCallModule& ctxt(context.getOwner());
 
 	(context.getState()).Exit(context);

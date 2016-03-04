@@ -51,7 +51,6 @@ public:
     virtual void onNotify(CSipTermCallContext& context, TUniNetMsg* msg);
     virtual void onResponse(CSipTermCallContext& context, TUniNetMsg* msg);
     virtual void onSdpAnswer(CSipTermCallContext& context, TUniNetMsg* msg);
-    virtual void onTimeOut(CSipTermCallContext& context, TUniNetMsg* msg);
     virtual void onTimeOut(CSipTermCallContext& context, TTimeMarkExt timerMark);
     virtual void onUpdate(CSipTermCallContext& context, TUniNetMsg* msg);
 
@@ -133,7 +132,8 @@ public:
     void onClose(CSipTermCallContext& context, TUniNetMsg* msg);
     void onError(CSipTermCallContext& context, TUniNetMsg* msg);
     void onSdpAnswer(CSipTermCallContext& context, TUniNetMsg* msg);
-    void onTimeOut(CSipTermCallContext& context, TUniNetMsg* msg);
+    void onTimeOut(CSipTermCallContext& context, TTimeMarkExt timerMark);
+    void onResponse(CSipTermCallContext& context, TUniNetMsg* msg);
 };
 
 class CSipTermCallState_BEAR_CONFIRMING :
@@ -319,11 +319,6 @@ public:
     void onSdpAnswer(TUniNetMsg* msg)
     {
         (getState()).onSdpAnswer(*this, msg);
-    };
-
-    void onTimeOut(TUniNetMsg* msg)
-    {
-        (getState()).onTimeOut(*this, msg);
     };
 
     void onTimeOut(TTimeMarkExt timerMark)
