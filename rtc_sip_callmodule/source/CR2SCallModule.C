@@ -874,6 +874,12 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 	if((pos = m_webSdp.find("m=video", 0)) != string::npos && (pos2 = m_imsSdp.find("m=video")) == string::npos ){
 		LOG4CXX_INFO(mLogger.getLogger(), "IMS Do Not Support Video, set PORT 0 in WebRTC SDP");
 		m_webSdp = m_webSdp.substr(0, pos);
+
+		pos = m_webSdp.find("a=group:BUNDLE",0);
+		pos2 = m_webSdp.find("\r\n", pos);
+		m_webSdp.erase(pos, pos2-pos);
+		m_webSdp.insert(pos, "a=group:BUNDLE audio");
+
 	}
 //	while ((pos = m_webSdp.find("m=", pos)) != string::npos) {
 //		unsigned pos2 = m_webSdp.find(" ", pos);
