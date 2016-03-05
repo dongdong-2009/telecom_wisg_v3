@@ -5,7 +5,6 @@
  * from file : CRtcOrigCall_sm.sm
  */
 
-
 /*********************************************************************
  * Copyright (c)2010-2012, by BUPT
  * All rights reserved.
@@ -17,10 +16,9 @@
  * Date:           2016-1-13
  * Version:        1.0
  * Description:
-     Rtc_original_call module, WebRTC???????��????
+ Rtc_original_call module, WebRTC???????��????
 
-*******************************************************************************/
-
+ *******************************************************************************/
 
 #include "CR2SCallModule.h"
 #include "CRtcOrigCall_sm.h"
@@ -29,1044 +27,913 @@ using namespace statemap;
 
 // Static class declarations.
 CRtcOrigCallState_IDLE CRtcOrigCallState::IDLE("CRtcOrigCallState::IDLE", 0);
-CRtcOrigCallState_RTC_CONFIRMING CRtcOrigCallState::RTC_CONFIRMING("CRtcOrigCallState::RTC_CONFIRMING", 1);
-CRtcOrigCallState_BEAR_CONFIRMING CRtcOrigCallState::BEAR_CONFIRMING("CRtcOrigCallState::BEAR_CONFIRMING", 2);
-CRtcOrigCallState_BEAR_CONFIRMED CRtcOrigCallState::BEAR_CONFIRMED("CRtcOrigCallState::BEAR_CONFIRMED", 3);
-CRtcOrigCallState_ACTIVE CRtcOrigCallState::ACTIVE("CRtcOrigCallState::ACTIVE", 4);
-CRtcOrigCallState_ACTIVE_WAIT1 CRtcOrigCallState::ACTIVE_WAIT1("CRtcOrigCallState::ACTIVE_WAIT1", 5);
-CRtcOrigCallState_ACTIVE_WAIT2 CRtcOrigCallState::ACTIVE_WAIT2("CRtcOrigCallState::ACTIVE_WAIT2", 6);
-CRtcOrigCallState_CLOSED CRtcOrigCallState::CLOSED("CRtcOrigCallState::CLOSED", 7);
+CRtcOrigCallState_RTC_CONFIRMING CRtcOrigCallState::RTC_CONFIRMING(
+		"CRtcOrigCallState::RTC_CONFIRMING", 1);
+CRtcOrigCallState_BEAR_CONFIRMING CRtcOrigCallState::BEAR_CONFIRMING(
+		"CRtcOrigCallState::BEAR_CONFIRMING", 2);
+CRtcOrigCallState_BEAR_CONFIRMED CRtcOrigCallState::BEAR_CONFIRMED(
+		"CRtcOrigCallState::BEAR_CONFIRMED", 3);
+CRtcOrigCallState_ACTIVE CRtcOrigCallState::ACTIVE("CRtcOrigCallState::ACTIVE",
+		4);
+CRtcOrigCallState_ACTIVE_WAIT1 CRtcOrigCallState::ACTIVE_WAIT1(
+		"CRtcOrigCallState::ACTIVE_WAIT1", 5);
+CRtcOrigCallState_ACTIVE_WAIT2 CRtcOrigCallState::ACTIVE_WAIT2(
+		"CRtcOrigCallState::ACTIVE_WAIT2", 6);
+CRtcOrigCallState_CLOSED CRtcOrigCallState::CLOSED("CRtcOrigCallState::CLOSED",
+		7);
 
-void CR2SCallModuleState_Rtc::onAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
+void CR2SCallModuleState_Rtc::onAnswer(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	Default(context);
+	return;
 }
 
-void CR2SCallModuleState_Rtc::onClose(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
+void CR2SCallModuleState_Rtc::onClose(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	Default(context);
+	return;
 }
 
-void CR2SCallModuleState_Rtc::onError(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
+void CR2SCallModuleState_Rtc::onError(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	Default(context);
+	return;
 }
 
-void CR2SCallModuleState_Rtc::onNotify(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
+void CR2SCallModuleState_Rtc::onNotify(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	Default(context);
+	return;
 }
 
-void CR2SCallModuleState_Rtc::onOK(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
+void CR2SCallModuleState_Rtc::onOK(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	Default(context);
+	return;
 }
 
-void CR2SCallModuleState_Rtc::onOffer(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
+void CR2SCallModuleState_Rtc::onOffer(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	Default(context);
+	return;
 }
 
-void CR2SCallModuleState_Rtc::onSdpAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
+void CR2SCallModuleState_Rtc::onSdpAnswer(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	Default(context);
+	return;
 }
 
-void CR2SCallModuleState_Rtc::onShutDown(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
+void CR2SCallModuleState_Rtc::onShutDown(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	Default(context);
+	return;
 }
 
-void CR2SCallModuleState_Rtc::onTimeOut(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    Default(context);
-    return;
+void CR2SCallModuleState_Rtc::onTimeOut(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	Default(context);
+	return;
 }
 
-void CR2SCallModuleState_Rtc::onTimeOut(CRtcOrigCallContext& context, TTimeMarkExt timerMark)
-{
-    Default(context);
-    return;
+void CR2SCallModuleState_Rtc::onTimeOut(CRtcOrigCallContext& context,
+		TTimeMarkExt timerMark) {
+	Default(context);
+	return;
 }
 
-void CR2SCallModuleState_Rtc::Default(CRtcOrigCallContext& context)
-{
-    throw (
-        TransitionUndefinedException(
-            context.getState().getName(),
-            context.getTransition()));
+void CR2SCallModuleState_Rtc::Default(CRtcOrigCallContext& context) {
+	throw(TransitionUndefinedException(context.getState().getName(),
+			context.getTransition()));
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_Default::onSdpAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_Default::onSdpAnswer(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState_Rtc& endState = context.getState();
+	CR2SCallModuleState_Rtc& endState = context.getState();
 
-    context.clearState();
-    try
-    {
-        ctxt.handleUnexpectedMsg(msg);
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
+	context.clearState();
+	try {
+		ctxt.handleUnexpectedMsg(msg);
+		context.setState(endState);
+	} catch (...) {
+		context.setState(endState);
+		throw;
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_Default::onShutDown(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_Default::onShutDown(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState_Rtc& endState = context.getState();
+	CR2SCallModuleState_Rtc& endState = context.getState();
 
-    context.clearState();
-    try
-    {
-        ctxt.handleUnexpectedMsg(msg);
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
+	context.clearState();
+	try {
+		ctxt.handleUnexpectedMsg(msg);
+		context.setState(endState);
+	} catch (...) {
+		context.setState(endState);
+		throw;
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_Default::onClose(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_Default::onClose(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState_Rtc& endState = context.getState();
+	CR2SCallModuleState_Rtc& endState = context.getState();
 
-    context.clearState();
-    try
-    {
-        ctxt.handleUnexpectedMsg(msg);
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
+	context.clearState();
+	try {
+		ctxt.handleUnexpectedMsg(msg);
+		context.setState(endState);
+	} catch (...) {
+		context.setState(endState);
+		throw;
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_Default::onError(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_Default::onError(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState_Rtc& endState = context.getState();
+	CR2SCallModuleState_Rtc& endState = context.getState();
 
-    context.clearState();
-    try
-    {
-        ctxt.handleUnexpectedMsg(msg);
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
+	context.clearState();
+	try {
+		ctxt.handleUnexpectedMsg(msg);
+		context.setState(endState);
+	} catch (...) {
+		context.setState(endState);
+		throw;
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_Default::onOK(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_Default::onOK(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState_Rtc& endState = context.getState();
+	CR2SCallModuleState_Rtc& endState = context.getState();
 
-    context.clearState();
-    try
-    {
-        ctxt.handleUnexpectedMsg(msg);
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
+	context.clearState();
+	try {
+		ctxt.handleUnexpectedMsg(msg);
+		context.setState(endState);
+	} catch (...) {
+		context.setState(endState);
+		throw;
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_Default::onOffer(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_Default::onOffer(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState_Rtc& endState = context.getState();
+	CR2SCallModuleState_Rtc& endState = context.getState();
 
-    context.clearState();
-    try
-    {
-        ctxt.handleUnexpectedMsg(msg);
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
+	context.clearState();
+	try {
+		ctxt.handleUnexpectedMsg(msg);
+		context.setState(endState);
+	} catch (...) {
+		context.setState(endState);
+		throw;
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_Default::onAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_Default::onAnswer(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState_Rtc& endState = context.getState();
+	CR2SCallModuleState_Rtc& endState = context.getState();
 
-    context.clearState();
-    try
-    {
-        ctxt.handleUnexpectedMsg(msg);
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
+	context.clearState();
+	try {
+		ctxt.handleUnexpectedMsg(msg);
+		context.setState(endState);
+	} catch (...) {
+		context.setState(endState);
+		throw;
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_Default::onNotify(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_Default::onNotify(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState_Rtc& endState = context.getState();
+	CR2SCallModuleState_Rtc& endState = context.getState();
 
-    context.clearState();
-    try
-    {
-        ctxt.handleUnexpectedMsg(msg);
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
+	context.clearState();
+	try {
+		ctxt.handleUnexpectedMsg(msg);
+		context.setState(endState);
+	} catch (...) {
+		context.setState(endState);
+		throw;
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_Default::onTimeOut(CRtcOrigCallContext& context, TTimeMarkExt timerMark)
-{
+void CRtcOrigCallState_Default::onTimeOut(CRtcOrigCallContext& context,
+		TTimeMarkExt timerMark) {
 
-
-    return;
+	return;
 }
 
-void CRtcOrigCallState_IDLE::onOffer(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_IDLE::onOffer(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    if (true == ctxt.checkSipUserAvailable(msg))
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.setTimer(RTC_WAITSIP_TIMEOUT);
-            ctxt.notifySipTermCallSdp(msg);
-            context.setState(CRtcOrigCallState::RTC_CONFIRMING);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::RTC_CONFIRMING);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }
-    else if (false == ctxt.checkSipUserAvailable(msg))
+	if (true == ctxt.checkSipUserAvailable(msg)) {
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.setTimer(RTC_WAITSIP_TIMEOUT);
+			ctxt.notifySipTermCallSdp(msg);
+			context.setState(CRtcOrigCallState::RTC_CONFIRMING);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::RTC_CONFIRMING);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else if (false == ctxt.checkSipUserAvailable(msg))
 
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.sendErrorToWeb(ERROR_NOSIP);
-            context.setState(CRtcOrigCallState::CLOSED);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::CLOSED);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }    else
-    {
-         CRtcOrigCallState_Default::onOffer(context, msg);
-    }
+	{
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.sendErrorToWeb(ERROR_NOSIP);
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else {
+		CRtcOrigCallState_Default::onOffer(context, msg);
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_RTC_CONFIRMING::onClose(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_RTC_CONFIRMING::onClose(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.sendErrorToWeb(ERROR_NOMATCH);
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.sendErrorToWeb(ERROR_NOMATCH);
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_RTC_CONFIRMING::onError(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_RTC_CONFIRMING::onError(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.forwardErrorToWeb(msg);
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.forwardErrorToWeb(msg);
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_RTC_CONFIRMING::onNotify(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_RTC_CONFIRMING::onNotify(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    if (true == ctxt.isSdpConfirmed())
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.stopTimer_Rtc();
-            ctxt.sendReqToBear_Rtc();
-            ctxt.setTimer(RTC_WAITBEAR_TIMEOUT);
-            context.setState(CRtcOrigCallState::BEAR_CONFIRMING);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::BEAR_CONFIRMING);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }
-    else if (false == ctxt.isSdpConfirmed())
+	if (true == ctxt.isSdpConfirmed()) {
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.sendReqToBear_Rtc();
+			ctxt.setTimer(RTC_WAITBEAR_TIMEOUT);
+			context.setState(CRtcOrigCallState::BEAR_CONFIRMING);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::BEAR_CONFIRMING);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else if (false == ctxt.isSdpConfirmed())
 
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.stopTimer_Rtc();
-            ctxt.sendErrorToWeb(ERROR_NOMATCH);
-            context.setState(CRtcOrigCallState::CLOSED);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::CLOSED);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }    else
-    {
-         CRtcOrigCallState_Default::onNotify(context, msg);
-    }
+	{
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.sendErrorToWeb(ERROR_NOMATCH);
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else {
+		CRtcOrigCallState_Default::onNotify(context, msg);
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_RTC_CONFIRMING::onShutDown(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_RTC_CONFIRMING::onShutDown(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.notifySipTermCallClose();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.notifySipTermCallClose();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_RTC_CONFIRMING::onTimeOut(CRtcOrigCallContext& context, TTimeMarkExt timerMark)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_RTC_CONFIRMING::onTimeOut(CRtcOrigCallContext& context,
+		TTimeMarkExt timerMark) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.notifySipTermCallClose();
-        ctxt.sendErrorToWeb(ERROR_TIMEOUT);
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.notifySipTermCallClose();
+		ctxt.sendErrorToWeb(ERROR_TIMEOUT);
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_BEAR_CONFIRMING::onClose(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_BEAR_CONFIRMING::onClose(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    if (true == ctxt.isFromSip(msg))
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.stopTimer_Rtc();
-            ctxt.sendErrorToWeb(ERROR_REFUSED);
-            ctxt.sendCloseToBear_Rtc();
-            context.setState(CRtcOrigCallState::CLOSED);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::CLOSED);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }
-    else
-    {
-         CRtcOrigCallState_Default::onClose(context, msg);
-    }
+	if (true == ctxt.isFromSip(msg)) {
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.sendErrorToWeb(ERROR_REFUSED);
+			ctxt.sendCloseToBear_Rtc();
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else if (false == ctxt.isFromSip(msg)) {//from Bear
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.sendErrorToWeb(ERROR_MEDIAFAILED);
+			ctxt.notifySipTermCallClose();
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else {
+		CRtcOrigCallState_Default::onClose(context, msg);
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_BEAR_CONFIRMING::onError(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_BEAR_CONFIRMING::onError(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.sendErrorToWeb(ERROR_MEDIAFAILED);
-        ctxt.notifySipTermCallClose();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.sendErrorToWeb(ERROR_MEDIAFAILED);
+		ctxt.notifySipTermCallClose();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_BEAR_CONFIRMING::onSdpAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_BEAR_CONFIRMING::onSdpAnswer(
+		CRtcOrigCallContext& context, TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.setWebConnId(msg);
-        ctxt.sendAnswerToWeb(msg);
-        ctxt.setTimer(RTC_CONNECTION_TIMEOUT);
-        context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.setWebConnId(msg);
+		ctxt.sendAnswerToWeb(msg);
+		ctxt.setTimer(RTC_CONNECTION_TIMEOUT);
+		context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_BEAR_CONFIRMING::onShutDown(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_BEAR_CONFIRMING::onShutDown(
+		CRtcOrigCallContext& context, TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.notifySipTermCallClose();
-        ctxt.sendCloseToBear_Rtc();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.notifySipTermCallClose();
+		ctxt.sendCloseToBear_Rtc();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_BEAR_CONFIRMING::onTimeOut(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_BEAR_CONFIRMING::onTimeOut(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.sendErrorToWeb(ERROR_TIMEOUT);
-        ctxt.notifySipTermCallClose();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.sendErrorToWeb(ERROR_TIMEOUT);
+		ctxt.notifySipTermCallClose();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_BEAR_CONFIRMED::onClose(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_BEAR_CONFIRMED::onClose(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    if (true == ctxt.isFromSip(msg))
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.stopTimer_Rtc();
-            ctxt.sendShutdownToWeb();
-            ctxt.sendCloseToBear_Rtc();
-            context.setState(CRtcOrigCallState::CLOSED);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::CLOSED);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }
-    else if (false == ctxt.isFromSip(msg))
+	if (true == ctxt.isFromSip(msg)) {
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.sendShutdownToWeb();
+			ctxt.sendCloseToBear_Rtc();
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else if (false == ctxt.isFromSip(msg))
 
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.stopTimer_Rtc();
-            ctxt.notifySipTermCallClose();
-            ctxt.sendShutdownToWeb();
-            context.setState(CRtcOrigCallState::CLOSED);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::CLOSED);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }    else
-    {
-         CRtcOrigCallState_Default::onClose(context, msg);
-    }
+	{
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.notifySipTermCallClose();
+			ctxt.sendShutdownToWeb();
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else {
+		CRtcOrigCallState_Default::onClose(context, msg);
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_BEAR_CONFIRMED::onOK(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_BEAR_CONFIRMED::onOK(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        context.setState(CRtcOrigCallState::ACTIVE);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::ACTIVE);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		context.setState(CRtcOrigCallState::ACTIVE);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::ACTIVE);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_BEAR_CONFIRMED::onShutDown(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_BEAR_CONFIRMED::onShutDown(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.notifySipTermCallClose();
-        ctxt.sendCloseToBear_Rtc();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.notifySipTermCallClose();
+		ctxt.sendCloseToBear_Rtc();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_BEAR_CONFIRMED::onTimeOut(CRtcOrigCallContext& context, TTimeMarkExt timerMark)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_BEAR_CONFIRMED::onTimeOut(CRtcOrigCallContext& context,
+		TTimeMarkExt timerMark) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.sendCloseToBear_Rtc();
-        ctxt.notifySipTermCallClose();
-        ctxt.sendShutdownToWeb();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.sendCloseToBear_Rtc();
+		ctxt.notifySipTermCallClose();
+		ctxt.sendShutdownToWeb();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE::onClose(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE::onClose(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    if (true == ctxt.isFromSip(msg))
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.sendShutdownToWeb();
-            ctxt.sendCloseToBear_Rtc();
-            context.setState(CRtcOrigCallState::CLOSED);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::CLOSED);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }
-    else if (false == ctxt.isFromSip(msg))
+	if (true == ctxt.isFromSip(msg)) {
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.sendShutdownToWeb();
+			ctxt.sendCloseToBear_Rtc();
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else if (false == ctxt.isFromSip(msg))
 
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.notifySipTermCallClose();
-            ctxt.sendShutdownToWeb();
-            context.setState(CRtcOrigCallState::CLOSED);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::CLOSED);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }    else
-    {
-         CRtcOrigCallState_Default::onClose(context, msg);
-    }
+	{
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.notifySipTermCallClose();
+			ctxt.sendShutdownToWeb();
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else {
+		CRtcOrigCallState_Default::onClose(context, msg);
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE::onNotify(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE::onNotify(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    CR2SCallModuleState_Rtc& endState = context.getState();
+	CR2SCallModuleState_Rtc& endState = context.getState();
 
-    context.clearState();
-    try
-    {
-       // ctxt.resetSwitchFlag();
-        ctxt.sendNotifyToWeb(msg);
-        context.setState(endState);
-    }
-    catch (...)
-    {
-        context.setState(endState);
-        throw;
-    }
+	context.clearState();
+	try {
+		// ctxt.resetSwitchFlag();
+		ctxt.sendNotifyToWeb(msg);
+		context.setState(endState);
+	} catch (...) {
+		context.setState(endState);
+		throw;
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE::onOffer(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE::onOffer(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    if (true == ctxt.isSwitch())
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.setTimer(RTC_WAITBEAR_TIMEOUT);
-            ctxt.sendReqToBear_Rtc();
-            context.setState(CRtcOrigCallState::ACTIVE_WAIT1);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::ACTIVE_WAIT1);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }
-    else
-    {
-         CRtcOrigCallState_Default::onOffer(context, msg);
-    }
+	if (true == ctxt.isSwitch()) {
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.setTimer(RTC_WAITBEAR_TIMEOUT);
+			ctxt.sendReqToBear_Rtc();
+			context.setState(CRtcOrigCallState::ACTIVE_WAIT1);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::ACTIVE_WAIT1);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else {
+		CRtcOrigCallState_Default::onOffer(context, msg);
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE::onShutDown(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE::onShutDown(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.notifySipTermCallClose();
-        ctxt.sendCloseToBear_Rtc();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.notifySipTermCallClose();
+		ctxt.sendCloseToBear_Rtc();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE_WAIT1::onClose(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE_WAIT1::onClose(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    if (true == ctxt.isFromSip(msg))
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.stopTimer_Rtc();
-            ctxt.sendErrorToWeb(ERROR_REFUSED);
-            ctxt.sendCloseToBear_Rtc();
-            context.setState(CRtcOrigCallState::CLOSED);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::CLOSED);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }
-    else
-    {
-         CRtcOrigCallState_Default::onClose(context, msg);
-    }
+	if (true == ctxt.isFromSip(msg)) {
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.sendErrorToWeb(ERROR_REFUSED);
+			ctxt.sendCloseToBear_Rtc();
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else {
+		CRtcOrigCallState_Default::onClose(context, msg);
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE_WAIT1::onError(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE_WAIT1::onError(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.sendErrorToWeb(ERROR_MEDIAFAILED);
-        ctxt.notifySipTermCallClose();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.sendErrorToWeb(ERROR_MEDIAFAILED);
+		ctxt.notifySipTermCallClose();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE_WAIT1::onSdpAnswer(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE_WAIT1::onSdpAnswer(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-    	ctxt.setWebConnId(msg);
-        ctxt.stopTimer_Rtc();
-        ctxt.sendAnswerToWeb(msg);
-        ctxt.setTimer(RTC_CONNECTION_TIMEOUT);
-        context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.setWebConnId(msg);
+		ctxt.stopTimer_Rtc();
+		ctxt.sendAnswerToWeb(msg);
+		ctxt.setTimer(RTC_CONNECTION_TIMEOUT);
+		context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::BEAR_CONFIRMED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE_WAIT1::onShutDown(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE_WAIT1::onShutDown(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.notifySipTermCallClose();
-        ctxt.sendCloseToBear_Rtc();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.notifySipTermCallClose();
+		ctxt.sendCloseToBear_Rtc();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE_WAIT1::onTimeOut(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE_WAIT1::onTimeOut(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.sendErrorToWeb(ERROR_TIMEOUT);
-        ctxt.notifySipTermCallClose();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.sendErrorToWeb(ERROR_TIMEOUT);
+		ctxt.notifySipTermCallClose();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE_WAIT2::onClose(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE_WAIT2::onClose(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    if (true == ctxt.isFromSip(msg))
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.stopTimer_Rtc();
-            ctxt.sendShutdownToWeb();
-            ctxt.sendCloseToBear_Rtc();
-            context.setState(CRtcOrigCallState::CLOSED);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::CLOSED);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }
-    else if (false == ctxt.isFromSip(msg))
+	if (true == ctxt.isFromSip(msg)) {
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.sendShutdownToWeb();
+			ctxt.sendCloseToBear_Rtc();
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else if (false == ctxt.isFromSip(msg))
 
-    {
-        (context.getState()).Exit(context);
-        context.clearState();
-        try
-        {
-            ctxt.stopTimer_Rtc();
-            ctxt.notifySipTermCallClose();
-            ctxt.sendShutdownToWeb();
-            context.setState(CRtcOrigCallState::CLOSED);
-        }
-        catch (...)
-        {
-            context.setState(CRtcOrigCallState::CLOSED);
-            throw;
-        }
-        (context.getState()).Entry(context);
-    }    else
-    {
-         CRtcOrigCallState_Default::onClose(context, msg);
-    }
+	{
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.notifySipTermCallClose();
+			ctxt.sendShutdownToWeb();
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else {
+		CRtcOrigCallState_Default::onClose(context, msg);
+	}
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE_WAIT2::onOK(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE_WAIT2::onOK(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        context.setState(CRtcOrigCallState::ACTIVE);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::ACTIVE);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		context.setState(CRtcOrigCallState::ACTIVE);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::ACTIVE);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE_WAIT2::onShutDown(CRtcOrigCallContext& context, TUniNetMsg* msg)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE_WAIT2::onShutDown(CRtcOrigCallContext& context,
+		TUniNetMsg* msg) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.notifySipTermCallClose();
-        ctxt.sendCloseToBear_Rtc();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.notifySipTermCallClose();
+		ctxt.sendCloseToBear_Rtc();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
-void CRtcOrigCallState_ACTIVE_WAIT2::onTimeOut(CRtcOrigCallContext& context, TTimeMarkExt timerMark)
-{
-    CR2SCallModule& ctxt(context.getOwner());
+void CRtcOrigCallState_ACTIVE_WAIT2::onTimeOut(CRtcOrigCallContext& context,
+		TTimeMarkExt timerMark) {
+	CR2SCallModule& ctxt(context.getOwner());
 
-    (context.getState()).Exit(context);
-    context.clearState();
-    try
-    {
-        ctxt.stopTimer_Rtc();
-        ctxt.sendCloseToBear_Rtc();
-        ctxt.notifySipTermCallClose();
-        ctxt.sendShutdownToWeb();
-        context.setState(CRtcOrigCallState::CLOSED);
-    }
-    catch (...)
-    {
-        context.setState(CRtcOrigCallState::CLOSED);
-        throw;
-    }
-    (context.getState()).Entry(context);
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Rtc();
+		ctxt.sendCloseToBear_Rtc();
+		ctxt.notifySipTermCallClose();
+		ctxt.sendShutdownToWeb();
+		context.setState(CRtcOrigCallState::CLOSED);
+	} catch (...) {
+		context.setState(CRtcOrigCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
 
-    return;
+	return;
 }
 
 void CRtcOrigCallState_CLOSED::Entry(CRtcOrigCallContext& context)
 
 {
-    CR2SCallModule& ctxt(context.getOwner());
+	CR2SCallModule& ctxt(context.getOwner());
 
-    ctxt.endTask_Rtc();
-    return;
+	ctxt.endTask_Rtc();
+	return;
 }
 
 /*

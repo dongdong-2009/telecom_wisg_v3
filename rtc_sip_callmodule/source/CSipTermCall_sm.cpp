@@ -461,7 +461,7 @@ void CSipTermCallState_CALLPROC::onTimeOut(CSipTermCallContext& context,
 	return;
 }
 
-void CSipTermCallState_BEAR_GATEWAY_READY::onClose(
+void CSipTermCallState_BEAR_GATEWAY_READY::onClose(//from bear
 		CSipTermCallContext& context, TUniNetMsg* msg) {
 	CR2SCallModule& ctxt(context.getOwner());
 
@@ -471,6 +471,7 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onClose(
 		ctxt.stopTimer_Sip();
 		ctxt.sendCloseToBear_Sip();
 		ctxt.sendCancelToIMS();
+		//notify rtc
 		context.setState(CSipTermCallState::CLOSED);
 	} catch (...) {
 		context.setState(CSipTermCallState::CLOSED);

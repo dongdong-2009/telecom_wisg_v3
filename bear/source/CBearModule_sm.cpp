@@ -271,9 +271,10 @@ void CBearState_BEAR_INITIAL::onTimeOut(CBearModuleContext& context, TTimeMarkEx
     context.clearState();
     try
     {
+    	ctxt.stopTimer();
         ctxt.sendCloseToCall();
         ctxt.sendCancelToMS();
-        ctxt.stopTimer();
+
         context.setState(CBearState::CLOSED);
     }
     catch (...)
