@@ -491,9 +491,13 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onResponse(
 		(context.getState()).Exit(context);
 		context.clearState();
 		try {
+			printf("1\n");
 			ctxt.stopTimer_Sip();
+			printf("2\n");
 			ctxt.notifyRtcOrigCallError(msg);
+			printf("3\n");
 			ctxt.sendCloseToBear_Sip();
+			printf("4\n");
 			context.setState(CSipTermCallState::CLOSED);
 		} catch (...) {
 			context.setState(CSipTermCallState::CLOSED);
