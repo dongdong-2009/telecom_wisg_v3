@@ -487,9 +487,12 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onResponse(
 	CR2SCallModule& ctxt(context.getOwner());
 
 	if (true == ctxt.isResp3xx_6xx(msg)) {
-		//IMS return error. Example: timeout
+		//IMS return error. Example: timeout, 480
+		printf("llllll\n");
 		(context.getState()).Exit(context);
+		printf("jjjjjjjjjj\n");
 		context.clearState();
+		printf("kkkkkkk\n");
 		try {
 			printf("1\n");
 			ctxt.stopTimer_Sip();
