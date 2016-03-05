@@ -245,7 +245,7 @@ void CR2SCallModule::procMsg(PTUniNetMsg msg) {
 		m_rtcContext.onShutDown(msg);
 		break;
 	case RTC_ERROR:
-		m_rtcContext.onError(msg);
+		m_rtcContext.onShutDown(msg);
 		break;
 
 	case INT_RESPONSE: {
@@ -769,7 +769,8 @@ void CR2SCallModule::notifySipTermCallSdp(TUniNetMsg * msg) {
 
 void CR2SCallModule::notifySipTermCallClose() {
 	//onClose(NULL)
-	m_sipContext.onClose(NULL);
+	if( (m_endFlag & 0x01) != 0x01)
+		m_sipContext.onClose(NULL);
 }
 
 //void notifyRtcOrigCallSdp();
@@ -783,56 +784,64 @@ void CR2SCallModule::notifyRtcOrigCallSdp() {
 }
 
 void CR2SCallModule::notifyRtcOrigCallError(TUniNetMsg * msg) {
-	TRtcError * pError = new TRtcError();
-	pError->seq = m_seq;
+	if((m_endFlag & 0x02) != 0x02){
+		TRtcError * pError = new TRtcError();
+		pError->seq = m_seq;
 
-	PTSipResp pSipResp = (PTSipResp) msg->msgBody;
+		PTSipResp pSipResp = (PTSipResp) msg->msgBody;
 
-	if (pSipResp->statusCode == 481) {
-		pError->errorType = ERROR_NOMATCH;
-	} else if (pSipResp->statusCode == 486 || pSipResp->statusCode == 600) {
-		pError->errorType = ERROR_REFUSED;
-	} else if (pSipResp->statusCode == 408) {
-		pError->errorType = ERROR_TIMEOUT;
-	} else if (pSipResp->statusCode == 491) {
-		pError->errorType = ERROR_CONFLICT;
-	} else if (pSipResp->statusCode == 404) {
-		pError->errorType = ERROR_OFFLINE;
-	} else if (pSipResp->statusCode < 700 && pSipResp->statusCode > 300) {
-		pError->errorType = ERROR_FAILED;
+		if (pSipResp->statusCode == 481) {
+				pError->errorType = ERROR_NOMATCH;
+		} else if (pSipResp->statusCode == 486 || pSipResp->statusCode == 600) {
+				pError->errorType = ERROR_REFUSED;
+		} else if (pSipResp->statusCode == 408) {
+				pError->errorType = ERROR_TIMEOUT;
+		} else if (pSipResp->statusCode == 491) {
+				pError->errorType = ERROR_CONFLICT;
+		} else if (pSipResp->statusCode == 404) {
+				pError->errorType = ERROR_OFFLINE;
+		} else if (pSipResp->statusCode < 700 && pSipResp->statusCode > 300) {
+				pError->errorType = ERROR_FAILED;
+		}
+
+		PTUniNetMsg newMsg = new TUniNetMsg();
+		newMsg->ctrlMsgHdr = m_rtcCtrlMsg->clone();
+		newMsg->setCtrlMsgHdr();
+		newMsg->msgBody = pError;
+		newMsg->setMsgBody();
+
+		m_rtcContext.onError(newMsg);
+
 	}
-
-	PTUniNetMsg newMsg = new TUniNetMsg();
-	newMsg->ctrlMsgHdr = m_rtcCtrlMsg->clone();
-	newMsg->setCtrlMsgHdr();
-	newMsg->msgBody = pError;
-	newMsg->setMsgBody();
-
-	m_rtcContext.onError(newMsg);
 
 }
 
 void CR2SCallModule::notifyRtcOrigCallClose() {
-	m_rtcContext.onClose(NULL);
+	if((m_endFlag & 0x02) != 0x02){
+		m_rtcContext.onClose(NULL);
+	}
 }
 
 void CR2SCallModule::notifyRtcOrigCallError(const int errorType) {
-	TRtcError * pError = new TRtcError();
-	pError->seq = m_seq;
+	if((m_endFlag&0x02) != 0x02){
+		TRtcError * pError = new TRtcError();
+		pError->seq = m_seq;
 
-	pError->errorType = errorType;
+		pError->errorType = errorType;
 
-	PTUniNetMsg msg = new TUniNetMsg();
-	msg->ctrlMsgHdr = m_rtcCtrlMsg;
-	msg->setCtrlMsgHdr();
-	msg->msgBody = pError;
-	msg->setMsgBody();
+		PTUniNetMsg msg = new TUniNetMsg();
+		msg->ctrlMsgHdr = m_rtcCtrlMsg;
+		msg->setCtrlMsgHdr();
+		msg->msgBody = pError;
+		msg->setMsgBody();
 
-	m_rtcContext.onError(msg);
+		m_rtcContext.onError(msg);
+
+	}
 }
 
 void CR2SCallModule::handleUnexpectedMsg(TUniNetMsg * msg) {
-
+	LOG4CXX_DEBUG(mLogger.getLogger(), "CR2SCallModule Recv Unexpected Msg!")
 }
 
 bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {

@@ -490,17 +490,12 @@ void CSipTermCallState_BEAR_GATEWAY_READY::onResponse(
 		//IMS return error. Example: timeout, 480
 		printf("llllll\n");
 		(context.getState()).Exit(context);
-		printf("jjjjjjjjjj\n");
 		context.clearState();
-		printf("kkkkkkk\n");
+		printf("lll\n");
 		try {
-			printf("1\n");
 			ctxt.stopTimer_Sip();
-			printf("2\n");
 			ctxt.notifyRtcOrigCallError(msg);
-			printf("3\n");
 			ctxt.sendCloseToBear_Sip();
-			printf("4\n");
 			context.setState(CSipTermCallState::CLOSED);
 		} catch (...) {
 			context.setState(CSipTermCallState::CLOSED);

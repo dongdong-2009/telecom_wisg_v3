@@ -298,18 +298,34 @@ void CRtcOrigCallState_IDLE::onOffer(CRtcOrigCallContext& context,
 void CRtcOrigCallState_RTC_CONFIRMING::onClose(CRtcOrigCallContext& context,
 		TUniNetMsg* msg) {
 	CR2SCallModule& ctxt(context.getOwner());
-
-	(context.getState()).Exit(context);
-	context.clearState();
-	try {
-		ctxt.stopTimer_Rtc();
-		ctxt.sendErrorToWeb(ERROR_NOMATCH);
-		context.setState(CRtcOrigCallState::CLOSED);
-	} catch (...) {
-		context.setState(CRtcOrigCallState::CLOSED);
-		throw;
+	if (ctxt.isFromSip(msg)) {
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.sendErrorToWeb(ERROR_NOMATCH);
+			ctxt.sendCloseToBear_Rtc();
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
+	} else if (!ctxt.isFromSip(msg)) {
+		//from bear
+		(context.getState()).Exit(context);
+		context.clearState();
+		try {
+			ctxt.stopTimer_Rtc();
+			ctxt.notifySipTermCallClose();
+			ctxt.sendErrorToWeb(ERROR_MEDIAFAILED);
+			context.setState(CRtcOrigCallState::CLOSED);
+		} catch (...) {
+			context.setState(CRtcOrigCallState::CLOSED);
+			throw;
+		}
+		(context.getState()).Entry(context);
 	}
-	(context.getState()).Entry(context);
 
 	return;
 }
@@ -317,12 +333,12 @@ void CRtcOrigCallState_RTC_CONFIRMING::onClose(CRtcOrigCallContext& context,
 void CRtcOrigCallState_RTC_CONFIRMING::onError(CRtcOrigCallContext& context,
 		TUniNetMsg* msg) {
 	CR2SCallModule& ctxt(context.getOwner());
-
 	(context.getState()).Exit(context);
 	context.clearState();
 	try {
 		ctxt.stopTimer_Rtc();
 		ctxt.forwardErrorToWeb(msg);
+		ctxt.sendCloseToBear_Rtc();
 		context.setState(CRtcOrigCallState::CLOSED);
 	} catch (...) {
 		context.setState(CRtcOrigCallState::CLOSED);
@@ -450,13 +466,12 @@ void CRtcOrigCallState_BEAR_CONFIRMING::onClose(CRtcOrigCallContext& context,
 void CRtcOrigCallState_BEAR_CONFIRMING::onError(CRtcOrigCallContext& context,
 		TUniNetMsg* msg) {
 	CR2SCallModule& ctxt(context.getOwner());
-
 	(context.getState()).Exit(context);
 	context.clearState();
 	try {
 		ctxt.stopTimer_Rtc();
-		ctxt.sendErrorToWeb(ERROR_MEDIAFAILED);
-		ctxt.notifySipTermCallClose();
+		ctxt.forwardErrorToWeb(msg);
+		ctxt.sendCloseToBear_Rtc();
 		context.setState(CRtcOrigCallState::CLOSED);
 	} catch (...) {
 		context.setState(CRtcOrigCallState::CLOSED);
@@ -750,20 +765,21 @@ void CRtcOrigCallState_ACTIVE_WAIT1::onClose(CRtcOrigCallContext& context,
 
 void CRtcOrigCallState_ACTIVE_WAIT1::onError(CRtcOrigCallContext& context,
 		TUniNetMsg* msg) {
-	CR2SCallModule& ctxt(context.getOwner());
 
+	CR2SCallModule& ctxt(context.getOwner());
 	(context.getState()).Exit(context);
 	context.clearState();
 	try {
 		ctxt.stopTimer_Rtc();
-		ctxt.sendErrorToWeb(ERROR_MEDIAFAILED);
-		ctxt.notifySipTermCallClose();
+		ctxt.forwardErrorToWeb(msg);
+		ctxt.sendCloseToBear_Rtc();
 		context.setState(CRtcOrigCallState::CLOSED);
 	} catch (...) {
 		context.setState(CRtcOrigCallState::CLOSED);
 		throw;
 	}
 	(context.getState()).Entry(context);
+
 
 	return;
 }

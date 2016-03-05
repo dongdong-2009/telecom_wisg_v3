@@ -205,7 +205,7 @@ void CBearState_BEAR_INITIAL::onResponse(CBearModuleContext& context, TUniNetMsg
         try
         {
             ctxt.stopTimer();
-            ctxt.sendErrorToCall(MS_ERROR_REFUSED);
+            ctxt.sendCloseToCall();
             context.setState(CBearState::CLOSED);
         }
         catch (...)
@@ -433,7 +433,7 @@ void CBearState_BEAR_JOIN::onResponse(CBearModuleContext& context, TUniNetMsg* m
         try
         {
             ctxt.stopTimer();
-            ctxt.sendErrorToCall(MS_ERROR_REFUSED);
+            ctxt.sendCloseToCall();
             context.setState(CBearState::CLOSED);
         }
         catch (...)
@@ -555,7 +555,7 @@ void CBearState_BEAR_MODIFYING::onResponse(CBearModuleContext& context, TUniNetM
         try
         {
             ctxt.stopTimer();
-            ctxt.sendErrorToCall(MS_ERROR_REFUSED);
+            ctxt.sendCloseToCall();
             context.setState(CBearState::CLOSED);
         }
         catch (...)
