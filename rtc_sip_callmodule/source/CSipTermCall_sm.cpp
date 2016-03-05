@@ -611,18 +611,18 @@ void CSipTermCallState_BEAR_CONFIRMING::onResponse(
 	CR2SCallModule& ctxt(context.getOwner());
 
 	if ("PRACK" != ctxt.checkRespCseqMothod(msg)) {
-		(context.getState()).Exit(context);
-		context.clearState();
-		try {
-			ctxt.sendCancelToIMS();
-			ctxt.sendCloseToBear_Sip();
-			ctxt.notifyRtcOrigCallClose();
-			context.setState(CSipTermCallState::CLOSED);
-		} catch (...) {
-			context.setState(CSipTermCallState::CLOSED);
-			throw;
-		}
-		(context.getState()).Entry(context);
+//		(context.getState()).Exit(context);
+//		context.clearState();
+//		try {
+//			ctxt.sendCancelToIMS();
+//			ctxt.sendCloseToBear_Sip();
+//			ctxt.notifyRtcOrigCallClose();
+//			context.setState(CSipTermCallState::CLOSED);
+//		} catch (...) {
+//			context.setState(CSipTermCallState::CLOSED);
+//			throw;
+//		}
+//		(context.getState()).Entry(context);
 	} else if (true == ctxt.isResp2xx(msg))
 
 	{
