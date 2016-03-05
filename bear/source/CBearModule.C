@@ -295,12 +295,14 @@ void CBearModule::sendMsgToDispatcher(TUniNetMsgName msgName,
 
 void CBearModule::endTask() {
 	LOG4CXX_DEBUG(mLogger.getLogger(), "endTask: end BearModule");
+
 	sendMsgToDispatcher(SIP_RESPONSE, INT_TYPE, DIALOG_END,
 			m_IntCtrlMsg->clone(), NULL);
 
 	if (m_MSSipCtrlMsg != NULL)
 		sendMsgToDispatcher(SIP_RESPONSE, SIP_TYPE, DIALOG_END,
 				m_MSSipCtrlMsg->clone(), NULL);
+	end();
 }
 
 bool CBearModule::isResp1xx(TUniNetMsg* msg) {

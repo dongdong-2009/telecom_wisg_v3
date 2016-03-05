@@ -116,7 +116,7 @@ void CMsgDispatcher::handleMsgFromBear(TUniNetMsg * msg) {
 	if (msg->msgType == INT_TYPE) {
 		if (msg->dialogType == DIALOG_BEGIN) {
 			if (!m_pDialogCtrl->storeBear(uniqID, msg->oAddr)) {
-				LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
+				LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromBear can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
 			}
 		}
 
@@ -124,15 +124,17 @@ void CMsgDispatcher::handleMsgFromBear(TUniNetMsg * msg) {
 		case INT_CLOSE:
 		case INT_RESPONSE: {
 			TMsgAddress tAddr;
+
 			if (m_pDialogCtrl->getDialogAddr(uniqID, tAddr)) {
+				LOG4CXX_DEBUG(mLogger.getLogger() ,"handleMsgFromBear: getDialogAddr "<< uniqID);
 				sendMsgtoInstance(msg, tAddr, DIALOG_CONTINUE);
 			} else {
-				LOG4CXX_ERROR(mLogger.getLogger() ,"handleMsgFromMSControl can not get addr by "<< uniqID);
+				LOG4CXX_ERROR(mLogger.getLogger() ,"handleMsgFromBear can not get addr by "<< uniqID);
 			}
 			break;
 		}
 		default:
-			LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromMSControl: received unknown msgName "<<msg->getMsgName())
+			LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromBear: received unknown msgName "<<msg->getMsgName())
 			;
 			break;
 		}
@@ -141,7 +143,7 @@ void CMsgDispatcher::handleMsgFromBear(TUniNetMsg * msg) {
 	if (msg->msgType == SIP_TYPE) {
 		if (msg->dialogType == DIALOG_BEGIN) {//store addr, sip_psa can find bear
 			if (!m_pDialogCtrl->storeDialog(uniqID, msg->oAddr)) {
-				LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromSipCall can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
+				LOG4CXX_ERROR(mLogger.getLogger(), "handleMsgFromBear can not store "<<uniqID.c_str()<< "logdaddr: "<< msg->oAddr.logAddr);
 				return;
 			}
 		}

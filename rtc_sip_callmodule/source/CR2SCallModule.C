@@ -190,7 +190,9 @@ void CR2SCallModule::endTask_Rtc() {
 	sendToDispatcher(RTC_OK, RTC_TYPE, DIALOG_END, m_rtcCtrlMsg->clone(), NULL);
 	m_endFlag = m_endFlag | 0x2;
 	if ((m_endFlag & 0x3) == 0x3) {
+		LOG4CXX_DEBUG(mLogger.getLogger(), "endTask_Rtc end()");
 		end();
+
 	}
 }
 
@@ -204,6 +206,7 @@ void CR2SCallModule::endTask_Sip() {
 	sendToDispatcher(SIP_BYE, SIP_TYPE, DIALOG_END, m_sipCtrlMsg->clone(), NULL);
 	m_endFlag = m_endFlag | 0x1;
 	if ((m_endFlag & 0x3) == 0x3) {
+		LOG4CXX_DEBUG(mLogger.getLogger(), "endTask_Sip end()");
 		end();
 	}
 
