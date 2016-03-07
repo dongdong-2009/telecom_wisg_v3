@@ -441,13 +441,14 @@ void CR2SCallModule::sendAnswerToWeb(TUniNetMsg * msg) {
 	if(m_isImsVideoValid == false){
 		LOG4CXX_DEBUG(mLogger.getLogger(), "sendAnswerToWeb:: set video = 0 in XMS return sdp");
 		string str = pResp->body.c_str();
-		size_t pos;
-		if((pos = str.find("m=video")) != string::npos){
+		str.append("");
+		if((pos = m_videoSdp.find("m=video")) != string::npos){
 			pos += 8;
-			unsigned int pos2 = str.find(" ", pos);
-			str.erase(pos, pos2 - pos);
-			str.insert(pos, "0");
+			unsigned int pos2 = m_videoSdp.find(" ", pos);
+			m_videoSdp.erase(pos, pos2 - pos);
+			m_videoSdp.insert(pos, "0");
 		}
+		str += m_videoSdp;
 		pAnswer->sdp = str.c_str();
 		m_isImsVideoValid = true;
 	}
@@ -935,7 +936,10 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 
 	if((pos = m_webSdp.find("m=video", 0)) != string::npos && (pos2 = m_imsSdp.find("m=video")) == string::npos ){
 		LOG4CXX_INFO(mLogger.getLogger(), "IMS Do Not Support Video, set PORT 0 in WebRTC SDP");
-//		m_webSdp = m_webSdp.substr(0, pos);
+		m_videoSdp = m_webSdp.substr(pos);
+		m_webSdp = m_webSdp.substr(0, pos);
+
+
 //
 //		pos = m_webSdp.find("a=group:BUNDLE",0);
 //		pos2 = m_webSdp.find("\r\n", pos);

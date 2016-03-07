@@ -116,6 +116,7 @@ private:
 	string m_webSdp;
 	string m_imsSdp;
 	string m_sipName;
+	string m_videoSdp;
 
 	int m_accessMode;
 
