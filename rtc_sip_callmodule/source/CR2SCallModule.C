@@ -442,7 +442,7 @@ void CR2SCallModule::sendAnswerToWeb(TUniNetMsg * msg) {
 		LOG4CXX_DEBUG(mLogger.getLogger(), "sendAnswerToWeb:: set video = 0 in XMS return sdp");
 		string str = pResp->body.c_str();
 		//str.append("");
-		int pos;
+		size_t pos;
 		if((pos = m_videoSdp.find("m=video")) != string::npos){
 			pos += 8;
 			unsigned int pos2 = m_videoSdp.find(" ", pos);
