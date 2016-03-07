@@ -66,6 +66,7 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	m_endFlag = 0;
 	m_joinSend = false;
 	m_sessionFlag = false;
+	m_isImsVideoValid = true;
 
 	/**
 	 * 设置定时器，因为MCF一个task只支持一个定时器，下面采用第三方的定时器，自定义
@@ -435,7 +436,24 @@ void CR2SCallModule::sendAnswerToWeb(TUniNetMsg * msg) {
 	PTRtcAnswer pAnswer = new TRtcAnswer();
 	pAnswer->seq = m_seq;
 	pAnswer->moreComing = false;
-	pAnswer->sdp = pResp->body;
+
+
+	if(m_isImsVideoValid == false){
+		LOG4CXX_DEBUG(mLogger.getLogger(), "sendAnswerToWeb:: set video = 0 in XMS return sdp");
+		string str = pResp->body.c_str();
+		size_t pos;
+		if((pos = str.find("m=video")) != string::npos){
+			pos += 8;
+			unsigned int pos2 = str.find(" ", pos);
+			str.erase(pos, pos2 - pos);
+			str.insert(pos, "0");
+		}
+		pAnswer->sdp = str.c_str();
+		m_isImsVideoValid = true;
+	}
+	else{
+		pAnswer->sdp = pResp->body;
+	}
 
 	//tell dispatcher record map of the addr
 	sendToDispatcher(RTC_ANSWER, RTC_TYPE, DIALOG_BEGIN, m_rtcCtrlMsg->clone(),
@@ -814,6 +832,7 @@ void CR2SCallModule::notifySipTermCallClose() {
 
 void CR2SCallModule::notifyRtcOrigCallSdp() {
 	LOG4CXX_DEBUG(mLogger.getLogger(), "notifyRtcOrigCallSdp");
+
 	m_rtcContext.onNotify(NULL);
 }
 
@@ -922,12 +941,14 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 //		pos2 = m_webSdp.find("\r\n", pos);
 //		m_webSdp.erase(pos, pos2-pos);
 //		m_webSdp.insert(pos, "a=group:BUNDLE audio");
+		m_isImsVideoValid = false;
 
-		pos += 8;
-		unsigned int pos2 = m_webSdp.find(" ", pos);
-		m_webSdp.erase(pos, pos2 - pos);
-		m_webSdp.insert(pos, "0");
+//		pos += 8;
+//		unsigned int pos2 = m_webSdp.find(" ", pos);
+//		m_webSdp.erase(pos, pos2 - pos);
+//		m_webSdp.insert(pos, "0");
 	}
+
 //	while ((pos = m_webSdp.find("m=", pos)) != string::npos) {
 //		unsigned pos2 = m_webSdp.find(" ", pos);
 //		pos += 2;

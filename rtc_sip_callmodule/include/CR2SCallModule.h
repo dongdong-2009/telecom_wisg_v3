@@ -130,6 +130,7 @@ private:
 	bool m_switchFlag;
 	BOOL m_isDispatcherAddrSet;
 	bool m_sessionFlag;
+	bool m_isImsVideoValid;
 
 	bool selectSipUser(string rtcname);
 public:
