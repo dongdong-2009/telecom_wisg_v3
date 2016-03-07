@@ -651,9 +651,10 @@ void CR2SCallModule::send200OKForUpdateToIMS(TUniNetMsg * msg) {
 		pAns->body.content_length = pResp->body.length();
 	}
 
-	PTSipCtrlMsg ctrlMsg = (PTSipCtrlMsg) m_sipCtrlMsg->clone();
+	PTSipCtrlMsg ctrlMsg = ((PTSipCtrlMsg)msg->ctrlMsgHdr)->clone();
 
-	ctrlMsg->cseq_method = "UPDATE";
+	//ctrlMsg->cseq_method = "UPDATE";
+	//ctrlMsg->via.branch = ((PTSipCtrlMsg)msg->ctrlMsgHdr)->clone();
 
 	sendToDispatcher(SIP_RESPONSE, SIP_TYPE, DIALOG_CONTINUE,
 			ctrlMsg->clone(), pAns);
