@@ -187,8 +187,10 @@ void CR2SCallModule::sendToDispatcher(TUniNetMsgName msgName,
 void CR2SCallModule::endTask_Rtc() {
 	LOG4CXX_DEBUG(mLogger.getLogger(), "endTask finished");
 	// 产生一条DIALOG——END消息，发给dispatcher，清除会话信息
-	sendToDispatcher(RTC_OK, RTC_TYPE, DIALOG_END, m_rtcCtrlMsg->clone(), NULL);
-	sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_END, m_intCtrlMsg_Rtc->clone(), NULL);
+	if(m_rtcCtrlMsg != NULL)
+		sendToDispatcher(RTC_OK, RTC_TYPE, DIALOG_END, m_rtcCtrlMsg->clone(), NULL);
+	if(m_intCtrlMsg_Rtc != NULL)
+		sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_END, m_intCtrlMsg_Rtc->clone(), NULL);
 	m_endFlag = m_endFlag | 0x2;
 	if ((m_endFlag & 0x3) == 0x3) {
 		LOG4CXX_DEBUG(mLogger.getLogger(), "endTask_Rtc end()");
@@ -204,8 +206,10 @@ void CR2SCallModule::endTask_Sip() {
 	}
 
 	// 产生一条DIALOG——END消息，发给dispatcher，清除会话信息
-	sendToDispatcher(SIP_BYE, SIP_TYPE, DIALOG_END, m_sipCtrlMsg->clone(), NULL);
-	sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_END, m_intCtrlMsg_Sip->clone(), NULL);
+	if(m_sipCtrlMsg != NULL)
+		sendToDispatcher(SIP_BYE, SIP_TYPE, DIALOG_END, m_sipCtrlMsg->clone(), NULL);
+	if(m_intCtrlMsg_Sip != NULL)
+		sendToDispatcher(INT_CLOSE, INT_TYPE, DIALOG_END, m_intCtrlMsg_Sip->clone(), NULL);
 	m_endFlag = m_endFlag | 0x1;
 	if ((m_endFlag & 0x3) == 0x3) {
 		LOG4CXX_DEBUG(mLogger.getLogger(), "endTask_Sip end()");
