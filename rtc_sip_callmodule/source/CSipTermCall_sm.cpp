@@ -932,6 +932,7 @@ void CSipTermCallState_BEAR_CLIENT_READY::onSdpAnswer(
 		ctxt.stopTimer_Sip();
 		ctxt.setIMSConnId(msg);
 		ctxt.sendAckToIMS(msg);
+
 		context.setState(CSipTermCallState::ACTIVE);
 	} catch (...) {
 		context.setState(CSipTermCallState::ACTIVE);
@@ -948,15 +949,10 @@ void CSipTermCallState_BEAR_CLIENT_READY::onTimeOut(
 
 	(context.getState()).Exit(context);
 	context.clearState();
-	try {//ToDO xms is shutdown, sg break
-		printf("1\n");
+	try {
 		ctxt.stopTimer_Sip();
-		printf("2\n");
 		ctxt.notifyRtcOrigCallError(ERROR_TIMEOUT);
-		printf("3\n");
 		ctxt.sendCancelToIMS();
-		printf("4\n");
-		//ctxt.notifyRtcOrigCallClose();
 		context.setState(CSipTermCallState::CLOSED);
 	} catch (...) {
 		context.setState(CSipTermCallState::CLOSED);
@@ -1089,6 +1085,12 @@ void CSipTermCallState_BEAR_MODYFYING::onTimeOut(CSipTermCallContext& context,
 	return;
 }
 
+void CSipTermCallState_ACTIVE::Entry(CSipTermCallContext* context){
+	CR2SCallModule& ctxt(context.getOwner());
+
+	ctxt.setTimer(SIP_ACTIVE_TIMEOUT);
+}
+
 void CSipTermCallState_ACTIVE::onBye(CSipTermCallContext& context,
 		TUniNetMsg* msg) {
 	CR2SCallModule& ctxt(context.getOwner());
@@ -1199,6 +1201,34 @@ void CSipTermCallState_ACTIVE::onInvite(CSipTermCallContext& context,
 	return;
 }
 
+void CSipTermCallState_ACTIVE::onTimeOut(CSipTermCallContext & context, TTimeMarkExt timerMark){
+	CR2SCallModule& ctxt(context.getOwner());
+
+	(context.getState()).Exit(context);
+	context.clearState();
+	try {
+		ctxt.stopTimer_Sip();
+		ctxt.notifyRtcOrigCallClose();
+		ctxt.sendCloseToBear_Sip();
+		context.setState(CSipTermCallState::CLOSED);
+	} catch (...) {
+		context.setState(CSipTermCallState::CLOSED);
+		throw;
+	}
+	(context.getState()).Entry(context);
+
+	return;
+
+}
+
+void CSipTermCallState_ACTIVE::Exit(CSipTermCallContext & context){
+	CR2SCallModule& ctxt(context.getOwner());
+
+	ctxt.stopTimer_Sip();
+
+	return;
+}
+
 void CSipTermCallState_ACTIVE::onUpdate(CSipTermCallContext& context,
 		TUniNetMsg* msg) {
 	CR2SCallModule& ctxt(context.getOwner());
@@ -1251,6 +1281,7 @@ void CSipTermCallState_ACTIVE::onUpdate(CSipTermCallContext& context,
 
 	return;
 }
+
 
 void CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING::onBye(
 		CSipTermCallContext& context, TUniNetMsg* msg) {
