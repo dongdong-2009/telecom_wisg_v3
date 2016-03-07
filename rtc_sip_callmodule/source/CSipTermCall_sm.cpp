@@ -842,7 +842,7 @@ void CSipTermCallState_BEAR_CONFIRMED::onUpdate(CSipTermCallContext& context,
 		context.clearState();
 		try {
 			ctxt.stopTimer_Sip();
-			ctxt.send200OKForUpdateToIMS(NULL);
+			ctxt.send200OKForUpdateToIMS(msg);
 			context.setState(endState);
 		} catch (...) {
 			context.setState(endState);
@@ -1238,7 +1238,7 @@ void CSipTermCallState_ACTIVE::onUpdate(CSipTermCallContext& context,
 		(context.getState()).Exit(context);
 		context.clearState();
 		try {
-			ctxt.send200OKForUpdateToIMS(NULL);
+			ctxt.send200OKForUpdateToIMS(msg);
 			context.setState(CSipTermCallState::ACTIVE);
 		} catch (...) {
 			context.setState(CSipTermCallState::ACTIVE);
