@@ -611,6 +611,8 @@ void CSipTermCallState_BEAR_CONFIRMING::onResponse(
 	CR2SCallModule& ctxt(context.getOwner());
 
 	if ("PRACK" != ctxt.checkRespCseqMothod(msg)) {
+
+		//maybe recv response for invite, ignore it
 //		(context.getState()).Exit(context);
 //		context.clearState();
 //		try {
