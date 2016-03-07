@@ -656,7 +656,7 @@ void CR2SCallModule::send200OKForUpdateToIMS(TUniNetMsg * msg) {
 	ctrlMsg->cseq_method = "UPDATE";
 
 	sendToDispatcher(SIP_RESPONSE, SIP_TYPE, DIALOG_CONTINUE,
-			m_sipCtrlMsg->clone(), pAns);
+			ctrlMsg->clone(), pAns);
 }
 
 void CR2SCallModule::send200OKForInviteToIMS(TUniNetMsg * msg) {

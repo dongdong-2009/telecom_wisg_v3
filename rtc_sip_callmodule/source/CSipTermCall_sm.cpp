@@ -1150,7 +1150,6 @@ void CSipTermCallState_ACTIVE::onClose(CSipTermCallContext& context,
 void CSipTermCallState_ACTIVE::onInvite(CSipTermCallContext& context,
 		TUniNetMsg* msg) {
 	CR2SCallModule& ctxt(context.getOwner());
-
 	if (false == ctxt.isWithSDP(msg)) {
 		(context.getState()).Exit(context);
 		context.clearState();
@@ -1164,7 +1163,6 @@ void CSipTermCallState_ACTIVE::onInvite(CSipTermCallContext& context,
 		}
 		(context.getState()).Entry(context);
 	} else if (true == ctxt.compSdpWithOld(msg))
-
 	{
 		(context.getState()).Exit(context);
 		context.clearState();

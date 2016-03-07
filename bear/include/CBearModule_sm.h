@@ -116,6 +116,7 @@ public:
     void onClose(CBearModuleContext& context, TUniNetMsg* msg);
     void onJoin(CBearModuleContext& context, TUniNetMsg* msg);
     void onSdpRequest(CBearModuleContext& context, TUniNetMsg* msg);
+
 };
 
 class CBearState_BEAR_JOIN :
