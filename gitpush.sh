@@ -7,5 +7,5 @@ else
     make deploy
     git add .
     git commit -m "$1"    
-    git push -u origin debug
+    git push -u origin ly
 fi
