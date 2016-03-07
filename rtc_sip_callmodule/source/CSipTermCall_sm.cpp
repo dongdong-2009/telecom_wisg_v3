@@ -1085,7 +1085,7 @@ void CSipTermCallState_BEAR_MODYFYING::onTimeOut(CSipTermCallContext& context,
 	return;
 }
 
-void CSipTermCallState_ACTIVE::Entry(CSipTermCallContext* context){
+void CSipTermCallState_ACTIVE::Entry(CSipTermCallContext& context){
 	CR2SCallModule& ctxt(context.getOwner());
 
 	ctxt.setTimer(SIP_ACTIVE_TIMEOUT);

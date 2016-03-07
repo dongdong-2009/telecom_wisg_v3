@@ -199,11 +199,14 @@ public:
     CSipTermCallState_ACTIVE(const char *name, int stateId)
     : CSipTermCallState_Default(name, stateId)
     {};
-
+    void Entry(CSipTermCallContext&);
     void onBye(CSipTermCallContext& context, TUniNetMsg* msg);
     void onClose(CSipTermCallContext& context, TUniNetMsg* msg);
     void onInvite(CSipTermCallContext& context, TUniNetMsg* msg);
     void onUpdate(CSipTermCallContext& context, TUniNetMsg* msg);
+    void onTimeOut(CSipTermCallContext& context, TTimeMarkExt timerMark);
+    void Exit(CSipTermCallContext&);
+
 };
 
 class CSipTermCallState_ACTIVE_WAIT_BEAR_MODIFYING :
