@@ -322,8 +322,8 @@ void CR2SCallModule::timeOut(timer* ptimer) {
 	UINT timer_id = myType->timer_id;
 	LOG4CXX_INFO(mLogger.getLogger(), "The CR2SCallModule task received a timeout event:"<<myType->timer_id);
 
-//	TTimeMarkExt timerMark;
-//	getTimeMarkExt(timer_id, timerMark);
+	TTimeMarkExt timerMark;
+	getTimeMarkExt(timer_id, timerMark);
 //	timerMark.timerDelay = 0;
 
 	switch (timer_id) {
