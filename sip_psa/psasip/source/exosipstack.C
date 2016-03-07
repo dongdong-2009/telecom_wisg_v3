@@ -1528,7 +1528,7 @@ BOOL CExosipStack::onSend_SIP_INVITE(PCTUniNetMsg uniMsg) {
 	//invite->to->url->scheme = "tel";
 	//printf("invite %s %s\n", invite->to->url->scheme, invite->to->url->username);
 	osip_message_set_supported(invite, "100rel,timer");
-	osip_message_set_header(invite, "Session-Expires", "600;refresher=uas");
+	osip_message_set_header(invite, "Session-Expires", "70;refresher=uas");
 	char* buf = NULL;
 	size_t len;
 	osip_message_to_str(invite, &buf, &len);
