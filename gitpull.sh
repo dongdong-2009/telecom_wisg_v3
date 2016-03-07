@@ -1,4 +1,4 @@
 #!/bin/sh
-git pull origin ly
+git pull origin debug
 make deploy
 cd unidir
