@@ -98,9 +98,7 @@ private:
 	CVarChar m_webConnId;
 	CVarChar m_imsConnId;
 
-	string m_webSdp;
-	string m_imsSdp;
-	string m_sipName;
+
 
 
 	TIntCtrlMsg* m_intCtrlMsg_Rtc;
@@ -110,8 +108,15 @@ private:
 	CVarChar64 m_offerSessionId;
 
 	TSipCtrlMsg * m_sipCtrlMsg;
+	TSipVia m_via;
+
 
 	UINT m_seq;
+
+	string m_webSdp;
+	string m_imsSdp;
+	string m_sipName;
+
 	int m_accessMode;
 
 
@@ -124,6 +129,7 @@ private:
 	bool m_isSdpConfirmed;
 	bool m_switchFlag;
 	BOOL m_isDispatcherAddrSet;
+	bool m_sessionFlag;
 
 	bool selectSipUser(string rtcname);
 public:
@@ -157,6 +163,8 @@ public:
 	void send200OKForUpdateToIMS(TUniNetMsg * msg);
 	void send200OKForInviteToIMS(TUniNetMsg * msg);
 	void sendByeToIMS();
+
+	void getSessionUpdateVia(TUniNetMsg * msg);
 
 
 	void notifyRtcOrigCallSdp();

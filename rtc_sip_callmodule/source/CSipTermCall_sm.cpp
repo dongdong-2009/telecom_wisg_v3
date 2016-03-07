@@ -1154,7 +1154,8 @@ void CSipTermCallState_ACTIVE::onInvite(CSipTermCallContext& context,
 		(context.getState()).Exit(context);
 		context.clearState();
 		try {
-			ctxt.send200OKForInviteToIMS(NULL);
+
+			ctxt.send200OKForInviteToIMS(msg);
 			ctxt.setTimer(SIP_ACK_TIMEOUT);
 			context.setState(CSipTermCallState::ACTIVE_WAIT_ACK);
 		} catch (...) {
@@ -1167,6 +1168,7 @@ void CSipTermCallState_ACTIVE::onInvite(CSipTermCallContext& context,
 		(context.getState()).Exit(context);
 		context.clearState();
 		try {
+			ctxt.getSessionUpdateVia(msg);
 			ctxt.notifyRtcOrigCallSdp();
 			ctxt.setInviteFlag();
 			ctxt.sendReqToBear_Sip();
@@ -1180,6 +1182,7 @@ void CSipTermCallState_ACTIVE::onInvite(CSipTermCallContext& context,
 	} else if (false == ctxt.compSdpWithOld(msg))
 
 	{
+		ctxt.getSessionUpdateVia(msg);
 		(context.getState()).Exit(context);
 		context.clearState();
 		try {
@@ -1245,9 +1248,11 @@ void CSipTermCallState_ACTIVE::onUpdate(CSipTermCallContext& context,
 	} else if (true == ctxt.compSdpWithOld(msg))
 
 	{
+
 		(context.getState()).Exit(context);
 		context.clearState();
 		try {
+			ctxt.getSessionUpdateVia(msg);
 			ctxt.notifyRtcOrigCallSdp();
 			ctxt.setUpdateFlag();
 			ctxt.sendReqToBear_Sip();
@@ -1259,11 +1264,11 @@ void CSipTermCallState_ACTIVE::onUpdate(CSipTermCallContext& context,
 		}
 		(context.getState()).Entry(context);
 	} else if (false == ctxt.compSdpWithOld(msg))
-
 	{
 		(context.getState()).Exit(context);
 		context.clearState();
 		try {
+			ctxt.getSessionUpdateVia(msg);
 			ctxt.setUpdateFlag();
 			ctxt.sendReqToBear_Sip();
 			ctxt.setTimer(SIP_WAITBEAR_TIMEOUT);

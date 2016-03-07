@@ -65,6 +65,7 @@ CR2SCallModule::CR2SCallModule(PCGFSM afsm) :
 	m_joinFlag = 0;
 	m_endFlag = 0;
 	m_joinSend = false;
+	m_sessionFlag = false;
 
 	/**
 	 * 设置定时器，因为MCF一个task只支持一个定时器，下面采用第三方的定时器，自定义
@@ -643,16 +644,23 @@ void CR2SCallModule::send200OKForUpdateToIMS(TUniNetMsg * msg) {
 	pAns->statusCode = 200;
 	pAns->reason_phase = "OK";
 
-	if (msg != NULL) {
+	PTSipCtrlMsg ctrlMsg =NULL;
+	if (msg->msgType == INT_TYPE) {
 		PTIntResponse pResp = (PTIntResponse) msg->msgBody;
 		pAns->content_type.type = "application";
 		pAns->content_type.subtype = "sdp";
 		pAns->body.content = pResp->body;
 		pAns->body.content_length = pResp->body.length();
+		ctrlMsg = (PTSipCtrlMsg) m_sipCtrlMsg->clone();
+		ctrlMsg->cseq_method = "UPDATE";
+		if(m_sessionFlag == true){
+			ctrlMsg->via = m_via;
+			m_sessionFlag = false;
+		}
 	}
-
-	PTSipCtrlMsg ctrlMsg = ((PTSipCtrlMsg)msg->ctrlMsgHdr)->clone();
-
+	else{
+		ctrlMsg = (PTSipCtrlMsg) msg->ctrlMsgHdr->clone();
+	}
 	//ctrlMsg->cseq_method = "UPDATE";
 	//ctrlMsg->via.branch = ((PTSipCtrlMsg)msg->ctrlMsgHdr)->clone();
 
@@ -660,21 +668,35 @@ void CR2SCallModule::send200OKForUpdateToIMS(TUniNetMsg * msg) {
 			ctrlMsg->clone(), pAns);
 }
 
+void CR2SCallModule::getSessionUpdateVia(TUniNetMsg * msg){
+	m_sessionFlag = true;
+	m_via = ((PTSipCtrlMsg)msg->ctrlMsgHdr)->via;
+}
+
 void CR2SCallModule::send200OKForInviteToIMS(TUniNetMsg * msg) {
 	PTSipResp pAns = new TSipResp();
 	pAns->statusCode = 200;
 	pAns->reason_phase = "OK";
-
-	if (msg != NULL) {
+	PTSipCtrlMsg ctrlMsg = NULL;
+	if (msg->msgType == INT_TYPE) {
 		PTIntResponse pResp = (PTIntResponse) msg->msgBody;
 		pAns->content_type.type = "application";
 		pAns->content_type.subtype = "sdp";
 		pAns->body.content = pResp->body;
 		pAns->body.content_length = pResp->body.length();
+		ctrlMsg = (PTSipCtrlMsg)m_sipCtrlMsg->clone();
+		ctrlMsg->cseq_method = "UPDATE";
+		if(m_sessionFlag == true){
+			ctrlMsg->via = m_via;
+			m_sessionFlag = false;
+		}
+	}
+	else{
+		ctrlMsg = (PTSipCtrlMsg) msg->ctrlMsgHdr->clone();
+		ctrlMsg->cseq_method = "INVITE";
 	}
 
-	PTSipCtrlMsg ctrlMsg = (PTSipCtrlMsg) m_sipCtrlMsg->clone();
-	ctrlMsg->cseq_method = "INVITE";
+
 	sendToDispatcher(SIP_RESPONSE, SIP_TYPE, DIALOG_CONTINUE,
 			m_sipCtrlMsg->clone(), pAns);
 }
