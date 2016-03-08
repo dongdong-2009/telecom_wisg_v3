@@ -685,7 +685,7 @@ void CR2SCallModule::send200OKForUpdateToIMS(TUniNetMsg * msg) {
 	//ctrlMsg->via.branch = ((PTSipCtrlMsg)msg->ctrlMsgHdr)->clone();
 
 	sendToDispatcher(SIP_RESPONSE, SIP_TYPE, DIALOG_CONTINUE,
-			ctrlMsg->clone(), pAns);
+			ctrlMsg, pAns);
 }
 
 void CR2SCallModule::getSessionUpdateVia(TUniNetMsg * msg){
@@ -718,7 +718,7 @@ void CR2SCallModule::send200OKForInviteToIMS(TUniNetMsg * msg) {
 
 
 	sendToDispatcher(SIP_RESPONSE, SIP_TYPE, DIALOG_CONTINUE,
-			m_sipCtrlMsg->clone(), pAns);
+			ctrlMsg, pAns);
 }
 
 void CR2SCallModule::sendByeToIMS() {

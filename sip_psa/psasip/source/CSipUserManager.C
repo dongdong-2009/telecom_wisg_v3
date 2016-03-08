@@ -2,6 +2,11 @@
 #include <stdio.h>
 #include "CSipUserManager.h"
 
+#define LOOP_COUNT	10
+int CSipUserManager::count = LOOP_COUNT;
+map<string, string> CSipUserManager::user_map;
+
+
 CSipUserManager::CSipUserManager()
 {
 
@@ -17,16 +22,43 @@ string CSipUserManager::getSipPassword(string sipname)
 	CHAR pcSQLStatement[512];
 	string passwd;
 
-	sprintf(pcSQLStatement,"SELECT password FROM user_map_table WHERE sipname = '%s'", sipname.c_str());
-	CDB::instance()->execSQL(pcSQLStatement);
-	PTSelectResult result = CDB::instance()->getSelectResult();
+	if(count == LOOP_COUNT){
+		count = 0;
+		if(CDB::instance()->ping()){
+			sprintf(pcSQLStatement,"SELECT password FROM user_map_table WHERE sipname = '%s'", sipname.c_str());
+			CDB::instance()->execSQL(pcSQLStatement);
+			PTSelectResult result = CDB::instance()->getSelectResult();
 
 
-	if (result->rowNum > 0){
-		passwd = result->pRows[0].arrayField[0].value.stringValue;
-		return passwd;
+			if (result->rowNum > 0){
+				passwd = result->pRows[0].arrayField[0].value.stringValue;
+				user_map[sipname] = passwd;
+				return passwd;
+			}
+			else{
+				if(user_map.find(sipname) != user_map.end()){
+					return user_map[sipname];
+				}
+			}
+		}
+		else
+		{
+			if(user_map.find(sipname) != user_map.end()){
+				return user_map[sipname];
+			}
+
+		}
+
 	}
-	return NULL;
+	else{
+		++count;
+		if(user_map.find(sipname) != user_map.end()){
+			return user_map[sipname];
+		}
+	}
+
+
+	return "";
 
 }
 

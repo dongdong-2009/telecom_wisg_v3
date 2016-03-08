@@ -96,7 +96,7 @@ private:
 	static int sendAuthRegister(timer *ptimer);
 	static int getSipUserFromDB(timer *ptimer);
 
-	void register_process_401(eXosip_event_t * je);
+	void register_process_4xx(eXosip_event_t * je);
 	void register_process_200(eXosip_event_t * je);
 	char * remove_quotes(char * text);
 	char * add_quotes(string text);

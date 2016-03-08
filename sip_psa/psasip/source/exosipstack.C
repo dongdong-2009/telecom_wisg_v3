@@ -317,7 +317,7 @@ int CExosipStack::getSipUserFromDB(timer *ptimer) {
 	return 0;
 }
 
-void CExosipStack::register_process_401(eXosip_event_t * je) {
+void CExosipStack::register_process_4xx(eXosip_event_t * je) {
 	string name;
 
 	name.append(osip_from_get_url(je->response->from)->scheme);
@@ -325,6 +325,13 @@ void CExosipStack::register_process_401(eXosip_event_t * je) {
 	name.append(osip_from_get_url(je->response->from)->username);
 	name.append("@");
 	name.append(osip_from_get_url(je->response->from)->host);
+	if(401 != je->response->status_code){
+		//非401，如果是403-密码错误，如果是404-用户不存在，十五钟之后重新注册
+		timer * ptimer = m_map_timers[name];
+		ptimer->timer_modify_internal(900);
+		return;
+	}
+
 	UserData * ud = m_map_userdata[name];
 
 	string cnonce = ud->cnonce;
@@ -347,6 +354,13 @@ void CExosipStack::register_process_401(eXosip_event_t * je) {
 	username.append(osip_from_get_url(je->response->from)->host);
 
 	string password = CSipUserManager::getSipPassword(username);
+	if(password.length() == 0){
+		LOG4CXX_ERROR(mLogger.getLogger(), "DB has NO data for "<<username<<", or DB is Disconnected!");
+		timer * ptimer = m_map_timers[name];
+		//数据库连接失败，十分钟后重新发送register 重连
+		ptimer->timer_modify_internal(600);
+		return;
+	}
 
 	string realm = osip_from_get_url(je->response->from)->host;
 
@@ -931,10 +945,8 @@ void CExosipStack::doActive(void) {
 						// REGISTER response 200OK, clear rid map
 						register_process_200(event);
 						return;
-					} else if (401 == event->response->status_code) {
-						register_process_401(event);
-						return;
 					} else {
+						register_process_4xx(event);
 						return;
 					}
 				} else {
