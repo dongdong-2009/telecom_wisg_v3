@@ -952,11 +952,13 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 		pos = m_videoSdp.find("\n", pos);
 		cout<<pos<<endl;
 		string str = m_videoSdp.substr(0, pos);
-
+		cout<<str<<endl;
 		while((pos2 = m_videoSdp.find("a=rtpmap", pos)) != string::npos){
 			pos = m_videoSdp.find("\n", pos2);
-			cout<<pos<<endl;
+
+			cout<<pos2<<" "<<pos<<endl;
 			str += m_videoSdp.substr(pos2, pos-pos2+1);
+			cout<<str<<endl;
 		}
 		LOG4CXX_INFO(mLogger.getLogger(), "m_videoSdp:"<<m_videoSdp);
 //
