@@ -943,18 +943,20 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 		pos = m_webSdp.find("a=group:BUNDLE audio video");
 		if(pos != string::npos){
 			pos2 = m_webSdp.find("video");
-			pos = m_webSdp.find("\r\n");
-			m_webSdp.erase(pos2, pos-pos2);
+
+			m_webSdp.erase(pos2, 5);
 		}
 		LOG4CXX_INFO(mLogger.getLogger(), "w_webSdp:"<<m_webSdp);
 
 		pos = 0;
 		pos = m_videoSdp.find("\n", pos);
+		cout<<pos<<endl;
 		string str = m_videoSdp.substr(0, pos);
 
 		while((pos2 = m_videoSdp.find("a=rtpmap", pos)) != string::npos){
-			pos = m_videoSdp.find("\r\n", pos2);
-			str += m_videoSdp.substr(pos2, pos-pos2+2);
+			pos = m_videoSdp.find("\n", pos2);
+			cout<<pos<<endl;
+			str += m_videoSdp.substr(pos2, pos-pos2+1);
 		}
 		LOG4CXX_INFO(mLogger.getLogger(), "m_videoSdp:"<<m_videoSdp);
 //
