@@ -960,6 +960,7 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 			str += m_videoSdp.substr(pos2, pos-pos2+1);
 			cout<<str<<endl;
 		}
+		m_videoSdp = str;
 		LOG4CXX_INFO(mLogger.getLogger(), "m_videoSdp:"<<m_videoSdp);
 //
 //		pos = m_webSdp.find("a=group:BUNDLE",0);
