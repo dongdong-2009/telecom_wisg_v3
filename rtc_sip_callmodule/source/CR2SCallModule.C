@@ -951,7 +951,7 @@ bool CR2SCallModule::compAndModifySdpWithRtc(TUniNetMsg * msg) {
 		pos = 0;
 		pos = m_videoSdp.find("\n", pos);
 		cout<<pos<<endl;
-		string str = m_videoSdp.substr(0, pos);
+		string str = m_videoSdp.substr(0, pos+1);
 		cout<<str<<endl;
 		while((pos2 = m_videoSdp.find("a=rtpmap", pos)) != string::npos){
 			pos = m_videoSdp.find("\n", pos2);
